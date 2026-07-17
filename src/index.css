@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Multplick brand: deep navy, steel silver, white */
+    --background: 0 0% 100%;
+    --foreground: 220 45% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 45% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 45% 12%;
+
+    --primary: 220 70% 22%;            /* deep navy */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 215 85% 48%;       /* electric blue accent */
+
+    --secondary: 215 25% 94%;
+    --secondary-foreground: 220 45% 12%;
+
+    --muted: 215 25% 96%;
+    --muted-foreground: 220 12% 42%;
+
+    --accent: 210 18% 88%;             /* silver */
+    --accent-foreground: 220 45% 12%;
+
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 20% 88%;
+    --input: 215 20% 88%;
+    --ring: 215 85% 48%;
+
+    --radius: 0.75rem;
+
+    --whatsapp: 142 70% 42%;
+
+    --gradient-hero: linear-gradient(135deg, hsl(220 70% 12%) 0%, hsl(220 70% 22%) 45%, hsl(215 85% 38%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(220 70% 22%), hsl(215 85% 48%));
+    --gradient-silver: linear-gradient(135deg, hsl(210 18% 95%), hsl(210 12% 78%));
+    --gradient-overlay: linear-gradient(180deg, hsl(220 70% 10% / 0.85), hsl(220 70% 18% / 0.55));
+
+    --shadow-elegant: 0 20px 50px -20px hsl(220 70% 22% / 0.35);
+    --shadow-glow: 0 0 60px hsl(215 85% 48% / 0.35);
+    --shadow-card: 0 8px 30px -12px hsl(220 40% 20% / 0.15);
+
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 50% 6%;
+    --foreground: 210 40% 98%;
+    --card: 220 45% 10%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 45% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 215 85% 55%;
+    --primary-foreground: 220 50% 6%;
+    --secondary: 220 30% 16%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 30% 14%;
+    --muted-foreground: 215 20% 70%;
+    --accent: 220 30% 18%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 30% 18%;
+    --input: 220 30% 18%;
+    --ring: 215 85% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Manrope', system-ui, sans-serif;
+    @apply tracking-tight;
+  }
+}
+
+@layer utilities {
+  .bg-hero-gradient { background: var(--gradient-hero); }
+  .bg-primary-gradient { background: var(--gradient-primary); }
+  .bg-silver-gradient { background: var(--gradient-silver); }
+  .shadow-elegant { box-shadow: var(--shadow-elegant); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-card-soft { box-shadow: var(--shadow-card); }
+  .transition-smooth { transition: var(--transition-smooth); }
+  .text-balance { text-wrap: balance; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes nr-blink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.9); }
+  50% { opacity: 0.75; box-shadow: 0 0 22px 4px rgba(250, 204, 21, 0.55); }
+}
+@layer utilities {
+  .animate-fade-up { animation: fade-up 0.7s ease-out both; }
+  .animate-float { animation: float 3s ease-in-out infinite; }
+  .animate-nr-blink { animation: nr-blink 1.1s ease-in-out infinite; }
+}
