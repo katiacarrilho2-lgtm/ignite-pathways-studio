@@ -109,8 +109,8 @@ const AdminImagensInner = () => {
                 </div>
                 <div className="p-3 space-y-2 flex-1 flex flex-col">
                   <p className="text-xs font-medium truncate" title={it.name}>{it.name}</p>
-                  {it.metadata?.size != null && (
-                    <p className="text-[11px] text-muted-foreground">{(it.metadata.size / 1024).toFixed(1)} KB</p>
+                  {typeof it.metadata?.size === "number" && (
+                    <p className="text-[11px] text-muted-foreground">{((it.metadata.size as number) / 1024).toFixed(1)} KB</p>
                   )}
                   <div className="flex items-center gap-1 mt-auto pt-2">
                     <Button size="sm" variant="ghost" className="flex-1" onClick={() => copyUrl(it.name)} title="Copiar URL">
