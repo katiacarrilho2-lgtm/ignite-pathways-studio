@@ -43,7 +43,7 @@ const Checkout = () => {
     setChecking(true);
     const { data } = await supabase.rpc("validate_coupon", {
       _code: code.trim().toUpperCase(),
-      _course_id: (course?.id ?? undefined) as string | undefined,
+      _course_id: course?.id ?? null,
     });
     const row = Array.isArray(data) ? data[0] : data;
     setChecking(false);
