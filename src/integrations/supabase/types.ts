@@ -283,6 +283,7 @@ export type Database = {
       }
       crm_appointments: {
         Row: {
+          account_id: string | null
           created_at: string
           done: boolean
           id: string
@@ -294,6 +295,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           done?: boolean
           id?: string
@@ -305,6 +307,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           done?: boolean
           id?: string
@@ -351,6 +354,7 @@ export type Database = {
       }
       crm_lead_events: {
         Row: {
+          account_id: string | null
           autor_id: string
           created_at: string
           id: string
@@ -359,6 +363,7 @@ export type Database = {
           tipo: Database["public"]["Enums"]["crm_event_type"]
         }
         Insert: {
+          account_id?: string | null
           autor_id: string
           created_at?: string
           id?: string
@@ -367,6 +372,7 @@ export type Database = {
           tipo: Database["public"]["Enums"]["crm_event_type"]
         }
         Update: {
+          account_id?: string | null
           autor_id?: string
           created_at?: string
           id?: string
@@ -386,6 +392,7 @@ export type Database = {
       }
       crm_leads: {
         Row: {
+          account_id: string | null
           atendimentos: number
           checklist: Json
           created_at: string
@@ -404,9 +411,12 @@ export type Database = {
           stage_changed_at: string
           telefone: string | null
           updated_at: string
+          urgente: boolean
+          urgente_resolvido_at: string | null
           valor_cents: number
         }
         Insert: {
+          account_id?: string | null
           atendimentos?: number
           checklist?: Json
           created_at?: string
@@ -425,9 +435,12 @@ export type Database = {
           stage_changed_at?: string
           telefone?: string | null
           updated_at?: string
+          urgente?: boolean
+          urgente_resolvido_at?: string | null
           valor_cents?: number
         }
         Update: {
+          account_id?: string | null
           atendimentos?: number
           checklist?: Json
           created_at?: string
@@ -446,6 +459,8 @@ export type Database = {
           stage_changed_at?: string
           telefone?: string | null
           updated_at?: string
+          urgente?: boolean
+          urgente_resolvido_at?: string | null
           valor_cents?: number
         }
         Relationships: []
@@ -489,6 +504,7 @@ export type Database = {
           notes: string | null
           payment_method: string | null
           phone: string | null
+          promo_code: string | null
           rg: string | null
           rg_issue_date: string | null
           rg_issuer: string | null
@@ -519,6 +535,7 @@ export type Database = {
           notes?: string | null
           payment_method?: string | null
           phone?: string | null
+          promo_code?: string | null
           rg?: string | null
           rg_issue_date?: string | null
           rg_issuer?: string | null
@@ -549,6 +566,7 @@ export type Database = {
           notes?: string | null
           payment_method?: string | null
           phone?: string | null
+          promo_code?: string | null
           rg?: string | null
           rg_issue_date?: string | null
           rg_issuer?: string | null
@@ -665,6 +683,7 @@ export type Database = {
       }
       enrollments: {
         Row: {
+          account_id: string | null
           completed_at: string | null
           course_id: string
           enrolled_at: string
@@ -675,6 +694,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           completed_at?: string | null
           course_id: string
           enrolled_at?: string
@@ -685,6 +705,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           completed_at?: string | null
           course_id?: string
           enrolled_at?: string
@@ -706,6 +727,7 @@ export type Database = {
       }
       installments: {
         Row: {
+          account_id: string | null
           created_at: string
           enrollment_id: string
           id: string
@@ -718,6 +740,7 @@ export type Database = {
           vencimento: string | null
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           enrollment_id: string
           id?: string
@@ -730,6 +753,7 @@ export type Database = {
           vencimento?: string | null
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           enrollment_id?: string
           id?: string
@@ -1040,18 +1064,21 @@ export type Database = {
       }
       turma_alunos: {
         Row: {
+          account_id: string | null
           added_at: string
           id: string
           turma_id: string
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           added_at?: string
           id?: string
           turma_id: string
           user_id: string
         }
         Update: {
+          account_id?: string | null
           added_at?: string
           id?: string
           turma_id?: string
@@ -1069,6 +1096,7 @@ export type Database = {
       }
       turmas: {
         Row: {
+          account_id: string | null
           capacidade: number
           course_id: string | null
           created_at: string
@@ -1080,6 +1108,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           capacidade?: number
           course_id?: string | null
           created_at?: string
@@ -1091,6 +1120,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           capacidade?: number
           course_id?: string | null
           created_at?: string
