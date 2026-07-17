@@ -412,7 +412,9 @@ export type Database = {
           telefone: string | null
           updated_at: string
           urgente: boolean
+          urgente_marcado_em: string | null
           urgente_resolvido_at: string | null
+          urgente_resolvido_em: string | null
           valor_cents: number
         }
         Insert: {
@@ -436,7 +438,9 @@ export type Database = {
           telefone?: string | null
           updated_at?: string
           urgente?: boolean
+          urgente_marcado_em?: string | null
           urgente_resolvido_at?: string | null
+          urgente_resolvido_em?: string | null
           valor_cents?: number
         }
         Update: {
@@ -460,7 +464,9 @@ export type Database = {
           telefone?: string | null
           updated_at?: string
           urgente?: boolean
+          urgente_marcado_em?: string | null
           urgente_resolvido_at?: string | null
+          urgente_resolvido_em?: string | null
           valor_cents?: number
         }
         Relationships: []
