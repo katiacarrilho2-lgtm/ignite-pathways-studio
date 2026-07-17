@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { ImageDropZone } from "@/components/admin/ImageDropZone";
 
-type StorageItem = { name: string; id?: string | null; updated_at?: string | null; created_at?: string | null; metadata?: Record<string, unknown> | null };
+type StorageItem = { name: string; id?: string; updated_at?: string; created_at?: string; metadata?: { size?: number } | null };
 
 const BUCKET = "course-images";
 
@@ -109,8 +109,8 @@ const AdminImagensInner = () => {
                 </div>
                 <div className="p-3 space-y-2 flex-1 flex flex-col">
                   <p className="text-xs font-medium truncate" title={it.name}>{it.name}</p>
-                  {typeof it.metadata?.size === "number" && (
-                    <p className="text-[11px] text-muted-foreground">{((it.metadata.size as number) / 1024).toFixed(1)} KB</p>
+                  {it.metadata?.size != null && (
+                    <p className="text-[11px] text-muted-foreground">{(it.metadata.size / 1024).toFixed(1)} KB</p>
                   )}
                   <div className="flex items-center gap-1 mt-auto pt-2">
                     <Button size="sm" variant="ghost" className="flex-1" onClick={() => copyUrl(it.name)} title="Copiar URL">
