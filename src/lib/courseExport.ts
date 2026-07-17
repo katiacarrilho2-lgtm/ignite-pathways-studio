@@ -1,2 +1,5 @@
-// Stub gerado durante a migração — funcionalidade pausada até o schema estendido ser importado.
+// Stub — exportação de cursos pausada durante a migração.
+export async function exportCourseJson(_id: string) {
+  throw new Error("Exportação temporariamente indisponível durante a migração.");
+}
 export {};
