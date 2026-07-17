@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { ImageDropZone } from "@/components/admin/ImageDropZone";
 
-type StorageItem = { name: string; id?: string | null; updated_at?: string; created_at?: string; metadata?: { size?: number } | null };
+type StorageItem = { name: string; id?: string | null; updated_at?: string | null; created_at?: string | null; metadata?: Record<string, unknown> | null };
 
 const BUCKET = "course-images";
 
