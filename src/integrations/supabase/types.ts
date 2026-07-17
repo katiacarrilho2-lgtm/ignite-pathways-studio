@@ -215,6 +215,8 @@ export type Database = {
           has_teacher_manual: boolean
           id: string
           image_url: string | null
+          live_label: string | null
+          live_url: string | null
           long_description: string | null
           passing_score: number
           price_cents: number | null
@@ -238,6 +240,8 @@ export type Database = {
           has_teacher_manual?: boolean
           id?: string
           image_url?: string | null
+          live_label?: string | null
+          live_url?: string | null
           long_description?: string | null
           passing_score?: number
           price_cents?: number | null
@@ -261,6 +265,8 @@ export type Database = {
           has_teacher_manual?: boolean
           id?: string
           image_url?: string | null
+          live_label?: string | null
+          live_url?: string | null
           long_description?: string | null
           passing_score?: number
           price_cents?: number | null

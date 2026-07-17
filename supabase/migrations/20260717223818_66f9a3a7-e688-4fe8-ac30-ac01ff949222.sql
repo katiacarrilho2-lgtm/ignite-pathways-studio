@@ -1,0 +1,1 @@
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS live_url text, ADD COLUMN IF NOT EXISTS live_label text;
