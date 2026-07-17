@@ -1,12 +1,10 @@
-// Stub gerado durante a migração — funcionalidade pausada até o schema estendido ser importado.
-export default function FinanceWidget() {
+import { AlertTriangle } from "lucide-react";
+export function FinanceWidget() {
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-2">Módulo em manutenção</h1>
-      <p className="text-muted-foreground">
-        Esta área depende de tabelas que ainda não foram migradas para o novo backend.
-        Em breve será reativada.
-      </p>
+    <div className="p-4 flex items-start gap-3 rounded-lg border bg-muted/30">
+      <AlertTriangle className="size-4 text-amber-600 mt-0.5" />
+      <div className="text-sm text-muted-foreground">Widget financeiro em manutenção.</div>
     </div>
   );
 }
+export default FinanceWidget;
