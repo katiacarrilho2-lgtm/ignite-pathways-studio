@@ -1,3 +1,6 @@
 // Stub — CRM desativado durante a migração.
-export const useCrmSellers = () => ({ sellers: [] as any[], loading: false, refresh: () => {} });
+export type CrmSeller = { user_id: string; display_name: string };
+export const useCrmSellers = (): { sellers: CrmSeller[]; loading: boolean; refresh: () => void } => ({
+  sellers: [], loading: false, refresh: () => {},
+});
 export default useCrmSellers;
