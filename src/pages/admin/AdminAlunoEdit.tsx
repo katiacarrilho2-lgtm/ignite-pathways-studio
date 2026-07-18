@@ -969,7 +969,7 @@ const Inner = () => {
                     <SelectItem value="__none__">— Sem vendedor —</SelectItem>
                     {sellers.map(s => (
                       <SelectItem key={s.user_id} value={s.user_id}>
-                        {s.display_name} {s.kind !== "staff" ? `· ${s.kind}` : ""}
+                        {s.display_name} {(s.kind as string) !== "staff" ? `· ${s.kind}` : ""}
                       </SelectItem>
                     ))}
                   </SelectContent>

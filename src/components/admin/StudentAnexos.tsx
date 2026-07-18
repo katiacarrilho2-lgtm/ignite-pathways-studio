@@ -1,5 +1,10 @@
 import { AlertTriangle } from "lucide-react";
-export function StudentAnexos(_: { userId?: string }) {
+export function StudentAnexos(_: {
+  userId?: string;
+  studentName?: string;
+  studentEmail?: string;
+  studentPhone?: string | null;
+}) {
   return (
     <div className="p-4 flex items-start gap-3 rounded-lg border bg-muted/30">
       <AlertTriangle className="size-4 text-amber-600 mt-0.5" />
