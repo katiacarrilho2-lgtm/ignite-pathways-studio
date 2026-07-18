@@ -86,6 +86,137 @@ export type Database = {
         }
         Relationships: []
       }
+      company_settings: {
+        Row: {
+          cep: string | null
+          cidade: string | null
+          cnpj: string | null
+          created_at: string
+          email: string | null
+          endereco: string | null
+          facebook: string | null
+          id: string
+          inscricao_estadual: string | null
+          instagram: string | null
+          linkedin: string | null
+          logo_url: string | null
+          nome_fantasia: string | null
+          razao_social: string | null
+          responsavel_cargo: string | null
+          responsavel_nome: string | null
+          singleton: boolean
+          site: string | null
+          telefone: string | null
+          uf: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          facebook?: string | null
+          id?: string
+          inscricao_estadual?: string | null
+          instagram?: string | null
+          linkedin?: string | null
+          logo_url?: string | null
+          nome_fantasia?: string | null
+          razao_social?: string | null
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          singleton?: boolean
+          site?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          facebook?: string | null
+          id?: string
+          inscricao_estadual?: string | null
+          instagram?: string | null
+          linkedin?: string | null
+          logo_url?: string | null
+          nome_fantasia?: string | null
+          razao_social?: string | null
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          singleton?: boolean
+          site?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      contas_comerciais: {
+        Row: {
+          atualizado_em: string
+          configuracoes: Json
+          criado_em: string
+          criado_por: string | null
+          documento_fiscal: string | null
+          email_contato: string | null
+          id: string
+          nome: string
+          parent_id: string | null
+          slug: string
+          status: string
+          telefone_contato: string | null
+          tipo_da_conta: string
+        }
+        Insert: {
+          atualizado_em?: string
+          configuracoes?: Json
+          criado_em?: string
+          criado_por?: string | null
+          documento_fiscal?: string | null
+          email_contato?: string | null
+          id?: string
+          nome: string
+          parent_id?: string | null
+          slug: string
+          status?: string
+          telefone_contato?: string | null
+          tipo_da_conta?: string
+        }
+        Update: {
+          atualizado_em?: string
+          configuracoes?: Json
+          criado_em?: string
+          criado_por?: string | null
+          documento_fiscal?: string | null
+          email_contato?: string | null
+          id?: string
+          nome?: string
+          parent_id?: string | null
+          slug?: string
+          status?: string
+          telefone_contato?: string | null
+          tipo_da_conta?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contas_comerciais_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_categories: {
         Row: {
           active: boolean
@@ -760,6 +891,7 @@ export type Database = {
       }
       finance_entries: {
         Row: {
+          account_id: string | null
           amount_cents: number
           created_at: string
           created_by: string | null
@@ -775,6 +907,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           amount_cents?: number
           created_at?: string
           created_by?: string | null
@@ -790,6 +923,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           amount_cents?: number
           created_at?: string
           created_by?: string | null
@@ -804,7 +938,15 @@ export type Database = {
           series_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "finance_entries_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       installments: {
         Row: {
