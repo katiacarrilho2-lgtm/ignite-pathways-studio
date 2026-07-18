@@ -1,25 +1,38 @@
-## Diagnóstico
+## Diagnóstico confirmado
 
-Rodei o preview local (`http://localhost:8080`) via headless Chromium e a **home renderiza corretamente** — logo Multplick, navbar, hero "A solução completa em formação profissional", CTAs e contadores aparecem. Não há erros de compilação nem `pageerror` no runtime. O dev server Vite está `ready` sem warnings críticos.
+O erro não foi resolvido porque a correção anterior ainda depende de campos/funções que não existem no banco atual:
 
-Portanto o "tela em branco" que você vê é quase certamente **cache do iframe de preview** carregado antes do `.env` existir / antes do último restart. E o **"files are missing"** no domínio publicado é porque o deploy atual corresponde ao estado quebrado anterior à migração — precisa de uma nova publicação.
+- A função `admin-create-user` tenta consultar e gravar `profiles.username`, mas a tabela `profiles` atual só tem: `id`, `user_id`, `display_name`, `email`, `avatar_url`, `created_at`, `updated_at`.
+- A função RPC `next_username` também não existe no banco atual.
+- Por isso, quando a tela cria aluno sem informar usuário, o fallback não consegue calcular corretamente o próximo login numérico e acaba tentando reutilizar um login já existente, gerando erros como:
+  - `Usuário deve ser numérico`
+  - `A user with this email address has already been registered`
+- Além disso, as telas `/admin/alunos`, `/admin/matriculas` e o hook de autenticação também consultam `profiles.username`, então a criação e listagem de alunos ficam quebradas enquanto essa coluna não existir.
 
-## Passos
+## Plano de correção
 
-1. **Forçar refresh do preview**
-   - Reiniciar o dev server Vite uma vez para garantir que o `.env` (Supabase URL/key) foi carregado no processo atual.
-   - Pedir que você faça um hard reload (Ctrl/Cmd+Shift+R) na aba de preview.
+1. **Ajustar o schema do banco**
+   - Adicionar a coluna `username` em `profiles`.
+   - Adicionar as colunas de perfil detalhado que a função já tenta salvar em `profiles`, ou ajustar a função para gravar detalhes em `student_profiles` conforme o schema atual.
+   - Criar índice único para `profiles.username`, evitando duplicidade.
+   - Criar a função `next_username()` para retornar o próximo login numérico disponível (`001`, `002`, `003`...).
 
-2. **Verificar imports de assets externos**
-   - Investigar os `ERR_NAME_NOT_RESOLVED` do console: identificar qual componente importa um `*.asset.json` apontando pra URL `/__l5e/assets-v1/...` (sistema de assets Lovable, que não resolve em Vite clássico) e trocar por import direto do binário local em `src/assets/`.
-   - Isso não é bloqueante pra a home carregar, mas evita ruído e imagens quebradas em outras páginas (EJA, NR10, NR35, certificados).
+2. **Corrigir a função `admin-create-user`**
+   - Usar `next_username()` quando o admin não informar login.
+   - Se o login gerado já existir no Auth, tentar o próximo número em vez de falhar.
+   - Gravar dados básicos em `profiles` e dados de aluno em `student_profiles`, usando os nomes reais das colunas do banco (`rua`, `numero`, `bairro`, `cidade`, etc.).
+   - Retornar erro claro apenas quando houver problema real de senha/permissão/dados.
 
-3. **Republicar**
-   - Após confirmar preview OK, publicar novamente pra sobrescrever o deploy quebrado que mostra "files are missing" em `multplick.live`.
+3. **Corrigir usuários já existentes**
+   - Preencher `profiles.username` para o super admin atual e qualquer aluno já criado, usando o prefixo do e-mail interno quando possível.
+   - Garantir que `display_name` continue preservado.
 
-## Detalhes técnicos
+4. **Deploy e validação**
+   - Publicar novamente a Edge Function `admin-create-user`.
+   - Testar a criação de aluno pela própria função.
+   - Confirmar que `/admin/alunos` não retorna mais erro 400 em `profiles.username`.
+   - Confirmar que um novo aluno recebe um login numérico e pode ser listado no admin.
 
-- Stack: Vite 5 + React Router (classic). `.env` já contém `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`. `src/integrations/supabase/client.ts` lê via `import.meta.env` — funcionando.
-- Nenhum erro de tipo/compilação pendente após os patches feitos em `AdminImagens.tsx` e `Checkout.tsx`.
-- Os arquivos `src/assets/**/*.asset.json` são metadados do sistema Lovable Assets; em Vite clássico só valem os binários (`.jpg/.webp/.png`) irmãos. Caso algum componente faça `import meta from ".../foo.jpg.asset.json"` e use `meta.url`, esse URL aponta pra `/__l5e/...` e falha. A correção é `import img from ".../foo.jpg"` (Vite gera hash e serve corretamente).
-- Publicar via botão Publish (ou tool `preview_ui--publish`) só após o preview estar visualmente OK.
+## Resultado esperado
+
+Depois da implementação, ao clicar em **Criar aluno**, o sistema deve gerar automaticamente um login como `002`, `003`, etc., salvar o aluno corretamente, listar na tela de alunos e permitir login com a senha definida.
