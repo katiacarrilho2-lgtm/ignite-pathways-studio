@@ -90,17 +90,14 @@ const Matricula = () => {
       };
 
       try {
-        // RPC pública: devolve dados mínimos mesmo se o curso ainda não foi publicado.
-        // Se a consulta falhar/demorar, a ficha abre mesmo assim usando o nome do link.
         const response = await Promise.race([
-          supabase.rpc("get_matricula_course", { _slug: slug }),
+          supabase.from("courses").select("id, slug, title, description, price_cents, image_url").eq("slug", slug).maybeSingle(),
           new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 8000)),
         ]);
         if (!active) return;
         if (!response) { setCourse(fallbackCourse); return; }
         const { data, error } = response;
-        const row = Array.isArray(data) ? data[0] : data;
-        setCourse(error || !row ? fallbackCourse : row as Course);
+        setCourse(error || !data ? fallbackCourse : (data as Course));
       } catch {
         if (active) setCourse(fallbackCourse);
       }
@@ -118,9 +115,8 @@ const Matricula = () => {
       if (slugs.length === 0) { setComboCourses([]); return; }
       const results = await Promise.all(slugs.map(async (s) => {
         try {
-          const { data } = await supabase.rpc("get_matricula_course", { _slug: s });
-          const row = Array.isArray(data) ? data[0] : data;
-          return (row as Course) ?? { id: null, slug: s, title: titleFromSlug(s), description: null, price_cents: null, image_url: null };
+          const { data } = await supabase.from("courses").select("id, slug, title, description, price_cents, image_url").eq("slug", s).maybeSingle();
+          return (data as Course) ?? { id: null, slug: s, title: titleFromSlug(s), description: null, price_cents: null, image_url: null };
         } catch {
           return { id: null, slug: s, title: titleFromSlug(s), description: null, price_cents: null, image_url: null } as Course;
         }
