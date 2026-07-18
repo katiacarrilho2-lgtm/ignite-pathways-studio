@@ -1,29 +1,19 @@
-## Problema
+## O que registrar
 
-A rota `/matricula/pmoc` (link "Matricular" da página de curso) exibe "Módulo em manutenção" porque `src/pages/Matricula.tsx` foi substituído por stub durante a migração. É o formulário público de pré-matrícula que o aluno preenche antes de você aprovar em `/admin/pre-matriculas`.
+Preferência do usuário, aplicada a partir de agora em toda demanda deste projeto:
 
-## Boa notícia
-
-- Arquivo original está no backup (361 linhas, formulário completo com validação Zod, rascunho em localStorage, seleção de curso/combo, forma de pagamento, código promocional).
-- Só usa a tabela `enrollment_applications` — **já existe no banco** com todas as 35 colunas necessárias (confirmado no schema atual).
-- Nenhuma migração de banco é necessária.
+> Antes de executar qualquer tarefa que consuma créditos (build mode, migrações, edge functions, geração de conteúdo, imagens, etc.), **eu apresento a estimativa de custo em créditos e aguardo o "ok" antes de rodar**.
 
 ## Passos
 
-1. Substituir `src/pages/Matricula.tsx` (stub de 12 linhas) pelo original do backup (361 linhas).
-2. Rodar typecheck. Se houver algum erro pontual (ex.: coluna com nome diferente), ajustar o `.tsx` — não o banco.
-3. Você testa em `/matricula/pmoc`: preencher e enviar. O registro aparece em `/admin/pre-matriculas` para você aprovar.
+1. Criar `mem://preferences/credit-estimate-first.md` com a regra e o "como aplicar":
+   - Sempre estimar faixa (ex.: 3–6 créditos) baseada em: nº de arquivos tocados, migrações SQL, funções deployadas, chamadas de IA.
+   - Nunca iniciar execução sem confirmação quando a estimativa passar de ~2 créditos.
+   - Para correções pequenas (1 arquivo, sem IA/migração), avisar mesmo assim e seguir.
+2. Adicionar linha em `mem://index.md` na seção **Core** (regra universal do projeto) apontando para o arquivo acima.
 
-## Custo e risco
+## Custo deste passo
 
-- **Estimativa**: 2–4 créditos (é 1 arquivo + build).
-- **Risco baixo**: não mexe em schema, não mexe em outras telas.
-- Se der erro de build no meu passo, eu corrijo sem custo extra de escopo (foi correção do que eu mesmo fiz).
+- 0 créditos de execução: são só 2 escritas de memória, sem código, sem migração, sem IA.
 
-## Fora deste plano (fica para depois)
-
-- Player de curso com seções/aulas do PMOC (o builder salva, mas há erro em `course_sections`/`course_lessons` — vira próximo ticket).
-- Tela `/admin/cargos` (tabela `role_definitions`).
-- Restaurar `AdminFinanceiro.tsx`, `Checkout.tsx`, `Prova.tsx` etc.
-
-Aprovando, sigo só com a substituição do `Matricula.tsx`.
+Aprovando, salvo a preferência e sigo aplicando daqui em diante.
