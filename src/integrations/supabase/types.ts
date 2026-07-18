@@ -854,6 +854,7 @@ export type Database = {
           id: string
           notes: string | null
           progress: number
+          seller_id: string | null
           status: string
           user_id: string
         }
@@ -865,6 +866,7 @@ export type Database = {
           id?: string
           notes?: string | null
           progress?: number
+          seller_id?: string | null
           status?: string
           user_id: string
         }
@@ -876,6 +878,7 @@ export type Database = {
           id?: string
           notes?: string | null
           progress?: number
+          seller_id?: string | null
           status?: string
           user_id?: string
         }
