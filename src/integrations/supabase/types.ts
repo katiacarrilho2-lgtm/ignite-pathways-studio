@@ -86,6 +86,137 @@ export type Database = {
         }
         Relationships: []
       }
+      company_settings: {
+        Row: {
+          cep: string | null
+          cidade: string | null
+          cnpj: string | null
+          created_at: string
+          email: string | null
+          endereco: string | null
+          facebook: string | null
+          id: string
+          inscricao_estadual: string | null
+          instagram: string | null
+          linkedin: string | null
+          logo_url: string | null
+          nome_fantasia: string | null
+          razao_social: string | null
+          responsavel_cargo: string | null
+          responsavel_nome: string | null
+          singleton: boolean
+          site: string | null
+          telefone: string | null
+          uf: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          facebook?: string | null
+          id?: string
+          inscricao_estadual?: string | null
+          instagram?: string | null
+          linkedin?: string | null
+          logo_url?: string | null
+          nome_fantasia?: string | null
+          razao_social?: string | null
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          singleton?: boolean
+          site?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          cep?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          facebook?: string | null
+          id?: string
+          inscricao_estadual?: string | null
+          instagram?: string | null
+          linkedin?: string | null
+          logo_url?: string | null
+          nome_fantasia?: string | null
+          razao_social?: string | null
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          singleton?: boolean
+          site?: string | null
+          telefone?: string | null
+          uf?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      contas_comerciais: {
+        Row: {
+          atualizado_em: string
+          configuracoes: Json
+          criado_em: string
+          criado_por: string | null
+          documento_fiscal: string | null
+          email_contato: string | null
+          id: string
+          nome: string
+          parent_id: string | null
+          slug: string
+          status: string
+          telefone_contato: string | null
+          tipo_da_conta: string
+        }
+        Insert: {
+          atualizado_em?: string
+          configuracoes?: Json
+          criado_em?: string
+          criado_por?: string | null
+          documento_fiscal?: string | null
+          email_contato?: string | null
+          id?: string
+          nome: string
+          parent_id?: string | null
+          slug: string
+          status?: string
+          telefone_contato?: string | null
+          tipo_da_conta?: string
+        }
+        Update: {
+          atualizado_em?: string
+          configuracoes?: Json
+          criado_em?: string
+          criado_por?: string | null
+          documento_fiscal?: string | null
+          email_contato?: string | null
+          id?: string
+          nome?: string
+          parent_id?: string | null
+          slug?: string
+          status?: string
+          telefone_contato?: string | null
+          tipo_da_conta?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contas_comerciais_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_categories: {
         Row: {
           active: boolean
@@ -501,10 +632,12 @@ export type Database = {
           cep: string | null
           city: string | null
           course_id: string | null
+          course_modality: string | null
           course_title: string
           cpf: string | null
           created_at: string
           email: string
+          entry_date: string | null
           father_name: string | null
           full_name: string
           graduation_year: string | null
@@ -514,13 +647,17 @@ export type Database = {
           naturalidade: string | null
           neighborhood: string | null
           notes: string | null
+          paid_amount_cents: number | null
+          paid_at: string | null
           payment_method: string | null
+          payment_reminder_date: string | null
           phone: string | null
           promo_code: string | null
           rg: string | null
           rg_issue_date: string | null
           rg_issuer: string | null
           schooling: string | null
+          seller_id: string | null
           source: string | null
           state: string | null
           status: string
@@ -532,10 +669,12 @@ export type Database = {
           cep?: string | null
           city?: string | null
           course_id?: string | null
+          course_modality?: string | null
           course_title: string
           cpf?: string | null
           created_at?: string
           email: string
+          entry_date?: string | null
           father_name?: string | null
           full_name: string
           graduation_year?: string | null
@@ -545,13 +684,17 @@ export type Database = {
           naturalidade?: string | null
           neighborhood?: string | null
           notes?: string | null
+          paid_amount_cents?: number | null
+          paid_at?: string | null
           payment_method?: string | null
+          payment_reminder_date?: string | null
           phone?: string | null
           promo_code?: string | null
           rg?: string | null
           rg_issue_date?: string | null
           rg_issuer?: string | null
           schooling?: string | null
+          seller_id?: string | null
           source?: string | null
           state?: string | null
           status?: string
@@ -563,10 +706,12 @@ export type Database = {
           cep?: string | null
           city?: string | null
           course_id?: string | null
+          course_modality?: string | null
           course_title?: string
           cpf?: string | null
           created_at?: string
           email?: string
+          entry_date?: string | null
           father_name?: string | null
           full_name?: string
           graduation_year?: string | null
@@ -576,13 +721,17 @@ export type Database = {
           naturalidade?: string | null
           neighborhood?: string | null
           notes?: string | null
+          paid_amount_cents?: number | null
+          paid_at?: string | null
           payment_method?: string | null
+          payment_reminder_date?: string | null
           phone?: string | null
           promo_code?: string | null
           rg?: string | null
           rg_issue_date?: string | null
           rg_issuer?: string | null
           schooling?: string | null
+          seller_id?: string | null
           source?: string | null
           state?: string | null
           status?: string
@@ -641,6 +790,7 @@ export type Database = {
         Row: {
           access_token: string
           application_id: string
+          candidate_name: string | null
           completed_at: string | null
           course_title: string
           created_at: string
@@ -656,6 +806,7 @@ export type Database = {
         Insert: {
           access_token?: string
           application_id: string
+          candidate_name?: string | null
           completed_at?: string | null
           course_title: string
           created_at?: string
@@ -671,6 +822,7 @@ export type Database = {
         Update: {
           access_token?: string
           application_id?: string
+          candidate_name?: string | null
           completed_at?: string | null
           course_title?: string
           created_at?: string
@@ -702,6 +854,7 @@ export type Database = {
           id: string
           notes: string | null
           progress: number
+          seller_id: string | null
           status: string
           user_id: string
         }
@@ -713,6 +866,7 @@ export type Database = {
           id?: string
           notes?: string | null
           progress?: number
+          seller_id?: string | null
           status?: string
           user_id: string
         }
@@ -724,6 +878,7 @@ export type Database = {
           id?: string
           notes?: string | null
           progress?: number
+          seller_id?: string | null
           status?: string
           user_id?: string
         }
@@ -733,6 +888,65 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      finance_entries: {
+        Row: {
+          account_id: string | null
+          amount_cents: number
+          created_at: string
+          created_by: string | null
+          due_date: string
+          id: string
+          installment_no: number | null
+          installment_total: number | null
+          kind: string
+          name: string
+          notes: string | null
+          paid_at: string | null
+          series_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          amount_cents?: number
+          created_at?: string
+          created_by?: string | null
+          due_date: string
+          id?: string
+          installment_no?: number | null
+          installment_total?: number | null
+          kind: string
+          name: string
+          notes?: string | null
+          paid_at?: string | null
+          series_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          amount_cents?: number
+          created_at?: string
+          created_by?: string | null
+          due_date?: string
+          id?: string
+          installment_no?: number | null
+          installment_total?: number | null
+          kind?: string
+          name?: string
+          notes?: string | null
+          paid_at?: string | null
+          series_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finance_entries_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
             referencedColumns: ["id"]
           },
         ]
