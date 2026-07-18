@@ -1,38 +1,29 @@
-## Diagnóstico confirmado
+## Problema
 
-O erro não foi resolvido porque a correção anterior ainda depende de campos/funções que não existem no banco atual:
+A rota `/matricula/pmoc` (link "Matricular" da página de curso) exibe "Módulo em manutenção" porque `src/pages/Matricula.tsx` foi substituído por stub durante a migração. É o formulário público de pré-matrícula que o aluno preenche antes de você aprovar em `/admin/pre-matriculas`.
 
-- A função `admin-create-user` tenta consultar e gravar `profiles.username`, mas a tabela `profiles` atual só tem: `id`, `user_id`, `display_name`, `email`, `avatar_url`, `created_at`, `updated_at`.
-- A função RPC `next_username` também não existe no banco atual.
-- Por isso, quando a tela cria aluno sem informar usuário, o fallback não consegue calcular corretamente o próximo login numérico e acaba tentando reutilizar um login já existente, gerando erros como:
-  - `Usuário deve ser numérico`
-  - `A user with this email address has already been registered`
-- Além disso, as telas `/admin/alunos`, `/admin/matriculas` e o hook de autenticação também consultam `profiles.username`, então a criação e listagem de alunos ficam quebradas enquanto essa coluna não existir.
+## Boa notícia
 
-## Plano de correção
+- Arquivo original está no backup (361 linhas, formulário completo com validação Zod, rascunho em localStorage, seleção de curso/combo, forma de pagamento, código promocional).
+- Só usa a tabela `enrollment_applications` — **já existe no banco** com todas as 35 colunas necessárias (confirmado no schema atual).
+- Nenhuma migração de banco é necessária.
 
-1. **Ajustar o schema do banco**
-   - Adicionar a coluna `username` em `profiles`.
-   - Adicionar as colunas de perfil detalhado que a função já tenta salvar em `profiles`, ou ajustar a função para gravar detalhes em `student_profiles` conforme o schema atual.
-   - Criar índice único para `profiles.username`, evitando duplicidade.
-   - Criar a função `next_username()` para retornar o próximo login numérico disponível (`001`, `002`, `003`...).
+## Passos
 
-2. **Corrigir a função `admin-create-user`**
-   - Usar `next_username()` quando o admin não informar login.
-   - Se o login gerado já existir no Auth, tentar o próximo número em vez de falhar.
-   - Gravar dados básicos em `profiles` e dados de aluno em `student_profiles`, usando os nomes reais das colunas do banco (`rua`, `numero`, `bairro`, `cidade`, etc.).
-   - Retornar erro claro apenas quando houver problema real de senha/permissão/dados.
+1. Substituir `src/pages/Matricula.tsx` (stub de 12 linhas) pelo original do backup (361 linhas).
+2. Rodar typecheck. Se houver algum erro pontual (ex.: coluna com nome diferente), ajustar o `.tsx` — não o banco.
+3. Você testa em `/matricula/pmoc`: preencher e enviar. O registro aparece em `/admin/pre-matriculas` para você aprovar.
 
-3. **Corrigir usuários já existentes**
-   - Preencher `profiles.username` para o super admin atual e qualquer aluno já criado, usando o prefixo do e-mail interno quando possível.
-   - Garantir que `display_name` continue preservado.
+## Custo e risco
 
-4. **Deploy e validação**
-   - Publicar novamente a Edge Function `admin-create-user`.
-   - Testar a criação de aluno pela própria função.
-   - Confirmar que `/admin/alunos` não retorna mais erro 400 em `profiles.username`.
-   - Confirmar que um novo aluno recebe um login numérico e pode ser listado no admin.
+- **Estimativa**: 2–4 créditos (é 1 arquivo + build).
+- **Risco baixo**: não mexe em schema, não mexe em outras telas.
+- Se der erro de build no meu passo, eu corrijo sem custo extra de escopo (foi correção do que eu mesmo fiz).
 
-## Resultado esperado
+## Fora deste plano (fica para depois)
 
-Depois da implementação, ao clicar em **Criar aluno**, o sistema deve gerar automaticamente um login como `002`, `003`, etc., salvar o aluno corretamente, listar na tela de alunos e permitir login com a senha definida.
+- Player de curso com seções/aulas do PMOC (o builder salva, mas há erro em `course_sections`/`course_lessons` — vira próximo ticket).
+- Tela `/admin/cargos` (tabela `role_definitions`).
+- Restaurar `AdminFinanceiro.tsx`, `Checkout.tsx`, `Prova.tsx` etc.
+
+Aprovando, sigo só com a substituição do `Matricula.tsx`.
