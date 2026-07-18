@@ -46,69 +46,98 @@ Deno.serve(async (req) => {
       if (!hasPerm) return json({ error: "Sem permissão" }, 403);
     }
 
-    // Resolve username
-    let username = requestedUsername;
-    if (!username) {
+    const normalizeUsername = (value: unknown) => String(value ?? "").replace(/\D/g, "");
+    const getNextUsername = async (after?: string) => {
+      if (after) return String(Number(after) + 1).padStart(3, "0");
+
       const { data: next, error: nextErr } = await admin.rpc("next_username");
-      if (nextErr || !next) {
-        // Fallback: derive next numeric username from profiles
-        const { data: rows } = await admin
-          .from("profiles")
-          .select("username")
-          .not("username", "is", null);
-        const max = (rows ?? []).reduce((acc: number, r: any) => {
-          const n = parseInt(String(r.username).replace(/\D/g, ""), 10);
-          return Number.isFinite(n) && n > acc ? n : acc;
-        }, 0);
-        username = String(max + 1).padStart(3, "0");
-      } else {
-        username = next as string;
+      if (!nextErr && next) return String(next);
+
+      const { data: rows } = await admin
+        .from("profiles")
+        .select("username")
+        .not("username", "is", null);
+      const max = (rows ?? []).reduce((acc: number, r: any) => {
+        const n = parseInt(normalizeUsername(r.username), 10);
+        return Number.isFinite(n) && n > acc ? n : acc;
+      }, 0);
+      return String(max + 1).padStart(3, "0");
+    };
+
+    let username = normalizeUsername(requestedUsername);
+    if (requestedUsername && !/^\d{1,6}$/.test(username)) return json({ error: "Usuário deve ser numérico" }, 400);
+
+    let created: any = null;
+    let lastError = "";
+    for (let attempt = 0; attempt < 50; attempt++) {
+      username = username || await getNextUsername(attempt === 0 ? undefined : username);
+      if (!/^\d{1,6}$/.test(username)) return json({ error: "Usuário deve ser numérico" }, 400);
+
+      const loginEmail = `${username}@multplick.local`;
+      const result = await admin.auth.admin.createUser({
+        email: loginEmail,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name: full_name ?? `Usuário ${username}`, username },
+      });
+
+      if (!result.error) {
+        created = result.data;
+        break;
       }
+
+      lastError = result.error.message;
+      const alreadyExists = lastError.toLowerCase().includes("already") || lastError.toLowerCase().includes("registered");
+      if (requestedUsername || !alreadyExists) return json({ error: lastError }, 400);
+      username = "";
+      const numeric = Number(loginEmail.split("@")[0]);
+      username = String(numeric + 1).padStart(3, "0");
     }
-    if (!/^\d{1,6}$/.test(username)) return json({ error: "Usuário deve ser numérico" }, 400);
+
+    if (!created?.user?.id) return json({ error: lastError || "Não foi possível criar o usuário" }, 400);
 
     const loginEmail = `${username}@multplick.local`;
 
-    const { data: created, error } = await admin.auth.admin.createUser({
-      email: loginEmail,
-      password,
-      email_confirm: true,
-      user_metadata: { full_name: full_name ?? `Usuário ${username}`, username },
-    });
-    if (error) return json({ error: error.message }, 400);
-
     // Assign role for non-bootstrap (bootstrap user already becomes super_admin via trigger)
     if (!isBootstrap && role && ["admin", "editor", "viewer", "certificadora"].includes(role)) {
-      await admin.from("user_roles").insert({ user_id: created.user!.id, role });
+      await admin.from("user_roles").insert({ user_id: created.user.id, role });
     }
 
-    // Upsert detailed profile fields
+    // Basic login profile used by admin lists and auth hooks
     await admin.from("profiles").upsert({
-      user_id: created.user!.id,
+      user_id: created.user.id,
       username,
       display_name: full_name ?? `Usuário ${username}`,
-      email: emailInput || null,
+      email: loginEmail,
       avatar_url: avatar_url || null,
+    }, { onConflict: "user_id" });
+
+    // Detailed student data lives in student_profiles in the restored schema
+    await admin.from("student_profiles").upsert({
+      user_id: created.user.id,
+      full_name: full_name ?? `Usuário ${username}`,
+      contact_email: emailInput || null,
       phone1: phone1 || null,
       phone2: phone2 || null,
       cpf: cpf || null,
       rg: rg || null,
       cep: cep || null,
-      street: street || null,
-      address_number: address_number || null,
-      neighborhood: neighborhood || null,
-      city: city || null,
-      state: state || null,
+      rua: street || null,
+      numero: address_number || null,
+      bairro: neighborhood || null,
+      cidade: city || null,
+      estado: state || null,
       birth_date: birth_date || null,
-      responsible_name: responsible_name || null,
-      responsible_rg: responsible_rg || null,
-      responsible_cpf: responsible_cpf || null,
-      sex: sex || null,
+      responsavel_nome: responsible_name || null,
+      responsavel_rg: responsible_rg || null,
+      responsavel_cpf: responsible_cpf || null,
+      sexo: sex || null,
       polo: polo || null,
-      notes: notes || null,
+      observacoes: notes || null,
+      foto_url: avatar_url || null,
     }, { onConflict: "user_id" });
 
-    return json({ username, user_id: created.user!.id, bootstrap: isBootstrap });
+    return json({ username, user_id: created.user.id, bootstrap: isBootstrap });
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
   }
