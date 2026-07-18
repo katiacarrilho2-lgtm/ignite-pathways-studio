@@ -49,8 +49,21 @@ Deno.serve(async (req) => {
     // Resolve username
     let username = requestedUsername;
     if (!username) {
-      const { data: next } = await admin.rpc("next_username");
-      username = next as string;
+      const { data: next, error: nextErr } = await admin.rpc("next_username");
+      if (nextErr || !next) {
+        // Fallback: derive next numeric username from profiles
+        const { data: rows } = await admin
+          .from("profiles")
+          .select("username")
+          .not("username", "is", null);
+        const max = (rows ?? []).reduce((acc: number, r: any) => {
+          const n = parseInt(String(r.username).replace(/\D/g, ""), 10);
+          return Number.isFinite(n) && n > acc ? n : acc;
+        }, 0);
+        username = String(max + 1).padStart(3, "0");
+      } else {
+        username = next as string;
+      }
     }
     if (!/^\d{1,6}$/.test(username)) return json({ error: "Usuário deve ser numérico" }, 400);
 
