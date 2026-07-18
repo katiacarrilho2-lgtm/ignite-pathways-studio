@@ -501,10 +501,12 @@ export type Database = {
           cep: string | null
           city: string | null
           course_id: string | null
+          course_modality: string | null
           course_title: string
           cpf: string | null
           created_at: string
           email: string
+          entry_date: string | null
           father_name: string | null
           full_name: string
           graduation_year: string | null
@@ -514,13 +516,17 @@ export type Database = {
           naturalidade: string | null
           neighborhood: string | null
           notes: string | null
+          paid_amount_cents: number | null
+          paid_at: string | null
           payment_method: string | null
+          payment_reminder_date: string | null
           phone: string | null
           promo_code: string | null
           rg: string | null
           rg_issue_date: string | null
           rg_issuer: string | null
           schooling: string | null
+          seller_id: string | null
           source: string | null
           state: string | null
           status: string
@@ -532,10 +538,12 @@ export type Database = {
           cep?: string | null
           city?: string | null
           course_id?: string | null
+          course_modality?: string | null
           course_title: string
           cpf?: string | null
           created_at?: string
           email: string
+          entry_date?: string | null
           father_name?: string | null
           full_name: string
           graduation_year?: string | null
@@ -545,13 +553,17 @@ export type Database = {
           naturalidade?: string | null
           neighborhood?: string | null
           notes?: string | null
+          paid_amount_cents?: number | null
+          paid_at?: string | null
           payment_method?: string | null
+          payment_reminder_date?: string | null
           phone?: string | null
           promo_code?: string | null
           rg?: string | null
           rg_issue_date?: string | null
           rg_issuer?: string | null
           schooling?: string | null
+          seller_id?: string | null
           source?: string | null
           state?: string | null
           status?: string
@@ -563,10 +575,12 @@ export type Database = {
           cep?: string | null
           city?: string | null
           course_id?: string | null
+          course_modality?: string | null
           course_title?: string
           cpf?: string | null
           created_at?: string
           email?: string
+          entry_date?: string | null
           father_name?: string | null
           full_name?: string
           graduation_year?: string | null
@@ -576,13 +590,17 @@ export type Database = {
           naturalidade?: string | null
           neighborhood?: string | null
           notes?: string | null
+          paid_amount_cents?: number | null
+          paid_at?: string | null
           payment_method?: string | null
+          payment_reminder_date?: string | null
           phone?: string | null
           promo_code?: string | null
           rg?: string | null
           rg_issue_date?: string | null
           rg_issuer?: string | null
           schooling?: string | null
+          seller_id?: string | null
           source?: string | null
           state?: string | null
           status?: string
@@ -641,6 +659,7 @@ export type Database = {
         Row: {
           access_token: string
           application_id: string
+          candidate_name: string | null
           completed_at: string | null
           course_title: string
           created_at: string
@@ -656,6 +675,7 @@ export type Database = {
         Insert: {
           access_token?: string
           application_id: string
+          candidate_name?: string | null
           completed_at?: string | null
           course_title: string
           created_at?: string
@@ -671,6 +691,7 @@ export type Database = {
         Update: {
           access_token?: string
           application_id?: string
+          candidate_name?: string | null
           completed_at?: string | null
           course_title?: string
           created_at?: string
@@ -736,6 +757,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      finance_entries: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          created_by: string | null
+          due_date: string
+          id: string
+          installment_no: number | null
+          installment_total: number | null
+          kind: string
+          name: string
+          notes: string | null
+          paid_at: string | null
+          series_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number
+          created_at?: string
+          created_by?: string | null
+          due_date: string
+          id?: string
+          installment_no?: number | null
+          installment_total?: number | null
+          kind: string
+          name: string
+          notes?: string | null
+          paid_at?: string | null
+          series_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          created_by?: string | null
+          due_date?: string
+          id?: string
+          installment_no?: number | null
+          installment_total?: number | null
+          kind?: string
+          name?: string
+          notes?: string | null
+          paid_at?: string | null
+          series_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       installments: {
         Row: {
