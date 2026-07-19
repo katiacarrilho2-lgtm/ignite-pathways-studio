@@ -1,70 +1,48 @@
-## Curso completo: Instalação de Ar-Condicionado — Nível B
+## Como vamos trabalhar o curso de Ar-Condicionado
 
-**Objetivo:** entregar o curso 100% pronto para o aluno abrir e estudar, com barra de progresso, prova final, certificado e apostila em PDF já funcionando (essas peças já existem no sistema).
+Você monta o conteúdo, eu reviso e complemento depois. Zero custo enquanto você digita — os créditos só entram quando eu revisar/enriquecer.
 
-**Custo estimado:** 45–65 créditos. Aviso quando ultrapassar 55.
+### 1. Você cria o conteúdo (sem custo de crédito)
 
-### Escopo do conteúdo
+No painel: **/admin/cursos → Instalação de Ar-Condicionado → editar aula**.
 
-- **Carga horária:** 260h
-- **Categoria:** Cursos Técnicos
-- **Preço:** Sob consulta (sem valor cadastrado)
-- **Capa:** imagem gerada por IA (split-inverter em ambiente residencial)
-- **Módulos:** 10
-- **Aulas:** 50 (média de 5 por módulo, ~5h cada)
+Em cada aula você já tem os campos prontos:
+- **Texto da aula** (editor rico: negrito, cores, listas, imagens)
+- **Vídeo do YouTube** (cola o link)
+- **Materiais e links extras** (PDFs, links)
+- **Flashcards** (pergunta/resposta)
+- **Quiz da aula**
+- **Imagens ilustrativas** (upload direto)
 
-### Estrutura dos 10 módulos
+Pode ir aula por aula, no seu ritmo. Salva e fica gravado no banco.
 
-1. Introdução ao ar-condicionado e mercado de trabalho
-2. Termodinâmica e ciclo de refrigeração (linguagem simples)
-3. Componentes: compressor, condensador, evaporador, válvula de expansão
-4. Ferramentas, EPIs e segurança na instalação
-5. Tipos de sistemas: split, multi-split, janela, cassete, VRF (visão geral)
-6. Instalação passo a passo do split hi-wall (parte 1: preparação e fixação)
-7. Instalação passo a passo (parte 2: tubulação, flangeamento, vácuo, carga)
-8. Elétrica, disjuntores, dimensionamento de fiação e aterramento
-9. Partida, testes, medições e entrega técnica ao cliente
-10. Manutenção preventiva, PMOC básico e resolução de defeitos comuns
+### 2. Quando terminar (ou por lote de módulo), me chama
 
-### O que cada aula contém
+Eu faço uma passada de revisão que inclui:
+- Ajuste de português, clareza e linguagem simples
+- Padronização de títulos, negritos e caixas de "Atenção / Dica de campo"
+- **Referências**: adiciono no rodapé de cada aula as fontes (normas ABNT NBR 16401, manuais de fabricante, NR-10/NR-35, canais de YouTube usados) — isso é o que evita problema de plágio
+- Confiro se os vídeos que você colou estão acessíveis e no tema
+- Reviso os quizzes/flashcards (respostas coerentes com o texto)
+- Ajusto a prova final de 20 questões se o conteúdo real divergir do que já está lá
 
-- Título + objetivo em 2 bullets
-- Texto didático (300–500 palavras) em linguagem simples, com **negrito** nos pontos-chave e caixas de "Atenção / Segurança / Dica de campo"
-- 1 vídeo do YouTube curado (canais técnicos BR: Mundo da Elétrica, Prof. Rodrigo, Instalador Profissional, etc.) — embed via `youtube_url` que o player já suporta
-- 3–5 flashcards de memorização (pergunta/resposta)
-- Mini-quiz de 3 questões ao final da aula
-- 1–2 imagens ilustrativas por aula em módulos técnicos (ferramentas, componentes, esquemas) — geradas por IA quando não houver referência livre
+### 3. Custo da revisão (só quando eu executar)
 
-### Avaliação e entrega ao aluno
+Faixa por lote, você aprova antes:
+- **Revisão leve** (ortografia + referências + checagem de links), curso inteiro: **4–7 créditos**
+- **Revisão média** (o de cima + reescrever trechos confusos, padronizar caixas de destaque, ajustar quizzes): **10–15 créditos**
+- **Revisão pesada** (reescrita significativa de aulas, novos exemplos, novas imagens IA): **20–30 créditos**
 
-- **Prova final:** 20 questões de múltipla escolha, nota mínima 70% (usa a tabela `enrollment_exams` já existente)
-- **Barra de progresso:** já funciona automaticamente via `lesson_progress` conforme aula é marcada como concluída
-- **Certificado:** emitido pelo fluxo atual em `/aluno/certificados` ao concluir 100% + prova aprovada
-- **Apostila PDF:** botão "Baixar apostila" já existe no player; consolida todas as aulas em PDF
-- **Vídeos:** embutidos no player; não há sincronização palavra-por-palavra com o texto (impossível garantir sem produção própria), mas cada vídeo é escolhido para reforçar o tema da aula. Uso de embed do YouTube é permitido pela própria plataforma — não gera plágio.
+Você pode pedir por módulo também (ex: revisar só os módulos 6 e 7 de instalação): ~1–2 créditos por módulo na revisão leve.
 
-### Como será executado (técnico)
+### 4. Recomendação prática
 
-1. Inserir 1 registro em `courses` (slug `instalacao-ar-condicionado`, categoria, capa, descrição, `published=true`, `active=true`)
-2. Gerar capa por IA e subir no bucket `course-images`
-3. Inserir 10 registros em `course_sections`
-4. Inserir 50 registros em `course_lessons` com HTML rico no campo `content`, `youtube_url`, `duration_minutes`, `flashcards` (JSON) e `quiz` (JSON) — usando as colunas já existentes no schema restaurado
-5. Gerar imagens ilustrativas por IA em lote para as aulas técnicas (módulos 3, 4, 6, 7, 8) e anexar via `lesson_attachments`
-6. Popular a prova final em `enrollment_exams` / `enrollment_exam_questions` (20 questões)
-7. Testar abrindo `/aluno` logado como aluno para validar player, progresso, quiz e apostila
+- Faça 1 módulo completo primeiro, me manda revisar leve (~1 cr) pra você ver o padrão que fica bom
+- Depois segue os outros 9 no mesmo modelo
+- No final, uma revisão leve geral + referências (~4–7 cr) e o curso fica pronto pra publicar
 
-### Fora de escopo (para não estourar créditos)
+### Fora de escopo agora
 
-- Curso de PMOC (fica para depois — não cabe nos créditos restantes)
-- Área separada de "Professor" (você usa o `/admin/cursos` atual)
-- Vídeos próprios / gravação
-- Tradução para outros idiomas
+- Não vou gerar conteúdo novo de aula por IA nesse fluxo (isso é o que consome crédito de verdade). Se em alguma aula você travar, me pede pontualmente ("gera o texto da aula X") e eu estimo antes.
 
-### Confirmação
-
-Ao aprovar, eu executo em ondas para você acompanhar o consumo:
-- **Onda 1** (~10 cr): curso + capa + 10 módulos + esqueleto das 50 aulas
-- **Onda 2** (~20–30 cr): conteúdo completo das aulas (texto, vídeos, flashcards, quizzes)
-- **Onda 3** (~10–15 cr): imagens ilustrativas + prova final de 20 questões + teste
-
-Se em qualquer onda o custo real superar minha faixa, eu paro e te aviso antes de continuar.
+Se topar esse fluxo, é só começar a editar as aulas — quando quiser revisão, me avisa qual módulo e qual nível (leve/média/pesada) e eu passo a estimativa exata antes de executar.
