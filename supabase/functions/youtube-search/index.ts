@@ -115,6 +115,39 @@ Deno.serve(async (req) => {
     const key = Deno.env.get("YOUTUBE_API_KEY");
     if (!key) return json({ error: "missing YOUTUBE_API_KEY" }, 500);
     const body = await req.json().catch(() => ({}));
+    const mode = String(body?.mode ?? "search");
+    if (mode === "lookup") {
+      const videoId = String(body?.videoId ?? "").trim();
+      if (!videoId) return json({ error: "videoId obrigatório" }, 400);
+      const vUrl = new URL("https://www.googleapis.com/youtube/v3/videos");
+      vUrl.searchParams.set("part", "snippet,contentDetails,status");
+      vUrl.searchParams.set("id", videoId);
+      vUrl.searchParams.set("key", key);
+      const vr = await fetch(vUrl.toString());
+      if (!vr.ok) {
+        const txt = await vr.text();
+        return json({ error: `YouTube videos ${vr.status}: ${txt.slice(0, 300)}` }, 500);
+      }
+      const vd = await vr.json();
+      const v = (vd.items ?? [])[0];
+      if (!v) return json({ error: "Vídeo não encontrado ou indisponível" }, 404);
+      const st = v?.status ?? {};
+      if (st.embeddable === false) return json({ error: "Vídeo não permite incorporação (embed)" }, 400);
+      if (st.privacyStatus && st.privacyStatus !== "public") return json({ error: "Vídeo não é público" }, 400);
+      const dur = parseISODuration(v?.contentDetails?.duration ?? "PT0S");
+      const sn = v?.snippet ?? {};
+      const thumb = sn?.thumbnails?.maxres?.url || sn?.thumbnails?.high?.url || sn?.thumbnails?.medium?.url || sn?.thumbnails?.default?.url || "";
+      return json({
+        results: [{
+          videoId: v.id,
+          title: sn.title ?? "",
+          channel: sn.channelTitle ?? "",
+          thumbnail: thumb,
+          url: `https://www.youtube.com/watch?v=${v.id}`,
+          duration_seconds: dur,
+        }],
+      });
+    }
     const query = String(body?.query ?? "").trim();
     const maxResults = Number(body?.maxResults ?? 10);
     if (!query) return json({ error: "query obrigatório" }, 400);
