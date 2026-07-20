@@ -15,6 +15,21 @@ export type YoutubeVideo = {
   duration_seconds?: number;
 };
 
+type YoutubeSearchResponse = {
+  error?: string;
+  results?: YoutubeVideo[];
+};
+
+type YoutubeOEmbedResponse = {
+  title?: string;
+  author_name?: string;
+  thumbnail_url?: string;
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => (
+  error instanceof Error ? error.message : fallback
+);
+
 function fmtDur(s?: number) {
   if (!s) return "";
   const m = Math.floor(s / 60), ss = s % 60;
@@ -58,7 +73,7 @@ export const YoutubePickerDialog = ({
     return null;
   };
 
-  const useLink = async () => {
+  const handleUseLink = async () => {
     const id = extractVideoId(pasteUrl);
     if (!id) return toast.error("Link do YouTube inválido");
     setPasteBusy(true);
@@ -77,7 +92,7 @@ export const YoutubePickerDialog = ({
           `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(normalizedUrl)}`,
         );
         if (oembed.ok) {
-          const meta = await oembed.json();
+          const meta = await oembed.json() as YoutubeOEmbedResponse;
           v = {
             ...v,
             title: meta?.title || v.title,
@@ -90,8 +105,8 @@ export const YoutubePickerDialog = ({
       onPick(v, pasteUrl);
       setPasteUrl("");
       toast.success("Vídeo adicionado à aula");
-    } catch (e: any) {
-      toast.error(e?.message ?? "Falha ao usar o link");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Falha ao usar o link"));
     } finally { setPasteBusy(false); }
   };
 
@@ -103,12 +118,13 @@ export const YoutubePickerDialog = ({
         body: { query, maxResults: 12 },
       });
       if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      const list: YoutubeVideo[] = (data as any)?.results ?? [];
+      const payload = data as YoutubeSearchResponse | null;
+      if (payload?.error) throw new Error(payload.error);
+      const list: YoutubeVideo[] = payload?.results ?? [];
       setResults(list);
       if (list.length === 0) toast.info("Nenhum vídeo válido encontrado (mín. 3 min, embutível, público).");
-    } catch (e: any) {
-      const msg = e?.message ?? "Falha na busca do YouTube";
+    } catch (error: unknown) {
+      const msg = getErrorMessage(error, "Falha na busca do YouTube");
       if (msg.includes("non-2xx") || msg.includes("YOUTUBE_API_KEY")) {
         toast.error("A busca automática precisa de chave do YouTube. Use a opção de colar link acima.");
       } else {
@@ -148,9 +164,9 @@ export const YoutubePickerDialog = ({
               value={pasteUrl}
               onChange={(e) => setPasteUrl(e.target.value)}
               placeholder="https://www.youtube.com/watch?v=... ou https://youtu.be/..."
-              onKeyDown={(e) => e.key === "Enter" && useLink()}
+              onKeyDown={(e) => e.key === "Enter" && handleUseLink()}
             />
-            <Button onClick={useLink} disabled={pasteBusy || !pasteUrl.trim()} variant="secondary">
+            <Button onClick={handleUseLink} disabled={pasteBusy || !pasteUrl.trim()} variant="secondary">
               {pasteBusy ? <Loader2 className="size-4 animate-spin" /> : null}
               Usar link
             </Button>
