@@ -1,45 +1,27 @@
-## Objetivo
+# Onde estão as 3 aulas premium
 
-Reescrever 3 aulas do curso "Instalação de Ar-Condicionado" no padrão premium, para você validar antes de aplicar ao curso inteiro.
+As 3 aulas foram salvas no banco (confirmado via query): cada uma com corpo HTML de 4.4k–5.7k caracteres, 7–8 flashcards e 6–7 questões de quiz.
 
-## Aulas escolhidas (piloto)
+## Localização
 
-Vou pegar 1 aula de cada perfil, para o modelo cobrir todos os tipos de conteúdo:
+Curso: **Instalação de Ar-Condicionado** (`slug: instalacao-ar-condicionado`, id `b13267f6-53c0-4624-82dd-d54317a219cf`)
 
-1. **Uma aula teórica** (ex.: Módulo 1 – Termodinâmica / ciclo de refrigeração)
-2. **Uma aula prática de instalação** (ex.: Módulo 5 – Instalação da unidade evaporadora/condensadora)
-3. **Uma aula técnica de elétrica ou vácuo** (ex.: Módulo 4 – Ligações elétricas OU Módulo 6 – Vácuo e carga de gás)
+| Aula | Seção | Posição |
+|---|---|---|
+| O ciclo de refrigeração passo a passo | Termodinâmica e Ciclo de Refrigeração | Seção 2 → aula 2 |
+| Fixação da evaporadora — o que ninguém te conta | Instalação Passo a Passo — Preparação e Fixação | Seção 6 → aula 2 |
+| Segurança elétrica: como não morrer no dia de serviço | Ferramentas, EPIs e Segurança na Instalação | Seção 4 → aula 3 |
 
-A escolha final das 3 aulas eu confirmo lendo `course_lessons` antes de escrever.
+## Rotas para abrir
 
-## Padrão premium de cada aula
+- Preview admin: `/admin/cursos/b13267f6-53c0-4624-82dd-d54317a219cf/preview`
+- Builder/edição: `/admin/cursos/b13267f6-53c0-4624-82dd-d54317a219cf/conteudo`
+- Lista de cursos: `/admin/cursos`
 
-Cada aula reescrita terá, dentro do `content` (jsonb) já existente:
+## Próximo passo proposto
 
-- **Introdução** (por que essa aula importa, onde se aplica no dia a dia)
-- **Conteúdo teórico aprofundado** (linguagem simples, tom profissional, 800–1500 palavras em HTML rico: subtítulos, listas, tabelas quando fizer sentido)
-- **Passo a passo prático** com numeração clara
-- **Normas e segurança** aplicáveis (NR-10, NR-35, NBR 16401, etc. quando pertinente — sem inventar números)
-- **Erros comuns em campo** e como evitar
-- **Checklist final** de execução/verificação
-- **Flashcards de memorização** (6–10 cards no array `content.flashcards`)
-- **Quiz com explicação** (5–8 questões no array `content.quiz`, cada uma com `explanation`)
-- **Vídeo do YouTube e imagem já existentes preservados** (não sobrescrevo `content.youtube` nem a `<img>` da seção)
+1. Você abre o preview e confirma se o texto premium, flashcards e quiz aparecem renderizados.
+2. Se **não** aparecerem (tela em manutenção, corpo vazio, etc.), eu investigo `AdminCursoPreview.tsx` — o dado está no banco, então seria bug de renderização (custo estimado: 1–2 créditos para diagnóstico + correção).
+3. Se aparecerem OK, você aprova o padrão e eu sigo com as 47 aulas restantes conforme estimativa anterior (35–55 créditos).
 
-## Como será entregue
-
-- Atualização direta no banco (`UPDATE course_lessons SET content = ...`) preservando `youtube` e imagem já inseridos.
-- Você abre `/admin/cursos/<id>/preview` e navega nas 3 aulas para avaliar.
-- Se aprovar o padrão, aí planejamos a reescrita do curso completo (estimativa realista: 35–55 créditos, como já conversado).
-
-## Custo estimado deste piloto
-
-**3–5 créditos** (leitura das 3 aulas atuais + 3 updates com conteúdo denso). Sem migração, sem edge function, sem gerar novas mídias.
-
-## Fora de escopo
-
-- Não vou tocar nas outras 47 aulas.
-- Não vou mexer em schema, RLS ou edge functions.
-- Não vou trocar vídeos nem imagens já inseridos.
-
-Aguardo seu "ok" para executar.
+Nenhuma alteração de código ou banco neste plano — só navegação e verificação.
