@@ -1,30 +1,23 @@
-## O erro que você está vendo
+## Problema
 
-"Edge Function returned a non-2xx status code" = a função `youtube-search` respondeu `missing YOUTUBE_API_KEY`. Ou seja: o código está funcionando, o que falta é a **chave da API do YouTube** cadastrada como secret.
+A rota `/admin/cursos/:id/preview` está apontando para `src/pages/admin/AdminCursoPreview.tsx`, que hoje é um **stub de manutenção** (foi um dos 60 arquivos "stubbed" durante a migração). Por isso, ao clicar em **Visualizar**, aparece a mensagem "Módulo em manutenção".
 
-Sem essa chave, o YouTube não responde a ninguém — não tem como contornar no código.
+## O que fazer
 
-## Como obter a chave (grátis, ~3 min)
+Restaurar o arquivo `AdminCursoPreview.tsx` a partir do backup (`/tmp/backup`) e ajustá-lo para o schema atual:
 
-1. Acesse **https://console.cloud.google.com/**
-2. Crie um projeto (ou selecione um existente) — nome livre, ex.: "Multplick YouTube".
-3. Menu → **APIs & Services → Library** → pesquise **"YouTube Data API v3"** → clique em **Enable**.
-4. Menu → **APIs & Services → Credentials** → **+ Create Credentials** → **API key**.
-5. Copie a chave (começa com `AIzaSy...`).
-6. (Opcional, recomendado) clique em "Edit API key" e em "API restrictions" restrinja a chave à **YouTube Data API v3**.
+1. Copiar o `AdminCursoPreview.tsx` original do backup.
+2. Ajustar imports/queries para as tabelas já existentes: `courses`, `course_sections`, `course_lessons`.
+3. Garantir que o preview renderize:
+   - Título, descrição e capa do curso
+   - Lista de seções → aulas na ordem (`order_index`)
+   - Player de vídeo do YouTube (quando `video_url` presente)
+   - Conteúdo textual (rich text) da aula
+   - Flashcards e quizzes (quando existirem no JSON da aula)
+4. Sem alterações de banco — apenas frontend.
 
-A cota gratuita é de 10.000 unidades/dia — uma busca custa 100, um "usar link" custa 1. Dá tranquilamente para o uso do curso.
+## Custo estimado
 
-## O que farei depois que você colar a chave
+**2–4 créditos** (uma tela, sem migração, sem edge function).
 
-1. Abrir o formulário seguro para você **colar `YOUTUBE_API_KEY`** (via ferramenta `add_secret` — o valor fica criptografado, não passa pelo chat).
-2. **Testar** a função direto no backend com um `curl` (busca + lookup por link).
-3. Você recarrega a aula e o botão "Buscar" / "Usar link" já vai funcionar.
-
-## Custo
-
-**0 créditos extras.** Está tudo dentro dos 1–2 créditos do plano anterior — só falta esse passo do secret.
-
-## Preciso do seu ok
-
-Confirma que vou abrir o formulário para você colar a `YOUTUBE_API_KEY`?
+Aguardo seu "ok" para executar.
