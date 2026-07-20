@@ -63,15 +63,33 @@ export const YoutubePickerDialog = ({
     if (!id) return toast.error("Link do YouTube inválido");
     setPasteBusy(true);
     try {
-      const { data, error } = await supabase.functions.invoke("youtube-search", {
-        body: { mode: "lookup", videoId: id },
-      });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      const v: YoutubeVideo | undefined = ((data as any)?.results ?? [])[0];
-      if (!v) throw new Error("Vídeo não encontrado");
+      const normalizedUrl = `https://www.youtube.com/watch?v=${id}`;
+      let v: YoutubeVideo = {
+        videoId: id,
+        title: "Vídeo do YouTube",
+        channel: "",
+        thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+        url: normalizedUrl,
+      };
+
+      try {
+        const oembed = await fetch(
+          `https://www.youtube.com/oembed?format=json&url=${encodeURIComponent(normalizedUrl)}`,
+        );
+        if (oembed.ok) {
+          const meta = await oembed.json();
+          v = {
+            ...v,
+            title: meta?.title || v.title,
+            channel: meta?.author_name || v.channel,
+            thumbnail: meta?.thumbnail_url || v.thumbnail,
+          };
+        }
+      } catch { /* salva mesmo sem metadados */ }
+
       onPick(v, pasteUrl);
       setPasteUrl("");
+      toast.success("Vídeo adicionado à aula");
     } catch (e: any) {
       toast.error(e?.message ?? "Falha ao usar o link");
     } finally { setPasteBusy(false); }
@@ -90,7 +108,12 @@ export const YoutubePickerDialog = ({
       setResults(list);
       if (list.length === 0) toast.info("Nenhum vídeo válido encontrado (mín. 3 min, embutível, público).");
     } catch (e: any) {
-      toast.error(e?.message ?? "Falha na busca do YouTube");
+      const msg = e?.message ?? "Falha na busca do YouTube";
+      if (msg.includes("non-2xx") || msg.includes("YOUTUBE_API_KEY")) {
+        toast.error("A busca automática precisa de chave do YouTube. Use a opção de colar link acima.");
+      } else {
+        toast.error(msg);
+      }
     } finally { setBusy(false); }
   };
 
@@ -133,7 +156,7 @@ export const YoutubePickerDialog = ({
             </Button>
           </div>
           <p className="text-[11px] text-muted-foreground">
-            Aceita youtube.com/watch, youtu.be e youtube.com/shorts. O vídeo precisa ser público e permitir incorporação.
+            Aceita youtube.com/watch, youtu.be e youtube.com/shorts. Basta colar o link e clicar em Usar link.
           </p>
         </div>
         <div className="text-xs text-muted-foreground text-center">— ou buscar por termo —</div>
