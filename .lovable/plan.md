@@ -1,48 +1,32 @@
-## Como vamos trabalhar o curso de Ar-Condicionado
+## O que está acontecendo
 
-Você monta o conteúdo, eu reviso e complemento depois. Zero custo enquanto você digita — os créditos só entram quando eu revisar/enriquecer.
+A tela de edição de aula já tem o botão **"Buscar vídeo"**, mas ele chama a edge function `youtube-search`, que hoje precisa de duas coisas para funcionar:
 
-### 1. Você cria o conteúdo (sem custo de crédito)
+1. **A função `youtube-search` implantada** no backend (o código existe em `supabase/functions/youtube-search/index.ts`, mas ainda não foi implantada no ambiente atual).
+2. **A chave `YOUTUBE_API_KEY`** cadastrada como secret do backend (a função retorna `missing YOUTUBE_API_KEY` se ela não existir).
 
-No painel: **/admin/cursos → Instalação de Ar-Condicionado → editar aula**.
+Além disso, hoje **não existe campo para colar um link do YouTube manualmente** — só a busca. É por isso que "colar o link" não faz nada.
 
-Em cada aula você já tem os campos prontos:
-- **Texto da aula** (editor rico: negrito, cores, listas, imagens)
-- **Vídeo do YouTube** (cola o link)
-- **Materiais e links extras** (PDFs, links)
-- **Flashcards** (pergunta/resposta)
-- **Quiz da aula**
-- **Imagens ilustrativas** (upload direto)
+## Sobre o custo
 
-Pode ir aula por aula, no seu ritmo. Salva e fica gravado no banco.
+Isso é ajuste da estrutura que eu montei, não é curso novo. Fica em **1–2 créditos** no total (implantar a função, ajustar o diálogo, testar). Só há custo extra se você **não tiver** uma chave da YouTube Data API — nesse caso é grátis, mas você precisa gerar a chave no Google Cloud (te passo o passo a passo) e me mandar para eu salvar como secret.
 
-### 2. Quando terminar (ou por lote de módulo), me chama
+## O que vou fazer (após seu ok)
 
-Eu faço uma passada de revisão que inclui:
-- Ajuste de português, clareza e linguagem simples
-- Padronização de títulos, negritos e caixas de "Atenção / Dica de campo"
-- **Referências**: adiciono no rodapé de cada aula as fontes (normas ABNT NBR 16401, manuais de fabricante, NR-10/NR-35, canais de YouTube usados) — isso é o que evita problema de plágio
-- Confiro se os vídeos que você colou estão acessíveis e no tema
-- Reviso os quizzes/flashcards (respostas coerentes com o texto)
-- Ajusto a prova final de 20 questões se o conteúdo real divergir do que já está lá
+1. **Implantar** a edge function `youtube-search` (já pronta no código).
+2. **Cadastrar `YOUTUBE_API_KEY`** como secret do backend usando a chave que você fornecer.
+3. **Adicionar campo "Colar link do YouTube"** no diálogo `YoutubePickerDialog`:
+   - aceita URLs `youtube.com/watch?v=…`, `youtu.be/…` e `youtube.com/shorts/…`
+   - extrai o `videoId`, busca título/canal/thumb/duração via a mesma função (novo modo `lookup`) e grava na aula igual à busca faz hoje
+4. **Testar** com um `curl` na função e uma aula real do curso de Ar-Condicionado.
 
-### 3. Custo da revisão (só quando eu executar)
+## Detalhes técnicos
 
-Faixa por lote, você aprova antes:
-- **Revisão leve** (ortografia + referências + checagem de links), curso inteiro: **4–7 créditos**
-- **Revisão média** (o de cima + reescrever trechos confusos, padronizar caixas de destaque, ajustar quizzes): **10–15 créditos**
-- **Revisão pesada** (reescrita significativa de aulas, novos exemplos, novas imagens IA): **20–30 créditos**
+- `supabase/functions/youtube-search/index.ts`: aceitar `{ mode: "lookup", videoId }` além do `query` atual; no modo `lookup` chamar só `videos.list` (mais barato em quota).
+- `src/components/admin/YoutubePickerDialog.tsx`: adicionar um `Input` "Colar link do YouTube" + botão "Usar este link"; ao colar, faz `parseYoutubeUrl(url)` no client e invoca `youtube-search` com `mode: "lookup"`.
+- Nenhuma mudança de schema; nenhum outro arquivo afetado.
 
-Você pode pedir por módulo também (ex: revisar só os módulos 6 e 7 de instalação): ~1–2 créditos por módulo na revisão leve.
+## O que eu preciso de você
 
-### 4. Recomendação prática
-
-- Faça 1 módulo completo primeiro, me manda revisar leve (~1 cr) pra você ver o padrão que fica bom
-- Depois segue os outros 9 no mesmo modelo
-- No final, uma revisão leve geral + referências (~4–7 cr) e o curso fica pronto pra publicar
-
-### Fora de escopo agora
-
-- Não vou gerar conteúdo novo de aula por IA nesse fluxo (isso é o que consome crédito de verdade). Se em alguma aula você travar, me pede pontualmente ("gera o texto da aula X") e eu estimo antes.
-
-Se topar esse fluxo, é só começar a editar as aulas — quando quiser revisão, me avisa qual módulo e qual nível (leve/média/pesada) e eu passo a estimativa exata antes de executar.
+- **Confirmar o "ok"** para eu executar (1–2 créditos).
+- **Uma chave da YouTube Data API v3** (Google Cloud → APIs & Services → Credentials). Se preferir, me avise e eu te mando o passo a passo antes.
