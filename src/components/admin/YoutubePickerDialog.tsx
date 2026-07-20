@@ -34,8 +34,48 @@ export const YoutubePickerDialog = ({
   const [query, setQuery] = useState(initialQuery ?? "");
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState<YoutubeVideo[]>([]);
+  const [pasteUrl, setPasteUrl] = useState("");
+  const [pasteBusy, setPasteBusy] = useState(false);
 
   useEffect(() => { if (open) setQuery(initialQuery ?? ""); }, [open, initialQuery]);
+
+  const extractVideoId = (raw: string): string | null => {
+    const s = raw.trim();
+    if (!s) return null;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+    try {
+      const u = new URL(s.startsWith("http") ? s : `https://${s}`);
+      const host = u.hostname.replace(/^www\./, "");
+      if (host === "youtu.be") return u.pathname.slice(1).split("/")[0] || null;
+      if (host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com")) {
+        const v = u.searchParams.get("v");
+        if (v) return v;
+        const parts = u.pathname.split("/").filter(Boolean);
+        const idx = parts.findIndex((p) => ["shorts", "embed", "live", "v"].includes(p));
+        if (idx >= 0 && parts[idx + 1]) return parts[idx + 1];
+      }
+    } catch { /* noop */ }
+    return null;
+  };
+
+  const useLink = async () => {
+    const id = extractVideoId(pasteUrl);
+    if (!id) return toast.error("Link do YouTube inválido");
+    setPasteBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("youtube-search", {
+        body: { mode: "lookup", videoId: id },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const v: YoutubeVideo | undefined = ((data as any)?.results ?? [])[0];
+      if (!v) throw new Error("Vídeo não encontrado");
+      onPick(v, pasteUrl);
+      setPasteUrl("");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao usar o link");
+    } finally { setPasteBusy(false); }
+  };
 
   const run = async () => {
     if (!query.trim()) return toast.error("Digite um termo de busca");
@@ -78,6 +118,25 @@ export const YoutubePickerDialog = ({
             )}
           </div>
         )}
+        <div className="border border-border rounded-lg p-3 space-y-2">
+          <div className="text-xs font-medium text-muted-foreground">Colar link do YouTube</div>
+          <div className="flex gap-2">
+            <Input
+              value={pasteUrl}
+              onChange={(e) => setPasteUrl(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=... ou https://youtu.be/..."
+              onKeyDown={(e) => e.key === "Enter" && useLink()}
+            />
+            <Button onClick={useLink} disabled={pasteBusy || !pasteUrl.trim()} variant="secondary">
+              {pasteBusy ? <Loader2 className="size-4 animate-spin" /> : null}
+              Usar link
+            </Button>
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Aceita youtube.com/watch, youtu.be e youtube.com/shorts. O vídeo precisa ser público e permitir incorporação.
+          </p>
+        </div>
+        <div className="text-xs text-muted-foreground text-center">— ou buscar por termo —</div>
         <div className="flex gap-2">
           <Input
             value={query}
