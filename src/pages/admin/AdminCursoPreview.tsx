@@ -110,6 +110,7 @@ export default function AdminCursoPreview() {
 function LessonView({ lesson }: { lesson: Lesson }) {
   const yt = lesson.content?.youtube;
   const body: string | undefined = lesson.content?.body;
+  const imageUrl: string | undefined = lesson.content?.image_url;
   const flashcards: Array<{ front: string; back: string }> = lesson.content?.flashcards ?? [];
   const quiz: Array<{ question: string; options: string[]; answer: number; explanation?: string }> =
     lesson.content?.quiz ?? lesson.content?.questions ?? [];
@@ -131,6 +132,12 @@ function LessonView({ lesson }: { lesson: Lesson }) {
             allowFullScreen
           />
         </div>
+      )}
+
+      {imageUrl && !yt?.videoId && (
+        <figure className="rounded-lg overflow-hidden border border-border">
+          <img src={imageUrl} alt={lesson.title} className="w-full h-auto object-cover" loading="lazy" />
+        </figure>
       )}
 
       {body && (
