@@ -1,27 +1,53 @@
-# Onde estão as 3 aulas premium
+# Importar curso "Instalação de Ar-Condicionado Split — Preparatório para Aula Prática"
 
-As 3 aulas foram salvas no banco (confirmado via query): cada uma com corpo HTML de 4.4k–5.7k caracteres, 7–8 flashcards e 6–7 questões de quiz.
+## O que será feito
 
-## Localização
+Importação **em lote** direto no banco a partir do JSON enviado. Nada de gerar imagens/vídeos com IA agora — o JSON já traz *prompts de imagem* e *buscas de YouTube* por aula, que ficam salvos no conteúdo para você (ou eu, depois) transformar em mídia quando quiser.
 
-Curso: **Instalação de Ar-Condicionado** (`slug: instalacao-ar-condicionado`, id `b13267f6-53c0-4624-82dd-d54317a219cf`)
+## Escopo do conteúdo importado
 
-| Aula | Seção | Posição |
-|---|---|---|
-| O ciclo de refrigeração passo a passo | Termodinâmica e Ciclo de Refrigeração | Seção 2 → aula 2 |
-| Fixação da evaporadora — o que ninguém te conta | Instalação Passo a Passo — Preparação e Fixação | Seção 6 → aula 2 |
-| Segurança elétrica: como não morrer no dia de serviço | Ferramentas, EPIs e Segurança na Instalação | Seção 4 → aula 3 |
+- **1 curso novo** (não sobrescreve o curso "Instalação de Ar-Condicionado" atual — slug diferente)
+- **10 módulos** (course_sections)
+- **40 aulas** (course_lessons) — todas do tipo `text`
+- Cada aula recebe no `content` JSONB:
+  - `body` em markdown compilado a partir de: explicação simples, conteúdo detalhado, passo a passo prático, alertas de segurança, ferramentas/materiais, ponte para a prática
+  - `flashcards` (5 por aula → 200 no total)
+  - `quiz` com explicações (4 por aula → 160 questões no total)
+  - `image_prompts` (guardados para gerar imagens depois)
+  - `video_references` com termos de busca do YouTube (guardados para você colar o link depois no editor)
 
-## Rotas para abrir
+## Dados do curso
 
-- Preview admin: `/admin/cursos/b13267f6-53c0-4624-82dd-d54317a219cf/preview`
-- Builder/edição: `/admin/cursos/b13267f6-53c0-4624-82dd-d54317a219cf/conteudo`
-- Lista de cursos: `/admin/cursos`
+- **Título:** Instalação de Ar-Condicionado Split — Preparatório para Aula Prática
+- **Slug:** `instalacao-ar-split-preparatorio`
+- **Duração:** 200 horas
+- **Categoria:** mesma do curso atual de ar-condicionado
+- **Passing score:** 70
+- **Published:** false (rascunho, você publica quando quiser)
 
-## Próximo passo proposto
+## Como será executado (técnico)
 
-1. Você abre o preview e confirma se o texto premium, flashcards e quiz aparecem renderizados.
-2. Se **não** aparecerem (tela em manutenção, corpo vazio, etc.), eu investigo `AdminCursoPreview.tsx` — o dado está no banco, então seria bug de renderização (custo estimado: 1–2 créditos para diagnóstico + correção).
-3. Se aparecerem OK, você aprova o padrão e eu sigo com as 47 aulas restantes conforme estimativa anterior (35–55 créditos).
+1. Script local lê o JSON e gera **um único arquivo SQL** com:
+   - `INSERT` do curso
+   - `INSERT` das 10 seções
+   - `INSERT` das 40 aulas com `content` JSONB montado
+2. Rodo via ferramenta de inserção (uma única chamada).
+3. Confirmo com `SELECT count(*)` que 10 seções e 40 aulas foram criadas.
 
-Nenhuma alteração de código ou banco neste plano — só navegação e verificação.
+## O que **não** faço nesta etapa (para economizar créditos)
+
+- Não gero imagens com IA (os prompts ficam salvos na aula)
+- Não faço busca no YouTube por aula (os termos de busca ficam salvos)
+- Não crio prova final separada — o JSON não traz prova final, só quizzes por aula
+
+Se depois você quiser, posso gerar imagens/vídeos por aula sob demanda com estimativa separada.
+
+## Estimativa
+
+**3 a 5 créditos** no total (leitura + geração do SQL + insert em lote + verificação).
+
+## Onde ver depois
+
+- `/admin/cursos` → "Instalação de Ar-Condicionado Split — Preparatório para Aula Prática"
+- Editor de conteúdo: `/admin/cursos/<id>/conteudo`
+- Preview: `/admin/cursos/<id>/preview`
