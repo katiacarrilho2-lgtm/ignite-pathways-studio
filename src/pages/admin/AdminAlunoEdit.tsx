@@ -369,7 +369,14 @@ const Inner = () => {
   const addCourse = async () => {
     if (!newCourseId || !userId) return;
     const { error } = await supabase.from("enrollments").insert(withAccount({ user_id: userId, course_id: newCourseId }, activeAccountId));
-    if (error) return toast.error(error.message);
+    if (error) {
+      if ((error as any).code === "23505" || /duplicate key/i.test(error.message)) {
+        toast.info("Aluno já está matriculado nesse curso.");
+        setAddCourseOpen(false); setNewCourseId(""); load();
+        return;
+      }
+      return toast.error(error.message);
+    }
     toast.success("Curso adicionado!"); setAddCourseOpen(false); setNewCourseId(""); load();
   };
   const removeEnr = async (id: string) => {
