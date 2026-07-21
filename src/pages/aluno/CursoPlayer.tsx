@@ -111,6 +111,14 @@ const CursoPlayer = () => {
     supabase.from("enrollments").update({ progress: percent, status: percent === 100 ? "concluido" : "active", completed_at: percent === 100 ? new Date().toISOString() : null }).eq("id", course.enrollment_id);
   }, [percent, course?.enrollment_id, allLessons.length]);
 
+  useEffect(() => {
+    if (percent === 100 && !finaleShown) {
+      setFinaleShown(true);
+      setFinaleOpen(true);
+      fireConfetti(2400);
+    }
+  }, [percent, finaleShown]);
+
   const markCompleted = async (lessonId: string, score?: number) => {
     if (!user) return;
     const already = progress[lessonId]?.completed;
@@ -133,12 +141,6 @@ const CursoPlayer = () => {
   if (loading) return <div className="p-8 text-muted-foreground">Carregando…</div>;
   if (!course) return <div className="p-8">Curso não encontrado.</div>;
   const courseboxUrl = extractEmbedUrl(course.coursebox_embed_url);
-
-  if (percent === 100 && !finaleShown && !finaleOpen) {
-    setFinaleShown(true);
-    setFinaleOpen(true);
-    fireConfetti(2400);
-  }
 
   const SidebarBody = (
     <>
