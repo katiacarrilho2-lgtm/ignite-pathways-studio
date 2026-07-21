@@ -70,6 +70,83 @@
 
 .lesson-content .lesson-section--refs { font-size: .92rem; color: hsl(var(--muted-foreground)); }
 
+/* Module-themed lesson wrapper (per-module accent color) */
+.lesson-themed {
+  --lesson-accent: hsl(var(--primary));
+  padding-top: .25rem;
+}
+.lesson-themed .lesson-mod-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .35rem .75rem; border-radius: 999px;
+  background: var(--lesson-accent); color: white;
+  font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: .75rem;
+  box-shadow: 0 4px 12px -4px var(--lesson-accent);
+}
+.lesson-themed .lesson-title-bar {
+  height: 4px; border-radius: 4px; background: var(--lesson-accent);
+  margin: .25rem 0 1rem; width: 72px;
+}
+.lesson-themed .lesson-content .lesson-objective {
+  background: color-mix(in oklab, var(--lesson-accent) 10%, transparent);
+  border-color: color-mix(in oklab, var(--lesson-accent) 30%, transparent);
+}
+.lesson-themed .lesson-content .lesson-objective__label { color: var(--lesson-accent); }
+.lesson-themed .lesson-content ol.lesson-steps > li::before { background: var(--lesson-accent); }
+.lesson-themed .lesson-content h3 { color: var(--lesson-accent); }
+
+/* Tools kit image card */
+.lesson-tools-kit {
+  border: 1px solid hsl(var(--border));
+  border-radius: .75rem; overflow: hidden; background: hsl(var(--card));
+  margin: 1rem 0;
+}
+.lesson-tools-kit__header {
+  padding: .75rem 1rem; border-bottom: 1px solid hsl(var(--border));
+  display: flex; align-items: center; gap: .5rem; font-weight: 600;
+  background: color-mix(in oklab, var(--lesson-accent, hsl(var(--primary))) 8%, transparent);
+}
+.lesson-tools-kit__img { width: 100%; height: auto; display: block; }
+.lesson-tools-kit__list {
+  padding: .75rem 1rem; display: grid; gap: .4rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  list-style: none; margin: 0;
+}
+.lesson-tools-kit__list li {
+  display: flex; align-items: center; gap: .5rem; font-size: .87rem;
+  padding: .35rem .5rem; border-radius: .35rem; background: hsl(var(--muted));
+}
+.lesson-tools-kit__list li::before {
+  content: ""; width: 6px; height: 6px; border-radius: 999px;
+  background: var(--lesson-accent, hsl(var(--primary))); flex: none;
+}
+
+/* Video suggestions (search links) */
+.lesson-videos { display: grid; gap: .55rem; margin: 1rem 0; }
+.lesson-videos__card {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .75rem 1rem; border-radius: .65rem;
+  border: 1px solid hsl(var(--border)); background: hsl(var(--card));
+  text-decoration: none; color: inherit; transition: all .15s;
+}
+.lesson-videos__card:hover { border-color: var(--lesson-accent, hsl(var(--primary))); transform: translateX(2px); }
+.lesson-videos__icon {
+  width: 36px; height: 36px; border-radius: 999px; flex: none;
+  display: grid; place-items: center;
+  background: color-mix(in oklab, var(--lesson-accent, hsl(var(--primary))) 15%, transparent);
+  color: var(--lesson-accent, hsl(var(--primary)));
+}
+.lesson-videos__title { font-weight: 600; font-size: .92rem; }
+.lesson-videos__why { font-size: .78rem; color: hsl(var(--muted-foreground)); margin-top: 2px; }
+
+/* Small "section header" pill used in the player */
+.lesson-block-heading {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .8rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--lesson-accent, hsl(var(--primary)));
+  margin-bottom: .5rem;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
