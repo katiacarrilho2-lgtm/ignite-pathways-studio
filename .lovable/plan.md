@@ -1,70 +1,60 @@
+## Escopo — Opção B + 3 (~5 créditos)
 
-# Refazer o curso "Instalação de Ar-Condicionado Split — Preparatório"
+Deixar as 40 aulas do curso "Instalação de Ar-Condicionado Split — Preparatório" mais dinâmicas, únicas e interativas, sem gerar vídeos automaticamente (você cola os links depois pelo YoutubePickerDialog que já existe).
 
-## Diagnóstico do que está hoje no banco
+## O que entrego
 
-Já conferi o curso `instalacao-ar-split-preparatorio` (id `982a…4dd`):
+**1. Identidade visual por módulo (10 módulos, 10 cores/ícones)**
+- Cada módulo ganha uma cor de destaque e um ícone temático (refrigeração, elétrica, vácuo, brasagem, testes, etc.).
+- O cabeçalho da aula, a barra lateral e os blocos de destaque usam essa cor — nenhuma aula parece igual à outra.
 
-- 10 módulos e 40 aulas criados ✅
-- Cada aula tem `body` (~4,5 KB), 5 flashcards e 4 questões de quiz ✅
-- Apenas ~20 das 40 aulas têm `image_url` (as outras ficaram sem imagem) ⚠️
-- **Não existe prova final** no banco, mas o JSON traz 20 questões prontas ❌
-- O `body` atual foi montado de forma resumida — não usa toda a riqueza do JSON (explicação simples, conteúdo detalhado em 6 parágrafos, passo a passo, alertas, ferramentas, ponte para a prática). Por isso a sensação de "aula fria / apostila". ❌
+**2. Imagens de kit de ferramentas (10 imagens, 1 por módulo)**
+- Uma imagem "kit" por módulo mostrando as ferramentas daquele bloco com nome ao lado (ex.: manifold, bomba de vácuo, torquímetro, flangeador…).
+- Substitui o bloco de texto "Ferramentas e materiais" por essa imagem visual + legenda.
+- Geradas via IA, subidas no CDN e vinculadas no `content.tools_image_url` da aula.
 
-## O que o JSON original tem por aula (e que vou usar de verdade)
+**3. Ícones inline nas ferramentas repetidas**
+- Além da imagem do kit, cada ferramenta citada no texto ganha um ícone Lucide (chave, termômetro, multímetro…) para escaneabilidade.
 
-Cada uma das 40 aulas do JSON traz:
+**4. Blocos mais vivos e menos "apostila"**
+- Passos numerados com círculos coloridos grandes.
+- Alertas de segurança em vermelho com ícone ⚠️ e borda pulsante suave.
+- "Ponte para a prática presencial" em azul com ícone de mão/ferramenta.
+- Objetivo da aula como badge no topo.
 
-- `simple_explanation` (parágrafo introdutório)
-- `detailed_content` (6 parágrafos aprofundados)
-- `practical_steps` (8 passos numerados)
-- `safety_alerts` (4 alertas)
-- `tools_and_materials` (6 itens)
-- `practice_lab_bridge` (ponte para a aula presencial)
-- `image_prompts` (4 sugestões) e `video_references` (3 buscas)
-- `flashcards` (5) e `quiz` (4 com explicação)
+**5. Barra de progresso da aula**
+- Barra fina no topo do player que preenche conforme o aluno rola a aula.
+- Ao clicar em "Concluir aula", grava em `lesson_progress` (tabela já existe) e mostra check verde na sidebar.
+- Progresso do curso agregado no card do `/aluno` (já existe base, só ligar).
 
-Mais um `final_exam` com 20 questões e regras de aprovação (70%).
+**6. Flashcards e quiz mais divertidos**
+- Flashcard: animação 3D de virada (flip) suave.
+- Quiz: feedback imediato colorido + confete leve quando gabarita 100%.
 
-## O que vou fazer
+**7. Vídeo por aula — pronto pra você colar**
+- Em cada aula, se `content.youtube.videoId` estiver vazio, aparece um botão discreto "Adicionar vídeo desta aula" (só no modo admin/preview) que abre o `YoutubePickerDialog` já existente.
+- No modo aluno, se não tiver vídeo ainda, mostra o link de sugestão de busca do JSON ("Buscar no YouTube: …") como fallback — nada quebra.
+- Salvo os 3 termos de busca do JSON em `content.video_suggestions` pra facilitar sua curadoria depois.
 
-1. **Ler o JSON local** que você já enviou (nada de IA, nada de gerar imagem nova).
-2. **Gerar um HTML rico e padronizado** para cada aula com estas seções visuais:
-   - Objetivo da aula (badge)
-   - Explicação simples (bloco destacado)
-   - Conteúdo detalhado (parágrafos + subtítulos)
-   - Passo a passo (lista ordenada com números grandes)
-   - Alertas de segurança (bloco vermelho com ícone ⚠️)
-   - Ferramentas e materiais (lista com ícone 🧰)
-   - Ponte para a aula prática (bloco azul “Na prática presencial…”)
-   - Referências de vídeo (lista para você colar links depois)
-3. **Preservar** flashcards e quiz (a estrutura já está boa) e **normalizar** o campo `answer` do quiz (o player espera `answer`, o JSON traz `correct_option_index`).
-4. **Manter as image_urls que já existem** nas ~20 aulas e adicionar no JSONB o array `image_prompts` completo, para você (ou eu, depois) gerar as faltantes sob demanda.
-5. **Criar a Prova Final** (`is_final: true`) como uma 41ª aula do tipo `quiz`, ligada a uma nova seção “Avaliação Final”, com as 20 questões do JSON e nota mínima 70%.
-6. **Estilos** já existem em `.lesson-content` no `index.css`. Só vou acrescentar 4 classes utilitárias (`.lesson-callout--safety`, `.lesson-callout--bridge`, `.lesson-steps`, `.lesson-tools`) para os blocos novos ficarem com visual premium.
-7. **Verificação:** consulta SQL confirmando 40 aulas atualizadas + 1 prova final criada, e abertura visual de 1 aula no `/admin/cursos/:id/preview` para você validar.
+## O que NÃO faço nesta rodada
 
-## Como executo (técnico)
+- Não gero vídeos nem chamo API do YouTube.
+- Não mexo em outros cursos.
+- Não mexo em schema de banco (uso colunas/JSONB que já existem).
 
-- Script Python local lê o JSON e gera **um único arquivo SQL** com `UPDATE` em cada `course_lessons` (por posição dentro da seção) + `INSERT` da seção "Avaliação Final" e da aula da prova final.
-- Rodo tudo via **uma chamada** de `supabase--insert` (bulk) — nada de edge function nova, nada de créditos de IA.
-- Ajuste no CSS: `src/index.css` (adição incremental, sem tocar em componentes).
+## Detalhes técnicos
 
-## O que **não** faço nesta rodada (para não gastar créditos)
+- `src/index.css`: adiciona paleta por módulo (`--mod-1` … `--mod-10`), animações do flashcard, barra de progresso e utilitários dos novos blocos.
+- `src/pages/aluno/CursoPlayer.tsx`: barra de progresso ao rolar, botão "Concluir aula" gravando em `lesson_progress`, render da `tools_image_url`, ícones inline por ferramenta, animação do flashcard, confete no quiz, fallback de sugestão de vídeo.
+- `src/pages/admin/AdminCursoPreview.tsx`: mesmos blocos visuais + botão "Adicionar vídeo" abrindo `YoutubePickerDialog`.
+- Script Python local (não vai pro repo) monta um mapa `moduleId → cor/ícone/kit_image_url`, gera as 10 imagens de kit via IA, sobe no CDN e faz um `bulk-update-lessons` gravando `theme`, `tools_image_url` e `video_suggestions` em cada aula. Sem migração nova.
 
-- Não gero novas imagens com IA. As ~20 imagens já geradas continuam. As faltantes ficam com os `image_prompts` salvos, prontas para gerar depois se você pedir.
-- Não busco vídeos no YouTube. As `video_references` ficam listadas na aula para você colar o link no `YoutubePickerDialog`.
+## Verificação
 
-## Estimativa
+- Abro `/admin/cursos/<id>/preview` em 3 aulas de módulos diferentes e confirmo cor/ícone/kit distintos.
+- Abro `/aluno` → curso → aula, rolo até o fim, clico "Concluir aula" e confirmo que a sidebar marca ✓ e o card do dashboard sobe o %.
+- Confirmo no console que não há erro de RLS ao gravar `lesson_progress`.
 
-**1 a 2 créditos** no total: leitura do JSON local, geração do SQL, um insert em lote, uma verificação e um pequeno patch de CSS. Sem chamadas de IA.
+## Custo
 
-## Depois que eu terminar, o que fica visível pra você
-
-- `/admin/cursos/<id>/preview` — cada aula com blocos coloridos, passos, alertas, ferramentas e ponte prática.
-- `/aluno` → curso → player já lendo o mesmo HTML (o `CursoPlayer` usa o mesmo `content.body`).
-- Uma **Prova Final** no fim do curso com 20 questões e regra de 70%.
-
-## Pergunta antes de eu começar
-
-Confirma que posso executar exatamente esse plano (refazer o `body` das 40 aulas + criar a Prova Final, sem gerar imagens novas)? Se preferir que eu **também já gere as ~20 imagens faltantes** na mesma rodada, me diz — nesse caso a estimativa sobe para **8 a 10 créditos** no total.
+**~5 créditos** (10 imagens de kit + código). Sem surpresa: se algo estourar, paro e te aviso antes.
