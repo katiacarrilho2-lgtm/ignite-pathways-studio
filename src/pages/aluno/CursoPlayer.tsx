@@ -19,6 +19,8 @@ import { AvatarTrail } from "@/components/gamer/AvatarTrail";
 import { CourseFinale } from "@/components/gamer/CourseFinale";
 import { useGamification } from "@/lib/gamer/useGamification";
 import { sfx, fireConfetti } from "@/lib/gamer/sfx";
+import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
+import { Pencil } from "lucide-react";
 
 type Lesson = {
   id: string; section_id: string; title: string;
@@ -255,6 +257,12 @@ const CursoPlayer = () => {
             onPrev={currentIdx > 0 ? goPrev : undefined}
             onDownloadApostila={handleDownloadApostila}
             downloadingApostila={downloadingApostila}
+            onLessonUpdated={(u) => {
+              setSections(secs => secs.map(sec => ({
+                ...sec,
+                lessons: sec.lessons.map(l => l.id === u.id ? { ...l, title: u.title, content: u.content } : l),
+              })));
+            }}
             />
           ) : (
             <div className="p-10 text-center text-muted-foreground"><BookOpen className="size-12 mx-auto mb-3" />Nenhuma aula publicada ainda.</div>
@@ -357,21 +365,36 @@ const SectionList = ({
   );
 };
 
-const LessonView = ({ lesson, progress, onComplete, onNext, onPrev, onDownloadApostila, downloadingApostila }: { lesson: Lesson; progress?: Progress; onComplete: (score?: number) => void; onNext?: () => void; onPrev?: () => void; onDownloadApostila: () => void; downloadingApostila: boolean }) => {
+const LessonView = ({ lesson, progress, onComplete, onNext, onPrev, onDownloadApostila, downloadingApostila, onLessonUpdated }: { lesson: Lesson; progress?: Progress; onComplete: (score?: number) => void; onNext?: () => void; onPrev?: () => void; onDownloadApostila: () => void; downloadingApostila: boolean; onLessonUpdated?: (u: Lesson) => void }) => {
   const done = !!progress?.completed;
   const attachments: { kind: string; title: string; url: string }[] = lesson.content?.attachments ?? [];
   const TypeIcon = ICONS[lesson.lesson_type];
+  const { isStaff } = useAuth();
+  const [editOpen, setEditOpen] = useState(false);
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6 md:p-10 space-y-6">
       <div className="flex items-start gap-3">
         <span className="size-10 grid place-items-center rounded-lg bg-primary/10 text-primary shrink-0">
           <TypeIcon className="size-5" />
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="text-[10px] text-muted-foreground uppercase tracking-[0.18em]">{LESSON_LABEL[lesson.lesson_type]}</p>
           <h2 className="text-2xl sm:text-3xl font-bold text-foreground mt-0.5 leading-tight">{lesson.title}</h2>
         </div>
+        {isStaff && (
+          <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+            <Pencil className="size-4" /> Editar aula
+          </Button>
+        )}
       </div>
+      {isStaff && (
+        <LessonEditDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          lesson={lesson as any}
+          onSaved={(u) => onLessonUpdated?.({ ...(lesson as any), ...u })}
+        />
+      )}
       {lesson.lesson_type === "video" && <VideoBlock lesson={lesson} done={done} onComplete={() => onComplete()} />}
       {lesson.lesson_type === "text" && <TextBlock lesson={lesson} />}
       {lesson.lesson_type === "quiz" && <QuizBlock lesson={lesson} previousScore={progress?.score ?? null} onPass={(s) => onComplete(s)} />}
@@ -493,8 +516,14 @@ const TextBlock = ({ lesson }: { lesson: Lesson }) => {
       )}
       {lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
       {lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
-        <figure className="rounded-lg overflow-hidden border border-border">
-          <img src={lesson.content.image_url} alt={lesson.title} className="w-full h-auto object-cover" loading="lazy" />
+        <figure className="flex justify-center">
+          <img
+            src={lesson.content.image_url}
+            alt={lesson.title}
+            loading="lazy"
+            className="rounded-lg border border-border w-full h-auto object-contain"
+            style={{ maxWidth: `${lesson.content?.image_width ?? 720}px` }}
+          />
         </figure>
       )}
       {html && (

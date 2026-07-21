@@ -48,8 +48,9 @@ export const CourseCard = ({ course }: { course: DbCourse }) => {
   };
 
   return (
-  <article className="group bg-card rounded-xl overflow-hidden shadow-card-soft hover:shadow-elegant transition-smooth border border-border/60">
+  <article className="game-card group rounded-xl overflow-hidden transition-smooth">
     <div className="aspect-[4/3] overflow-hidden relative">
+      <span className="game-card__badge">{course.category}</span>
       <img
         src={resolveImage(course.image_url)}
         alt={course.title}

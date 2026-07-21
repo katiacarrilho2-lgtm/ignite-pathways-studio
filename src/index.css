@@ -441,3 +441,31 @@ All colors MUST be HSL.
   color: hsl(var(--neon-green)); text-shadow: 0 0 8px hsl(var(--neon-green) / 0.7);
   animation: xp-float 1.2s ease-out forwards; pointer-events: none;
 }
+
+/* Gamer-style course cards on public listing */
+.game-card {
+  position: relative;
+  background:
+    linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--card)) 60%, hsl(var(--neon-purple) / 0.06) 100%);
+  border: 1px solid hsl(var(--neon-purple) / 0.25);
+  box-shadow: 0 8px 24px hsl(240 30% 10% / 0.10), 0 0 0 1px hsl(var(--neon-green) / 0.05) inset;
+}
+.game-card::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(120deg, hsl(var(--neon-green) / 0.45), hsl(var(--neon-purple) / 0.45), hsl(var(--neon-orange) / 0.35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px; opacity: 0; transition: opacity 220ms;
+}
+.game-card:hover::before { opacity: 1; }
+.game-card:hover { transform: translateY(-2px); box-shadow: 0 14px 40px hsl(var(--neon-purple) / 0.28); }
+.game-card__badge {
+  position: absolute; top: .6rem; left: .6rem; z-index: 2;
+  font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: .25rem .55rem; border-radius: 999px;
+  color: hsl(var(--neon-green)); background: hsl(240 30% 6% / 0.72);
+  border: 1px solid hsl(var(--neon-green) / 0.55);
+  box-shadow: 0 0 12px hsl(var(--neon-green) / 0.35);
+  backdrop-filter: blur(4px);
+}

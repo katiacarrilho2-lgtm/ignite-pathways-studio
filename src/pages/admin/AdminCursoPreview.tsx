@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink } from "lucide-react";
+import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink, Pencil } from "lucide-react";
+import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
 
 const MODULE_ICONS: Record<string, any> = { Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle: CheckCircle2 };
 
@@ -101,7 +102,10 @@ export default function AdminCursoPreview() {
           {!active ? (
             <div className="p-8 text-muted-foreground border border-dashed border-border rounded-lg">Selecione uma aula à esquerda.</div>
           ) : (
-            <LessonView lesson={active} />
+            <LessonView
+              lesson={active}
+              onUpdated={(u) => setLessons(ls => ls.map(l => l.id === u.id ? { ...l, title: u.title, content: u.content } : l))}
+            />
           )}
         </main>
       </div>
@@ -109,7 +113,8 @@ export default function AdminCursoPreview() {
   );
 }
 
-function LessonView({ lesson }: { lesson: Lesson }) {
+function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Lesson) => void }) {
+  const [editOpen, setEditOpen] = useState(false);
   const yt = lesson.content?.youtube;
   const body: string | undefined = lesson.content?.body;
   const imageUrl: string | undefined = lesson.content?.image_url;
@@ -125,6 +130,17 @@ function LessonView({ lesson }: { lesson: Lesson }) {
 
   return (
     <article className="lesson-themed space-y-6 max-w-3xl" style={themeStyle}>
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+          <Pencil className="size-4" /> Editar aula
+        </Button>
+      </div>
+      <LessonEditDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        lesson={lesson as any}
+        onSaved={(u) => onUpdated?.({ ...(lesson as any), ...u })}
+      />
       {theme && (
         <div>
           <span className="lesson-mod-badge">
@@ -152,8 +168,14 @@ function LessonView({ lesson }: { lesson: Lesson }) {
       )}
 
       {imageUrl && !yt?.videoId && (
-        <figure className="rounded-lg overflow-hidden border border-border">
-          <img src={imageUrl} alt={lesson.title} className="w-full h-auto object-cover" loading="lazy" />
+        <figure className="flex justify-center">
+          <img
+            src={imageUrl}
+            alt={lesson.title}
+            loading="lazy"
+            className="rounded-lg border border-border w-full h-auto object-contain"
+            style={{ maxWidth: `${lesson.content?.image_width ?? 720}px` }}
+          />
         </figure>
       )}
 
