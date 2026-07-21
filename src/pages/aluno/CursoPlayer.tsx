@@ -25,6 +25,12 @@ type Progress = { lesson_id: string; completed: boolean; score: number | null };
 
 const ICONS = { video: Video, text: FileText, quiz: HelpCircle, flip: RotateCw, accordion: Rows } as const;
 
+const extractEmbedUrl = (value?: string | null) => {
+  if (!value) return null;
+  const match = value.match(/src=["']([^"']+)["']/i);
+  return match?.[1] ?? value;
+};
+
 const CursoPlayer = () => {
   const { enrollmentId } = useParams();
   const { user } = useAuth();
@@ -105,6 +111,7 @@ const CursoPlayer = () => {
 
   if (loading) return <div className="p-8 text-muted-foreground">Carregando…</div>;
   if (!course) return <div className="p-8">Curso não encontrado.</div>;
+  const courseboxUrl = extractEmbedUrl(course.coursebox_embed_url);
 
   const SidebarBody = (
     <>
@@ -132,9 +139,9 @@ const CursoPlayer = () => {
               </a>
             </Button>
           )}
-          {course.coursebox_embed_url && (
+          {courseboxUrl && (
             <Button asChild size="sm" className="w-full mt-2">
-              <a href={course.coursebox_embed_url} target="_blank" rel="noopener noreferrer">
+              <a href={courseboxUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="size-4" /> Abrir Coursebox
               </a>
             </Button>
@@ -187,7 +194,7 @@ const CursoPlayer = () => {
         </header>
 
         <main className="flex-1 overflow-y-auto min-w-0 bg-background">
-          {course.coursebox_embed_url ? (
+          {courseboxUrl ? (
             <div className="h-full min-h-[720px] flex flex-col">
               <div className="p-4 sm:p-6 border-b border-border bg-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
@@ -195,13 +202,13 @@ const CursoPlayer = () => {
                   <h2 className="text-2xl font-bold text-foreground leading-tight">{course.title}</h2>
                 </div>
                 <Button asChild>
-                  <a href={course.coursebox_embed_url} target="_blank" rel="noopener noreferrer">
+                  <a href={courseboxUrl} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="size-4" /> Abrir em nova aba
                   </a>
                 </Button>
               </div>
               <iframe
-                src={course.coursebox_embed_url}
+                src={courseboxUrl}
                 title={course.title}
                 className="flex-1 w-full border-0 bg-background"
                 allow="fullscreen; clipboard-write"
