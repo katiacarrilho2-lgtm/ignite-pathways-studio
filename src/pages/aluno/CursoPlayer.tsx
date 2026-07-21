@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Video, FileText, HelpCircle,
   RotateCw, Rows, Award, BookOpen, Loader2, ListTree, Download, ExternalLink, Paperclip, Link2, Radio,
+  Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, Youtube,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
@@ -24,6 +25,10 @@ type Section = { id: string; title: string; sort_order: number; lessons: Lesson[
 type Progress = { lesson_id: string; completed: boolean; score: number | null };
 
 const ICONS = { video: Video, text: FileText, quiz: HelpCircle, flip: RotateCw, accordion: Rows } as const;
+
+const MODULE_ICONS: Record<string, any> = {
+  Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle: CheckCircle2,
+};
 
 const extractEmbedUrl = (value?: string | null) => {
   if (!value) return null;
@@ -436,8 +441,23 @@ const TextBlock = ({ lesson }: { lesson: Lesson }) => {
   const flashcards: { front: string; back: string }[] = lesson.content?.flashcards ?? [];
   const quiz: { question: string; options: string[]; answer?: number; correct?: number; explanation?: string }[] =
     lesson.content?.quiz ?? [];
+  const theme = lesson.content?.module_theme;
+  const toolsImg: string | undefined = lesson.content?.tools_image_url;
+  const toolsList: string[] = lesson.content?.tools_list ?? [];
+  const videos: { title: string; url: string; why?: string }[] = lesson.content?.video_suggestions ?? [];
+  const ModIcon = theme?.icon ? (MODULE_ICONS[theme.icon] ?? BookOpen) : null;
+  const themeStyle = theme?.color ? ({ "--lesson-accent": `hsl(${theme.color})` } as React.CSSProperties) : undefined;
   return (
-    <div className="space-y-8">
+    <div className="lesson-themed space-y-8" style={themeStyle}>
+      {theme && (
+        <div>
+          <span className="lesson-mod-badge">
+            {ModIcon && <ModIcon className="size-3.5" />}
+            Módulo {theme.module_index} · {theme.label}
+          </span>
+          <div className="lesson-title-bar" />
+        </div>
+      )}
       {lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
       {lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
         <figure className="rounded-lg overflow-hidden border border-border">
@@ -449,6 +469,39 @@ const TextBlock = ({ lesson }: { lesson: Lesson }) => {
           className="lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/85 prose-li:text-foreground/85 prose-strong:text-foreground prose-a:text-primary"
           dangerouslySetInnerHTML={{ __html: html }}
         />
+      )}
+      {(toolsImg || toolsList.length > 0) && (
+        <section>
+          <p className="lesson-block-heading"><Wrench className="size-4" /> Ferramentas & materiais</p>
+          <div className="lesson-tools-kit">
+            <div className="lesson-tools-kit__header">
+              {ModIcon && <ModIcon className="size-4" />} Kit do módulo
+            </div>
+            {toolsImg && <img src={toolsImg} alt="Kit de ferramentas" className="lesson-tools-kit__img" loading="lazy" />}
+            {toolsList.length > 0 && (
+              <ul className="lesson-tools-kit__list">
+                {toolsList.map((t, i) => <li key={i}>{t}</li>)}
+              </ul>
+            )}
+          </div>
+        </section>
+      )}
+      {videos.length > 0 && (
+        <section>
+          <p className="lesson-block-heading"><Youtube className="size-4" /> Vídeos recomendados</p>
+          <div className="lesson-videos">
+            {videos.map((v, i) => (
+              <a key={i} href={v.url} target="_blank" rel="noreferrer" className="lesson-videos__card">
+                <span className="lesson-videos__icon"><Youtube className="size-4" /></span>
+                <span className="flex-1 min-w-0">
+                  <span className="lesson-videos__title block">{v.title}</span>
+                  {v.why && <span className="lesson-videos__why block">{v.why}</span>}
+                </span>
+                <ExternalLink className="size-4 text-muted-foreground" />
+              </a>
+            ))}
+          </div>
+        </section>
       )}
       {flashcards.length > 0 && (
         <section className="space-y-3">
