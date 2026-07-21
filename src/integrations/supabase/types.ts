@@ -1108,6 +1108,94 @@ export type Database = {
           },
         ]
       }
+      lesson_reflections: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_id: string
+          mood: string | null
+          note: string | null
+          self_rating: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_id: string
+          mood?: string | null
+          note?: string | null
+          self_rating?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          mood?: string | null
+          note?: string | null
+          self_rating?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_reflections_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "course_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_reviews: {
+        Row: {
+          allow_public: boolean
+          comment: string | null
+          course_id: string | null
+          created_at: string
+          id: string
+          improve: string | null
+          liked: string | null
+          rating_course: number | null
+          rating_platform: number
+          simulator_score: number | null
+          user_id: string
+        }
+        Insert: {
+          allow_public?: boolean
+          comment?: string | null
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          improve?: string | null
+          liked?: string | null
+          rating_course?: number | null
+          rating_platform: number
+          simulator_score?: number | null
+          user_id: string
+        }
+        Update: {
+          allow_public?: boolean
+          comment?: string | null
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          improve?: string | null
+          liked?: string | null
+          rating_course?: number | null
+          rating_platform?: number
+          simulator_score?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_reviews_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1370,6 +1458,42 @@ export type Database = {
           },
         ]
       }
+      user_gamification: {
+        Row: {
+          coins: number
+          created_at: string
+          current_streak: number
+          last_activity_at: string | null
+          level: number
+          longest_streak: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          coins?: number
+          created_at?: string
+          current_streak?: number
+          last_activity_at?: string | null
+          level?: number
+          longest_streak?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          coins?: number
+          created_at?: string
+          current_streak?: number
+          last_activity_at?: string | null
+          level?: number
+          longest_streak?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       user_permissions: {
         Row: {
           created_at: string
@@ -1420,6 +1544,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_xp: {
+        Args: { delta_coins?: number; delta_xp: number }
+        Returns: {
+          coins: number
+          created_at: string
+          current_streak: number
+          last_activity_at: string | null
+          level: number
+          longest_streak: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "user_gamification"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       crm_can_manage_all: { Args: { _uid: string }; Returns: boolean }
       has_permission: {
         Args: {

@@ -14,6 +14,11 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { CourseTutorChat } from "@/components/aluno/CourseTutorChat";
 import { generateApostila } from "@/lib/apostila";
+import { GamerHUD } from "@/components/gamer/GamerHUD";
+import { AvatarTrail } from "@/components/gamer/AvatarTrail";
+import { CourseFinale } from "@/components/gamer/CourseFinale";
+import { useGamification } from "@/lib/gamer/useGamification";
+import { sfx, fireConfetti } from "@/lib/gamer/sfx";
 
 type Lesson = {
   id: string; section_id: string; title: string;
@@ -46,6 +51,9 @@ const CursoPlayer = () => {
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloadingApostila, setDownloadingApostila] = useState(false);
+  const [finaleOpen, setFinaleOpen] = useState(false);
+  const [finaleShown, setFinaleShown] = useState(false);
+  const { award } = useGamification();
 
   const handleDownloadApostila = async () => {
     if (!course || sections.length === 0) return;
@@ -103,12 +111,28 @@ const CursoPlayer = () => {
     supabase.from("enrollments").update({ progress: percent, status: percent === 100 ? "concluido" : "active", completed_at: percent === 100 ? new Date().toISOString() : null }).eq("id", course.enrollment_id);
   }, [percent, course?.enrollment_id, allLessons.length]);
 
+  useEffect(() => {
+    if (percent === 100 && !finaleShown) {
+      setFinaleShown(true);
+      setFinaleOpen(true);
+      fireConfetti(2400);
+    }
+  }, [percent, finaleShown]);
+
   const markCompleted = async (lessonId: string, score?: number) => {
     if (!user) return;
+    const already = progress[lessonId]?.completed;
     const row = { user_id: user.id, lesson_id: lessonId, completed: true, score: score ?? null, completed_at: new Date().toISOString() };
     const { error } = await supabase.from("lesson_progress").upsert(row, { onConflict: "user_id,lesson_id" });
     if (error) return toast.error(error.message);
     setProgress(p => ({ ...p, [lessonId]: { lesson_id: lessonId, completed: true, score: score ?? null } }));
+    if (!already) {
+      const bonus = typeof score === "number" && score >= 80 ? 20 : 0;
+      sfx.coin();
+      const rect = document.querySelector("[data-xp-anchor]")?.getBoundingClientRect();
+      const anchor = rect ? { x: rect.left + rect.width / 2, y: rect.top } : undefined;
+      await award(50 + bonus, 5, { label: `+${50 + bonus} XP`, anchor });
+    }
   };
 
   const goNext = () => { const next = allLessons[currentIdx + 1]; if (next) setCurrentId(next.id); };
@@ -179,9 +203,11 @@ const CursoPlayer = () => {
   );
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
+    <div className="gamer-shell flex flex-col h-screen bg-background text-foreground">
+      <GamerHUD />
+      <AvatarTrail total={allLessons.length} completed={completedCount} currentIndex={Math.max(0, currentIdx)} courseTitle={course.title} />
       {/* Top progress strip (Netflix-style) */}
-      <div className="h-1 w-full bg-muted shrink-0">
+      <div data-xp-anchor className="h-1 w-full bg-muted shrink-0">
         <div className="h-full bg-primary transition-all" style={{ width: `${percent}%` }} />
       </div>
       <div className="flex flex-col md:flex-row flex-1 min-h-0">
@@ -239,6 +265,13 @@ const CursoPlayer = () => {
           lessonTitle={current?.title}
         />
       </div>
+      <CourseFinale
+        open={finaleOpen}
+        onOpenChange={setFinaleOpen}
+        courseId={course.id}
+        courseSlug={course.slug}
+        courseTitle={course.title}
+      />
     </div>
   );
 };

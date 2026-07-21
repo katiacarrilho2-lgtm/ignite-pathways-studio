@@ -290,3 +290,154 @@ All colors MUST be HSL.
   .animate-float { animation: float 3s ease-in-out infinite; }
   .animate-nr-blink { animation: nr-blink 1.1s ease-in-out infinite; }
 }
+
+/* ============= GAMER MODE ============= */
+.gamer-shell {
+  --neon-green: 158 84% 51%;
+  --neon-purple: 259 94% 74%;
+  --neon-orange: 20 100% 60%;
+  --neon-yellow: 52 100% 60%;
+  --hud-bg: 240 30% 6%;
+}
+.gamer-hud {
+  background: linear-gradient(180deg, hsl(var(--hud-bg)) 0%, hsl(240 30% 10%) 100%);
+  border-bottom: 1px solid hsl(var(--neon-purple) / 0.35);
+  box-shadow: 0 0 24px hsl(var(--neon-purple) / 0.25), inset 0 -1px 0 hsl(var(--neon-green) / 0.2);
+  color: hsl(0 0% 98%);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+.gamer-hud__pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px;
+  background: hsl(0 0% 100% / 0.06);
+  border: 1px solid hsl(0 0% 100% / 0.12);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+}
+.gamer-hud__pill--xp { border-color: hsl(var(--neon-green) / 0.5); color: hsl(var(--neon-green)); }
+.gamer-hud__pill--coin { border-color: hsl(var(--neon-yellow) / 0.5); color: hsl(var(--neon-yellow)); }
+.gamer-hud__pill--streak { border-color: hsl(var(--neon-orange) / 0.5); color: hsl(var(--neon-orange)); }
+.gamer-hud__pill--level { border-color: hsl(var(--neon-purple) / 0.55); color: hsl(var(--neon-purple)); }
+.gamer-hud__xpbar { height: 6px; border-radius: 999px; background: hsl(0 0% 100% / 0.08); overflow: hidden; position: relative; }
+.gamer-hud__xpbar > span {
+  position: absolute; inset: 0 auto 0 0;
+  background: linear-gradient(90deg, hsl(var(--neon-green)), hsl(var(--neon-purple)));
+  box-shadow: 0 0 10px hsl(var(--neon-green) / 0.7);
+  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gamer-trail {
+  position: relative;
+  padding: 40px 12px 28px;
+  background: radial-gradient(ellipse at top, hsl(var(--neon-purple) / 0.14), transparent 60%), hsl(var(--hud-bg));
+  border-bottom: 1px solid hsl(var(--neon-purple) / 0.25);
+  overflow: hidden;
+}
+.gamer-trail__track {
+  position: relative; height: 74px;
+  background-image:
+    linear-gradient(90deg, hsl(0 0% 100% / 0.12) 50%, transparent 50%);
+  background-size: 14px 3px;
+  background-repeat: repeat-x;
+  background-position: 0 62px;
+}
+.gamer-trail__dot {
+  position: absolute; top: 54px; width: 18px; height: 18px; border-radius: 50%;
+  background: hsl(0 0% 100% / 0.12); border: 2px solid hsl(0 0% 100% / 0.25);
+  transform: translateX(-50%);
+  transition: all 300ms;
+}
+.gamer-trail__dot--done { background: hsl(var(--neon-green)); border-color: hsl(var(--neon-green)); box-shadow: 0 0 12px hsl(var(--neon-green) / 0.8); }
+.gamer-trail__dot--current { background: hsl(var(--neon-yellow)); border-color: hsl(var(--neon-yellow)); animation: gamer-pulse 1.2s ease-in-out infinite; }
+.gamer-trail__flag {
+  position: absolute; top: 24px; right: 0; transform: translateX(50%);
+  font-size: 28px; filter: drop-shadow(0 0 8px hsl(var(--neon-yellow) / 0.8));
+  animation: gamer-wave 2s ease-in-out infinite;
+}
+.gamer-trail__avatar {
+  position: absolute; bottom: 0; width: 56px; height: 56px;
+  transform: translateX(-50%);
+  transition: left 800ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 6px 8px hsl(var(--neon-purple) / 0.5));
+  animation: gamer-bob 1.6s ease-in-out infinite;
+}
+.gamer-trail__label {
+  color: hsl(0 0% 100% / 0.7); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;
+}
+.gamer-trail__label b { color: hsl(var(--neon-green)); }
+
+@keyframes gamer-pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 0 hsl(var(--neon-yellow) / 0.7); }
+  50% { transform: translateX(-50%) scale(1.2); box-shadow: 0 0 0 10px hsl(var(--neon-yellow) / 0); }
+}
+@keyframes gamer-bob { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-4px); } }
+@keyframes gamer-wave { 0%,100% { transform: translateX(50%) rotate(-6deg); } 50% { transform: translateX(50%) rotate(6deg); } }
+
+/* Level-up burst */
+@keyframes gamer-burst {
+  0% { transform: scale(0.5); opacity: 0; }
+  40% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+.gamer-burst { animation: gamer-burst 1.4s ease-out forwards; }
+
+/* Simulator */
+.sim-stage {
+  background: linear-gradient(180deg, hsl(210 60% 96%) 0%, hsl(210 30% 88%) 100%);
+  border-radius: 16px; position: relative; overflow: hidden;
+  border: 2px solid hsl(var(--neon-purple) / 0.4);
+  box-shadow: 0 12px 40px hsl(var(--neon-purple) / 0.2), inset 0 0 60px hsl(var(--neon-green) / 0.05);
+}
+.sim-hud {
+  background: hsl(var(--hud-bg)); color: white;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+.sim-drop {
+  border: 2px dashed hsl(var(--neon-purple) / 0.6);
+  background: hsl(var(--neon-purple) / 0.06);
+  border-radius: 12px; transition: all 200ms;
+}
+.sim-drop.is-over { background: hsl(var(--neon-green) / 0.18); border-color: hsl(var(--neon-green)); box-shadow: 0 0 24px hsl(var(--neon-green) / 0.5); }
+.sim-drop.is-done { background: hsl(var(--neon-green) / 0.24); border-style: solid; border-color: hsl(var(--neon-green)); }
+.sim-tool {
+  cursor: grab; user-select: none;
+  padding: 10px 14px; border-radius: 10px;
+  background: white; border: 2px solid hsl(240 20% 85%);
+  font-weight: 700; font-size: 13px;
+  box-shadow: 0 4px 0 hsl(240 20% 80%);
+  transition: transform 120ms;
+}
+.sim-tool:active { cursor: grabbing; transform: translateY(2px); box-shadow: 0 2px 0 hsl(240 20% 80%); }
+.sim-tool.is-dragging { opacity: 0.5; }
+
+.sim-gauge {
+  width: 100%; height: 16px; border-radius: 999px;
+  background: linear-gradient(90deg, hsl(0 80% 55%) 0%, hsl(50 90% 55%) 30%, hsl(140 70% 45%) 45%, hsl(140 70% 45%) 55%, hsl(50 90% 55%) 70%, hsl(0 80% 55%) 100%);
+  position: relative; box-shadow: inset 0 2px 4px hsl(0 0% 0% / 0.25);
+}
+.sim-gauge__needle {
+  position: absolute; top: -4px; bottom: -4px; width: 4px;
+  background: hsl(240 30% 10%); border-radius: 2px;
+  transform: translateX(-50%);
+}
+
+/* Confetti */
+@keyframes confetti-fall {
+  0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+.confetti-piece {
+  position: fixed; top: 0; width: 10px; height: 14px; z-index: 999;
+  animation: confetti-fall 2.4s linear forwards;
+  pointer-events: none;
+}
+
+/* Coin & XP toast float */
+@keyframes xp-float { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-40px); opacity: 0; } }
+.xp-toast {
+  position: fixed; z-index: 60;
+  font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 800; font-size: 20px;
+  color: hsl(var(--neon-green)); text-shadow: 0 0 8px hsl(var(--neon-green) / 0.7);
+  animation: xp-float 1.2s ease-out forwards; pointer-events: none;
+}
