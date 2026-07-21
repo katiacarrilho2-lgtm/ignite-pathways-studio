@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { ArrowLeft, Save, KeyRound, Trash2, Plus, Send, Mail, CheckCircle2, Pencil, Download, MessageCircle, Activity, Clock, Award, FileText, XCircle, ExternalLink, Copy, ClipboardList, UploadCloud } from "lucide-react";
 import { Barcode } from "lucide-react";
