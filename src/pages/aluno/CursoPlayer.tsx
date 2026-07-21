@@ -208,6 +208,14 @@ const CursoPlayer = () => {
     <div className="gamer-shell flex flex-col h-screen bg-background text-foreground">
       <GamerHUD />
       <AvatarTrail total={allLessons.length} completed={completedCount} currentIndex={Math.max(0, currentIdx)} courseTitle={course.title} />
+      {isStaff && course.slug === "instalacao-ar-split-preparatorio" && (
+        <div className="px-4 py-2 bg-[hsl(var(--neon-purple)/0.12)] border-b border-[hsl(var(--neon-purple)/0.4)] flex items-center justify-between gap-2 text-xs">
+          <span className="text-muted-foreground">Modo staff · testar trabalho final interativo</span>
+          <Button size="sm" variant="secondary" onClick={() => setFinaleOpen(true)}>
+            ▶ Abrir simulador final
+          </Button>
+        </div>
+      )}
       {/* Top progress strip (Netflix-style) */}
       <div data-xp-anchor className="h-1 w-full bg-muted shrink-0">
         <div className="h-full bg-primary transition-all" style={{ width: `${percent}%` }} />
