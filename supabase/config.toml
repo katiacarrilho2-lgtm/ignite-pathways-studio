@@ -1,1 +1,3 @@
+[functions.bulk-update-lessons]
+verify_jwt = false
 project_id = "lddawqvklmfibhgnhgsa"
