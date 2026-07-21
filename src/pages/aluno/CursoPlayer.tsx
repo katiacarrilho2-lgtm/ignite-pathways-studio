@@ -516,8 +516,14 @@ const TextBlock = ({ lesson }: { lesson: Lesson }) => {
       )}
       {lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
       {lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
-        <figure className="rounded-lg overflow-hidden border border-border">
-          <img src={lesson.content.image_url} alt={lesson.title} className="w-full h-auto object-cover" loading="lazy" />
+        <figure className="flex justify-center">
+          <img
+            src={lesson.content.image_url}
+            alt={lesson.title}
+            loading="lazy"
+            className="rounded-lg border border-border w-full h-auto object-contain"
+            style={{ maxWidth: `${lesson.content?.image_width ?? 720}px` }}
+          />
         </figure>
       )}
       {html && (
