@@ -142,7 +142,7 @@ function LessonView({ lesson }: { lesson: Lesson }) {
 
       {body && (
         <div
-          className="prose prose-neutral max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary"
+          className="lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary"
           dangerouslySetInnerHTML={{ __html: body }}
         />
       )}
