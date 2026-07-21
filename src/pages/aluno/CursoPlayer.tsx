@@ -397,20 +397,91 @@ const VideoBlock = ({ lesson, done, onComplete }: { lesson: Lesson; done: boolea
   );
 };
 
-const TextBlock = ({ lesson }: { lesson: Lesson }) => (
-  <div className="space-y-6">
-    {lesson.content?.youtube?.videoId && (
-      <YoutubeEmbed yt={lesson.content.youtube} />
-    )}
-    {lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
-      <figure className="rounded-lg overflow-hidden border border-border">
-        <img src={lesson.content.image_url} alt={lesson.title} className="w-full h-auto object-cover" loading="lazy" />
-      </figure>
-    )}
-    <article className="prose max-w-none prose-headings:text-foreground prose-p:text-foreground/80 prose-li:text-foreground/80 prose-strong:text-foreground prose-a:text-primary"
-      dangerouslySetInnerHTML={{ __html: lesson.content?.html ?? "" }} />
-  </div>
-);
+const TextBlock = ({ lesson }: { lesson: Lesson }) => {
+  const html: string = lesson.content?.html ?? lesson.content?.body ?? "";
+  const flashcards: { front: string; back: string }[] = lesson.content?.flashcards ?? [];
+  const quiz: { question: string; options: string[]; answer?: number; correct?: number; explanation?: string }[] =
+    lesson.content?.quiz ?? [];
+  return (
+    <div className="space-y-8">
+      {lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
+      {lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
+        <figure className="rounded-lg overflow-hidden border border-border">
+          <img src={lesson.content.image_url} alt={lesson.title} className="w-full h-auto object-cover" loading="lazy" />
+        </figure>
+      )}
+      {html && (
+        <article
+          className="lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/85 prose-li:text-foreground/85 prose-strong:text-foreground prose-a:text-primary"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      )}
+      {flashcards.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-lg font-bold">Flashcards de memorização</h3>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {flashcards.map((f, i) => <Flashcard key={i} front={f.front} back={f.back} />)}
+          </div>
+        </section>
+      )}
+      {quiz.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-lg font-bold">Verifique seu aprendizado</h3>
+          <InlineQuiz questions={quiz.map(q => ({ question: q.question, options: q.options, correct: (q.correct ?? q.answer ?? 0), explanation: q.explanation }))} />
+        </section>
+      )}
+    </div>
+  );
+};
+
+const Flashcard = ({ front, back }: { front: string; back: string }) => {
+  const [flipped, setFlipped] = useState(false);
+  return (
+    <button onClick={() => setFlipped(v => !v)} className="aspect-[4/3] [perspective:1200px] text-left" aria-pressed={flipped}>
+      <div className="relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d]" style={{ transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}>
+        <div className="absolute inset-0 [backface-visibility:hidden] border border-border rounded-xl p-5 bg-card shadow-sm flex items-center">
+          <p className="text-sm">{front}</p>
+        </div>
+        <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] border border-primary/40 rounded-xl p-5 bg-secondary/40 shadow-sm flex items-center">
+          <p className="text-sm">{back}</p>
+        </div>
+      </div>
+    </button>
+  );
+};
+
+const InlineQuiz = ({ questions }: { questions: { question: string; options: string[]; correct: number; explanation?: string }[] }) => {
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [submitted, setSubmitted] = useState(false);
+  return (
+    <div className="space-y-3">
+      {questions.map((q, i) => (
+        <div key={i} className="border border-border rounded-lg p-4 space-y-2 bg-card">
+          <p className="font-medium">{i + 1}. {q.question}</p>
+          <div className="grid gap-2">
+            {q.options.map((opt, j) => {
+              const chosen = answers[i] === j;
+              const isCorrect = submitted && j === q.correct;
+              const isWrong = submitted && chosen && j !== q.correct;
+              return (
+                <button key={j} type="button" onClick={() => !submitted && setAnswers(a => ({ ...a, [i]: j }))}
+                  className={`text-left px-3 py-2 rounded-md border text-sm transition-colors ${isCorrect ? "border-emerald-500 bg-emerald-500/10" : isWrong ? "border-destructive bg-destructive/10" : chosen ? "border-primary bg-primary/10" : "border-border hover:bg-secondary/50"}`}>
+                  {opt}
+                </button>
+              );
+            })}
+          </div>
+          {submitted && q.explanation && <p className="text-xs text-muted-foreground">{q.explanation}</p>}
+        </div>
+      ))}
+      {!submitted ? (
+        <Button variant="hero" onClick={() => setSubmitted(true)} disabled={Object.keys(answers).length < questions.length}>Conferir respostas</Button>
+      ) : (
+        <Button variant="outline" onClick={() => { setAnswers({}); setSubmitted(false); }}>Refazer</Button>
+      )}
+    </div>
+  );
+};
 
 const YoutubeEmbed = ({ yt }: { yt: { videoId: string; title?: string; channel?: string } }) => (
   <figure className="space-y-2">
