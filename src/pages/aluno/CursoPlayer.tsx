@@ -19,6 +19,8 @@ import { AvatarTrail } from "@/components/gamer/AvatarTrail";
 import { CourseFinale } from "@/components/gamer/CourseFinale";
 import { useGamification } from "@/lib/gamer/useGamification";
 import { sfx, fireConfetti } from "@/lib/gamer/sfx";
+import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
+import { Pencil } from "lucide-react";
 
 type Lesson = {
   id: string; section_id: string; title: string;
@@ -255,6 +257,12 @@ const CursoPlayer = () => {
             onPrev={currentIdx > 0 ? goPrev : undefined}
             onDownloadApostila={handleDownloadApostila}
             downloadingApostila={downloadingApostila}
+            onLessonUpdated={(u) => {
+              setSections(secs => secs.map(sec => ({
+                ...sec,
+                lessons: sec.lessons.map(l => l.id === u.id ? { ...l, title: u.title, content: u.content } : l),
+              })));
+            }}
             />
           ) : (
             <div className="p-10 text-center text-muted-foreground"><BookOpen className="size-12 mx-auto mb-3" />Nenhuma aula publicada ainda.</div>
