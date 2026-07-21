@@ -45,7 +45,7 @@ const extractEmbedUrl = (value?: string | null) => {
 
 const CursoPlayer = () => {
   const { enrollmentId } = useParams();
-  const { user } = useAuth();
+  const { user, isStaff } = useAuth();
   const nav = useNavigate();
   const [course, setCourse] = useState<any>(null);
   const [sections, setSections] = useState<Section[]>([]);
