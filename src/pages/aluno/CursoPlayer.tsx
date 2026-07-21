@@ -58,7 +58,7 @@ const CursoPlayer = () => {
     if (!user || !enrollmentId) return;
     const { data: enr, error: e1 } = await supabase
       .from("enrollments")
-      .select("id, course_id, courses ( id, title, category, slug, passing_score, live_url, live_label )")
+      .select("id, course_id, courses ( id, title, category, slug, passing_score, live_url, live_label, coursebox_embed_url, external_url )")
       .eq("id", enrollmentId).eq("user_id", user.id).maybeSingle();
     if (e1 || !enr?.courses) { toast.error(e1?.message ?? "Curso não encontrado"); setLoading(false); return; }
     setCourse({ ...(enr as any).courses, enrollment_id: enr.id });
@@ -132,6 +132,13 @@ const CursoPlayer = () => {
               </a>
             </Button>
           )}
+          {course.coursebox_embed_url && (
+            <Button asChild size="sm" className="w-full mt-2">
+              <a href={course.coursebox_embed_url} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="size-4" /> Abrir Coursebox
+              </a>
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
@@ -180,7 +187,27 @@ const CursoPlayer = () => {
         </header>
 
         <main className="flex-1 overflow-y-auto min-w-0 bg-background">
-          {current ? (
+          {course.coursebox_embed_url ? (
+            <div className="h-full min-h-[720px] flex flex-col">
+              <div className="p-4 sm:p-6 border-b border-border bg-card flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-[0.18em]">Curso externo</p>
+                  <h2 className="text-2xl font-bold text-foreground leading-tight">{course.title}</h2>
+                </div>
+                <Button asChild>
+                  <a href={course.coursebox_embed_url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="size-4" /> Abrir em nova aba
+                  </a>
+                </Button>
+              </div>
+              <iframe
+                src={course.coursebox_embed_url}
+                title={course.title}
+                className="flex-1 w-full border-0 bg-background"
+                allow="fullscreen; clipboard-write"
+              />
+            </div>
+          ) : current ? (
             <LessonView
             key={current.id}
             lesson={current}
