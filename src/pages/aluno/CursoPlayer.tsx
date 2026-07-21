@@ -402,6 +402,11 @@ const TextBlock = ({ lesson }: { lesson: Lesson }) => (
     {lesson.content?.youtube?.videoId && (
       <YoutubeEmbed yt={lesson.content.youtube} />
     )}
+    {lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
+      <figure className="rounded-lg overflow-hidden border border-border">
+        <img src={lesson.content.image_url} alt={lesson.title} className="w-full h-auto object-cover" loading="lazy" />
+      </figure>
+    )}
     <article className="prose max-w-none prose-headings:text-foreground prose-p:text-foreground/80 prose-li:text-foreground/80 prose-strong:text-foreground prose-a:text-primary"
       dangerouslySetInnerHTML={{ __html: lesson.content?.html ?? "" }} />
   </div>
