@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers } from "lucide-react";
+import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink } from "lucide-react";
+
+const MODULE_ICONS: Record<string, any> = { Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle: CheckCircle2 };
 
 type Course = { id: string; title: string; description: string | null; image_url: string | null; category: string | null };
 type Section = { id: string; title: string; sort_order: number };
@@ -114,9 +116,24 @@ function LessonView({ lesson }: { lesson: Lesson }) {
   const flashcards: Array<{ front: string; back: string }> = lesson.content?.flashcards ?? [];
   const quiz: Array<{ question: string; options: string[]; answer: number; explanation?: string }> =
     lesson.content?.quiz ?? lesson.content?.questions ?? [];
+  const theme = lesson.content?.module_theme;
+  const toolsImg: string | undefined = lesson.content?.tools_image_url;
+  const toolsList: string[] = lesson.content?.tools_list ?? [];
+  const videos: { title: string; url: string; why?: string }[] = lesson.content?.video_suggestions ?? [];
+  const ModIcon = theme?.icon ? (MODULE_ICONS[theme.icon] ?? FileText) : null;
+  const themeStyle = theme?.color ? ({ "--lesson-accent": `hsl(${theme.color})` } as React.CSSProperties) : undefined;
 
   return (
-    <article className="space-y-6 max-w-3xl">
+    <article className="lesson-themed space-y-6 max-w-3xl" style={themeStyle}>
+      {theme && (
+        <div>
+          <span className="lesson-mod-badge">
+            {ModIcon && <ModIcon className="size-3.5" />}
+            Módulo {theme.module_index} · {theme.label}
+          </span>
+          <div className="lesson-title-bar" />
+        </div>
+      )}
       <header>
         <div className="text-xs uppercase tracking-wide text-muted-foreground">{lesson.lesson_type}</div>
         <h2 className="text-2xl font-bold">{lesson.title}</h2>
@@ -145,6 +162,41 @@ function LessonView({ lesson }: { lesson: Lesson }) {
           className="lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary"
           dangerouslySetInnerHTML={{ __html: body }}
         />
+      )}
+
+      {(toolsImg || toolsList.length > 0) && (
+        <section>
+          <p className="lesson-block-heading"><Wrench className="size-4" /> Ferramentas & materiais</p>
+          <div className="lesson-tools-kit">
+            <div className="lesson-tools-kit__header">
+              {ModIcon && <ModIcon className="size-4" />} Kit do módulo
+            </div>
+            {toolsImg && <img src={toolsImg} alt="Kit de ferramentas" className="lesson-tools-kit__img" loading="lazy" />}
+            {toolsList.length > 0 && (
+              <ul className="lesson-tools-kit__list">
+                {toolsList.map((t, i) => <li key={i}>{t}</li>)}
+              </ul>
+            )}
+          </div>
+        </section>
+      )}
+
+      {videos.length > 0 && (
+        <section>
+          <p className="lesson-block-heading"><Youtube className="size-4" /> Vídeos recomendados</p>
+          <div className="lesson-videos">
+            {videos.map((v, i) => (
+              <a key={i} href={v.url} target="_blank" rel="noreferrer" className="lesson-videos__card">
+                <span className="lesson-videos__icon"><Youtube className="size-4" /></span>
+                <span className="flex-1 min-w-0">
+                  <span className="lesson-videos__title block">{v.title}</span>
+                  {v.why && <span className="lesson-videos__why block">{v.why}</span>}
+                </span>
+                <ExternalLink className="size-4 text-muted-foreground" />
+              </a>
+            ))}
+          </div>
+        </section>
       )}
 
       {flashcards.length > 0 && (
