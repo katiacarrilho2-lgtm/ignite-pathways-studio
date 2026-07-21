@@ -8,7 +8,7 @@ type Enr = {
   progress: number | null;
   status: string | null;
   enrolled_at: string;
-  courses: { id: string; title: string; slug: string | null; cover_url: string | null } | null;
+  courses: { id: string; title: string; slug: string | null; image_url: string | null; coursebox_embed_url: string | null } | null;
 };
 
 export default function Dashboard() {
@@ -21,7 +21,7 @@ export default function Dashboard() {
       if (!user) { setLoading(false); return; }
       const { data, error } = await supabase
         .from("enrollments")
-        .select("id, progress, status, enrolled_at, courses(id, title, slug, cover_url)")
+        .select("id, progress, status, enrolled_at, courses(id, title, slug, image_url, coursebox_embed_url)")
         .eq("user_id", user.id)
         .order("enrolled_at", { ascending: false });
       if (!error) setEnrollments((data ?? []) as any);
@@ -55,8 +55,8 @@ export default function Dashboard() {
               className="group rounded-lg border bg-card overflow-hidden hover:shadow-lg transition"
             >
               <div className="aspect-video bg-muted relative overflow-hidden">
-                {c?.cover_url ? (
-                  <img src={c.cover_url} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
+                {c?.image_url ? (
+                  <img src={c.image_url} alt={c.title} className="w-full h-full object-cover group-hover:scale-105 transition" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                     <BookOpen className="size-10" />
@@ -73,7 +73,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex justify-between text-xs text-muted-foreground mt-2">
                   <span>{progress}% concluído</span>
-                  <span className="capitalize">{e.status ?? "ativo"}</span>
+                  <span>{c?.coursebox_embed_url ? "Coursebox" : (e.status ?? "ativo")}</span>
                 </div>
               </div>
             </Link>

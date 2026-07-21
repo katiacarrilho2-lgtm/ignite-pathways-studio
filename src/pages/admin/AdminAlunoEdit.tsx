@@ -23,7 +23,7 @@ import { useCrmSellers } from "@/hooks/useCrmSellers";
 import { useAuth } from "@/hooks/useAuth";
 
 type Course = { id: string; title: string };
-type Enrollment = { id: string; course_id: string; status: string; progress: number; enrolled_at: string; certificate_authorized?: boolean; courses: { title: string } | null };
+type Enrollment = { id: string; course_id: string; status: string; progress: number; enrolled_at: string; courses: { title: string } | null };
 type Turma = { id: string; nome: string; courses: { title: string } | null };
 type ProgressRow = {
   lesson_id: string; completed: boolean; score: number | null;
@@ -166,7 +166,7 @@ const Inner = () => {
     const [{ data: prof }, { data: spd }, { data: enrs }, { data: tas }, { data: ats }, { data: cs }] = await Promise.all([
       supabase.from("profiles").select("username, display_name, email").eq("user_id", userId).maybeSingle(),
       supabase.from("student_profiles").select("*").eq("user_id", userId).maybeSingle(),
-      supabase.from("enrollments").select("id,course_id,status,progress,enrolled_at,certificate_authorized, courses(title)").eq("user_id", userId).order("enrolled_at", { ascending: false }),
+      supabase.from("enrollments").select("id,course_id,status,progress,enrolled_at, courses(title)").eq("user_id", userId).order("enrolled_at", { ascending: false }),
       supabase.from("turma_alunos").select("turma_id, turmas(id, nome, courses(title))").eq("user_id", userId),
       supabase.from("turmas").select("id, nome").order("nome"),
       supabase.from("courses").select("id,title").eq("active", true).order("title"),
@@ -1079,7 +1079,7 @@ const Inner = () => {
           </div>
           <div className="bg-card rounded-xl border border-border overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-secondary/60"><tr><th className="text-left p-3">Curso</th><th className="text-left p-3">Progresso</th><th className="text-left p-3">Status</th><th className="text-left p-3">Data</th><th className="text-left p-3">Certificado</th><th></th></tr></thead>
+              <thead className="bg-secondary/60"><tr><th className="text-left p-3">Curso</th><th className="text-left p-3">Progresso</th><th className="text-left p-3">Status</th><th className="text-left p-3">Data</th><th></th></tr></thead>
               <tbody>
                 {enrollments.map(e => (
                   <tr key={e.id} className="border-t border-border">
@@ -1087,24 +1087,10 @@ const Inner = () => {
                     <td className="p-3">{e.progress}%</td>
                     <td className="p-3"><span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">{e.status}</span></td>
                     <td className="p-3 text-muted-foreground">{new Date(e.enrolled_at).toLocaleDateString("pt-BR")}</td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={e.certificate_authorized !== false}
-                          onCheckedChange={async (v) => {
-                            const { error } = await supabase.from("enrollments").update({ certificate_authorized: v } as any).eq("id", e.id);
-                            if (error) return toast.error(error.message);
-                            setEnrollments(prev => prev.map(x => x.id === e.id ? { ...x, certificate_authorized: v } : x));
-                            toast.success(v ? "Certificado autorizado" : "Certificado bloqueado");
-                          }}
-                        />
-                        <span className="text-xs text-muted-foreground">{e.certificate_authorized !== false ? "Autorizado" : "Bloqueado"}</span>
-                      </div>
-                    </td>
                     <td className="p-3 text-right"><Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeEnr(e.id)}><Trash2 className="size-4" /></Button></td>
                   </tr>
                 ))}
-                {enrollments.length === 0 && <tr><td colSpan={6} className="p-6 text-center text-muted-foreground">Nenhum curso.</td></tr>}
+                {enrollments.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">Nenhum curso.</td></tr>}
               </tbody>
             </table>
           </div>
