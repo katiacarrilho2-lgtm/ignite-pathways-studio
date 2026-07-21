@@ -15,6 +15,61 @@
 .lesson-content section.lesson-bridge { border-left: 4px solid hsl(var(--primary)); background: hsl(var(--primary) / .06); padding: 1rem 1rem 1rem 1.25rem; border-radius: .5rem; }
 .lesson-content section.lesson-intro { background: hsl(var(--secondary)); padding: 1rem; border-radius: .5rem; }
 
+/* New rich lesson blocks (JSON-imported courses) */
+.lesson-content .lesson-objective {
+  display: flex; flex-direction: column; gap: .35rem;
+  background: hsl(var(--primary) / .08);
+  border: 1px solid hsl(var(--primary) / .25);
+  border-radius: .75rem; padding: 1rem 1.15rem; margin-bottom: 1.25rem;
+}
+.lesson-content .lesson-objective__label {
+  font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: hsl(var(--primary));
+}
+.lesson-content .lesson-objective p { margin: 0; font-weight: 500; }
+
+.lesson-content .lesson-callout {
+  border-radius: .75rem; padding: 1rem 1.15rem; margin: 1.25rem 0;
+  border-left: 4px solid hsl(var(--primary));
+  background: hsl(var(--secondary));
+}
+.lesson-content .lesson-callout h3 { margin-top: 0; }
+.lesson-content .lesson-callout p:last-child { margin-bottom: 0; }
+.lesson-content .lesson-callout--intro { background: hsl(var(--primary) / .06); }
+.lesson-content .lesson-callout--safety {
+  border-left-color: #dc2626; background: rgba(220,38,38,.07);
+}
+.lesson-content .lesson-callout--safety h3 { color: #b91c1c; }
+.lesson-content .lesson-callout--bridge {
+  border-left-color: #0ea5e9; background: rgba(14,165,233,.08);
+}
+.lesson-content .lesson-callout--bridge h3 { color: #0369a1; }
+
+.lesson-content ol.lesson-steps { list-style: none; padding-left: 0; counter-reset: step; }
+.lesson-content ol.lesson-steps > li {
+  counter-increment: step; position: relative;
+  padding: .65rem .75rem .65rem 3rem; margin-bottom: .5rem;
+  border: 1px solid hsl(var(--border)); border-radius: .55rem; background: hsl(var(--card));
+}
+.lesson-content ol.lesson-steps > li::before {
+  content: counter(step); position: absolute; left: .6rem; top: .55rem;
+  width: 1.85rem; height: 1.85rem; border-radius: 999px;
+  background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: .85rem;
+}
+
+.lesson-content ul.lesson-tools { list-style: none; padding-left: 0; display: grid; gap: .4rem; }
+.lesson-content ul.lesson-tools > li {
+  padding: .5rem .75rem; border: 1px solid hsl(var(--border));
+  border-radius: .5rem; background: hsl(var(--card));
+}
+.lesson-content ul.lesson-tools > li::before {
+  content: "•"; color: hsl(var(--primary)); font-weight: 700; margin-right: .5rem;
+}
+
+.lesson-content .lesson-section--refs { font-size: .92rem; color: hsl(var(--muted-foreground)); }
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */
