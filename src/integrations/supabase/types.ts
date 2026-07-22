@@ -1333,6 +1333,42 @@ export type Database = {
         }
         Relationships: []
       }
+      role_definitions: {
+        Row: {
+          base_role: Database["public"]["Enums"]["app_role"]
+          created_at: string
+          description: string | null
+          is_system: boolean
+          key: string
+          label: string
+          permissions: string[]
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          base_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          description?: string | null
+          is_system?: boolean
+          key: string
+          label: string
+          permissions?: string[]
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          base_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          description?: string | null
+          is_system?: boolean
+          key?: string
+          label?: string
+          permissions?: string[]
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       student_documents: {
         Row: {
           created_at: string
