@@ -14,7 +14,7 @@ import { YoutubePickerDialog, YoutubeVideo } from "./YoutubePickerDialog";
 
 type Lesson = { id: string; title: string; content: any };
 
-async function fileToResizedDataUrl(file: File, maxWidth = 1400, quality = 0.85): Promise<string> {
+async function resizeFile(file: File, maxWidth = 1400, quality = 0.85): Promise<Blob> {
   const dataUrl = await new Promise<string>((res, rej) => {
     const r = new FileReader(); r.onerror = () => rej(r.error);
     r.onload = () => res(r.result as string); r.readAsDataURL(file);
@@ -28,7 +28,27 @@ async function fileToResizedDataUrl(file: File, maxWidth = 1400, quality = 0.85)
   canvas.width = w; canvas.height = h;
   const ctx = canvas.getContext("2d")!;
   ctx.drawImage(img, 0, 0, w, h);
-  return canvas.toDataURL(file.type === "image/png" ? "image/png" : "image/jpeg", quality);
+  const isPng = file.type === "image/png";
+  return await new Promise<Blob>((res, rej) =>
+    canvas.toBlob((b) => b ? res(b) : rej(new Error("Falha ao processar imagem")), isPng ? "image/png" : "image/jpeg", quality)
+  );
+}
+
+// Upload resized image to Storage and return a long-lived signed URL.
+// Falls back to data URL if the bucket upload fails, so the editor never breaks.
+async function uploadLessonImage(file: File, lessonId: string): Promise<string> {
+  const blob = await resizeFile(file);
+  const ext = (file.type === "image/png" ? "png" : "jpg");
+  const path = `lessons/${lessonId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error: upErr } = await supabase.storage.from("course-images").upload(path, blob, {
+    contentType: blob.type,
+    upsert: false,
+  });
+  if (upErr) throw upErr;
+  // 10 years — bucket is private but has a public SELECT policy; signed URL works everywhere.
+  const { data, error } = await supabase.storage.from("course-images").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+  if (error || !data?.signedUrl) throw error ?? new Error("Falha ao gerar URL");
+  return data.signedUrl;
 }
 
 type ExtraImage = { url: string; width: number; caption?: string };
@@ -245,10 +265,12 @@ export const LessonEditDialog = ({
     if (!f.type.startsWith("image/")) return toast.error("Selecione uma imagem");
     if (f.size > 8 * 1024 * 1024) return toast.error("Máx 8 MB");
     try {
-      const url = await fileToResizedDataUrl(f);
+      setBusy(true);
+      const url = await uploadLessonImage(f, lesson.id);
       setImageUrl(url);
-      toast.success("Imagem carregada (será salva ao clicar em Salvar)");
-    } catch (e: any) { toast.error(e?.message ?? "Falha ao processar imagem"); }
+      toast.success("Imagem enviada");
+    } catch (e: any) { toast.error(e?.message ?? "Falha ao enviar imagem"); }
+    finally { setBusy(false); }
   };
 
   const addExtraImageFromFile = async (f: File | null) => {
@@ -256,9 +278,12 @@ export const LessonEditDialog = ({
     if (!f.type.startsWith("image/")) return toast.error("Selecione uma imagem");
     if (f.size > 8 * 1024 * 1024) return toast.error("Máx 8 MB");
     try {
-      const url = await fileToResizedDataUrl(f);
+      setBusy(true);
+      const url = await uploadLessonImage(f, lesson.id);
       setExtraImages(arr => [...arr, { url, width: 480, caption: "" }]);
-    } catch (e: any) { toast.error(e?.message ?? "Falha ao processar imagem"); }
+      toast.success("Imagem adicionada");
+    } catch (e: any) { toast.error(e?.message ?? "Falha ao enviar imagem"); }
+    finally { setBusy(false); }
   };
 
   const updateExtraImage = (i: number, patch: Partial<ExtraImage>) =>
