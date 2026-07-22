@@ -551,14 +551,11 @@ const Inner = () => {
 
       if (opts?.silent) {
         setAutoSavedAt(new Date());
-        // Mantém edição aberta; reseta snapshot para limpar isDirty
-        if (!editing.id && savedId) {
-          const next = { ...editing, id: savedId } as any;
-          setEditing(next);
-          setOriginalSnapshot(JSON.stringify(next));
-        } else {
-          setOriginalSnapshot(JSON.stringify(editing));
-        }
+        const next = !editing.id && savedId ? ({ ...editing, id: savedId } as any) : editing;
+        setOriginalSnapshot(JSON.stringify(next));
+        if (opts.keepOpen === false) setEditing(null);
+        else setEditing(next);
+        await load({ force: true });
         return;
       }
       toast.success("Aula salva");
