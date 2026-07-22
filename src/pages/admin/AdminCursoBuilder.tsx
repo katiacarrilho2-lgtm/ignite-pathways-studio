@@ -75,7 +75,11 @@ const TYPE_META: Record<Lesson["lesson_type"], { icon: any; label: string }> = {
 
 const normalizeLessonContentForSave = (lessonType: Lesson["lesson_type"] | undefined, content: any = {}) => {
   if (lessonType === "text" || lessonType === "video") {
-    const html = content.html ?? content.body ?? content.content_html ?? "";
+    const html = (typeof content.html === "string" && content.html.trim())
+      ? content.html
+      : (typeof content.body === "string" && content.body.trim())
+        ? content.body
+        : (content.content_html ?? "");
     return { ...content, html, body: html };
   }
   if (lessonType === "quiz") {
@@ -934,7 +938,7 @@ const Inner = () => {
                   </div>
                   <ImageDropZone onFiles={(files) => files[0] && uploadLessonImage(files[0])} multiple={false} showHint>
                     <RichTextEditor
-                      value={editing.content?.html ?? editing.content?.body ?? ""}
+                      value={(typeof editing.content?.html === "string" && editing.content.html.trim()) ? editing.content.html : (editing.content?.body ?? "")}
                       onChange={(html) => setEditing(prev => prev ? { ...prev, content: { ...(prev.content ?? {}), html, body: html } } : prev)}
                       onUploadImage={uploadLessonImage}
                     />

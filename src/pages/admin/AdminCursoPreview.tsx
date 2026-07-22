@@ -7,6 +7,15 @@ import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
 
 const MODULE_ICONS: Record<string, any> = { Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle: CheckCircle2 };
 
+const pickLessonHtml = (content: any): string => {
+  const html = typeof content?.html === "string" ? content.html.trim() : "";
+  if (html) return content.html;
+  const body = typeof content?.body === "string" ? content.body.trim() : "";
+  if (body) return content.body;
+  const contentHtml = typeof content?.content_html === "string" ? content.content_html.trim() : "";
+  return contentHtml ? content.content_html : "";
+};
+
 const ytIdFromUrl = (input?: string | null): string | null => {
   if (!input) return null;
   const s = input.trim();
@@ -130,7 +139,7 @@ export default function AdminCursoPreview() {
 function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Lesson) => void }) {
   const [editOpen, setEditOpen] = useState(false);
   const yt = lesson.content?.youtube;
-  const body: string | undefined = lesson.content?.html ?? lesson.content?.body ?? lesson.content?.content_html;
+  const body = pickLessonHtml(lesson.content);
   const imageUrl: string | undefined = lesson.content?.image_url;
   const flashcards: Array<{ front: string; back: string }> = lesson.content?.flashcards ?? lesson.content?.items ?? [];
   const quiz: Array<{ question: string; options: string[]; answer: number; explanation?: string }> =
