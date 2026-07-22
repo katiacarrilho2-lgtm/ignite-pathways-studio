@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Copy, UserPlus, Pencil, LogIn, KeyRound } from "lucide-react";
+import { Search, Copy, UserPlus, Pencil, LogIn, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
 import { startImpersonation } from "@/lib/impersonate";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 type Row = {
   user_id: string; username: string | null; display_name: string | null;
@@ -24,6 +25,7 @@ type Course = { id: string; title: string };
 const Inner = () => {
   const { activeAccountId } = useCommercialAccounts();
   const nav = useNavigate();
+  const { isSuperAdmin } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [q, setQ] = useState("");
@@ -161,6 +163,32 @@ const Inner = () => {
     window.open(`https://wa.me/${phone.startsWith("55") ? phone : "55" + phone}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
+  const removeStudent = async (r: Row) => {
+    const name = r.display_name || r.username || "aluno";
+    if (!confirm(`Excluir o aluno "${name}"? Esta ação remove o usuário, matrículas e dados relacionados. Não pode ser desfeita.`)) return;
+    if (!confirm(`Confirmação final: digite OK no próximo prompt para excluir "${name}".`)) return;
+    const check = prompt(`Para confirmar, digite EXCLUIR para remover ${name}`);
+    if (check !== "EXCLUIR") return toast.info("Exclusão cancelada");
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-delete-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${sess.session?.access_token ?? ""}`,
+          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ user_id: r.user_id }),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok) return toast.error(out.error || "Erro ao excluir aluno");
+      toast.success("Aluno excluído");
+      load();
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao excluir");
+    }
+  };
+
   const filtered = rows.filter(r => {
     if (!q) return true;
     const s = `${r.username} ${r.display_name} ${r.contact_email} ${r.phone1} ${r.polo}`.toLowerCase();
@@ -215,6 +243,11 @@ const Inner = () => {
                       <LogIn className="size-4" /> Entrar como
                     </Button>
                     <Button asChild size="sm" variant="outline"><Link to={`/admin/alunos/${r.user_id}`}><Pencil className="size-4" /> Abrir ficha</Link></Button>
+                    {isSuperAdmin && (
+                      <Button size="sm" variant="outline" className="text-destructive hover:text-destructive" onClick={() => removeStudent(r)}>
+                        <Trash2 className="size-4" /> Excluir
+                      </Button>
+                    )}
                   </div>
                 </td>
               </tr>
