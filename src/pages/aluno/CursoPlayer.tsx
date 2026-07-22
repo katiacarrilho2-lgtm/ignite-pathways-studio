@@ -423,6 +423,10 @@ const LessonView = ({ lesson, progress, onComplete, onNext, onPrev, onDownloadAp
       {lesson.lesson_type === "flip" && <FlipBlock lesson={lesson} />}
       {lesson.lesson_type === "accordion" && <AccordionBlock lesson={lesson} />}
 
+      {lesson.lesson_type !== "text" && (
+        <TextBlock lesson={lesson} hideMedia />
+      )}
+
       {attachments.length > 0 && (
         <div className="border border-border rounded-lg p-4 bg-card">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Materiais desta aula</p>
