@@ -518,7 +518,7 @@ const VideoBlock = ({ lesson, done, onComplete }: { lesson: Lesson; done: boolea
   );
 };
 
-const TextBlock = ({ lesson }: { lesson: Lesson }) => {
+const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: boolean }) => {
   const html: string = lesson.content?.html ?? lesson.content?.body ?? "";
   const flashcards: { front: string; back: string }[] = lesson.content?.flashcards ?? [];
   const quiz: { question: string; options: string[]; answer?: number; correct?: number; explanation?: string }[] =
@@ -542,8 +542,8 @@ const TextBlock = ({ lesson }: { lesson: Lesson }) => {
           <div className="lesson-title-bar" />
         </div>
       )}
-      {lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
-      {lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
+      {!hideMedia && lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
+      {!hideMedia && lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
         <figure className="flex justify-center">
           <img
             src={lesson.content.image_url}
