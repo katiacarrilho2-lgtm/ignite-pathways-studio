@@ -32,17 +32,13 @@ export default function CrmGoalsBar() {
     setGoals(g);
 
     const since = startOf("mes");
-    // Soma apenas parcelas efetivamente recebidas (status = 'pago') no período
+    // Fonte única e canônica: parcelas em `installments` com status='pago'.
+    // Quando uma pré-matrícula é marcada como paga, ela também gera/atualiza
+    // a parcela correspondente — somar as duas tabelas causava duplicidade.
     const { data: paidInst } = await supabase
       .from("installments")
       .select("valor_cents, valor_final_cents, paid_at, status")
       .eq("status", "pago")
-      .gte("paid_at", since.toISOString());
-    // Também soma pré-matrículas marcadas como pagas (recebimento avulso)
-    const { data: paidApps } = await supabase
-      .from("enrollment_applications")
-      .select("paid_amount_cents, paid_at")
-      .not("paid_at", "is", null)
       .gte("paid_at", since.toISOString());
     const p: any = { dia: 0, semana: 0, mes: 0 };
     const sDay = startOf("dia").getTime();
@@ -55,14 +51,6 @@ export default function CrmGoalsBar() {
       if (t >= sWeek) p.semana += v;
       if (t >= sDay) p.dia += v;
     });
-    (paidApps ?? []).forEach((a: any) => {
-      if (!a.paid_at) return;
-      const t = new Date(a.paid_at).getTime();
-      const v = a.paid_amount_cents ?? 0;
-      p.mes += v;
-      if (t >= sWeek) p.semana += v;
-      if (t >= sDay) p.dia += v;
-    });
     setProgress(p);
   };
 
@@ -70,7 +58,6 @@ export default function CrmGoalsBar() {
     load();
     const ch = supabase.channel("crm-goals-bar")
       .on("postgres_changes", { event: "*", schema: "public", table: "installments" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "enrollment_applications" }, load)
       .on("postgres_changes", { event: "*", schema: "public", table: "crm_goals" }, load)
       .subscribe();
     return () => { supabase.removeChannel(ch); };
