@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Save, ImageIcon, Trash2, Youtube, Plus } from "lucide-react";
+import { Loader2, Save, ImageIcon, Trash2, Youtube, Plus, Target, AlertTriangle, Info, MessagesSquare, Wrench, Video as VideoIcon, ListChecks, Layers, Code2, ArrowUp, ArrowDown } from "lucide-react";
 import { YoutubePickerDialog, YoutubeVideo } from "./YoutubePickerDialog";
 
 type Lesson = { id: string; title: string; content: any };
@@ -31,6 +33,104 @@ async function fileToResizedDataUrl(file: File, maxWidth = 1400, quality = 0.85)
 
 type ExtraImage = { url: string; width: number; caption?: string };
 type ExtraVideo = { url: string; title?: string; why?: string };
+
+// -------- Block parsing / serialization --------
+type BlockKind = "intro" | "content" | "safety" | "bridge" | "refs" | "other";
+type Block = { id: string; kind: BlockKind; title: string; html: string };
+
+const BLOCK_META: Record<BlockKind, { label: string; icon: any; wrapOpen: (title: string) => string; wrapClose: string; defaultTitle: string }> = {
+  intro: {
+    label: "Introdução",
+    icon: Info,
+    wrapOpen: (t) => `<div class="lesson-callout lesson-callout--intro"><h3>${t}</h3>`,
+    wrapClose: "</div>",
+    defaultTitle: "Em poucas palavras",
+  },
+  content: {
+    label: "Conteúdo detalhado",
+    icon: Layers,
+    wrapOpen: (t) => `<section class="lesson-section"><h3>${t}</h3>`,
+    wrapClose: "</section>",
+    defaultTitle: "Conteúdo detalhado",
+  },
+  safety: {
+    label: "Alertas de segurança",
+    icon: AlertTriangle,
+    wrapOpen: (t) => `<div class="lesson-callout lesson-callout--safety"><h3>${t}</h3>`,
+    wrapClose: "</div>",
+    defaultTitle: "⚠️ Alertas de segurança",
+  },
+  bridge: {
+    label: "Ponte para a prática",
+    icon: MessagesSquare,
+    wrapOpen: (t) => `<div class="lesson-callout lesson-callout--bridge"><h3>${t}</h3>`,
+    wrapClose: "</div>",
+    defaultTitle: "Na aula prática presencial",
+  },
+  refs: {
+    label: "Sugestões de vídeo / referências",
+    icon: VideoIcon,
+    wrapOpen: (t) => `<section class="lesson-section lesson-section--refs"><h3>${t}</h3>`,
+    wrapClose: "</section>",
+    defaultTitle: "Sugestões de vídeo para complementar",
+  },
+  other: {
+    label: "Bloco livre",
+    icon: Code2,
+    wrapOpen: (t) => `<section class="lesson-section"><h3>${t}</h3>`,
+    wrapClose: "</section>",
+    defaultTitle: "Bloco",
+  },
+};
+
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+function classifyEl(el: Element): BlockKind {
+  const c = el.className || "";
+  if (c.includes("lesson-callout--intro")) return "intro";
+  if (c.includes("lesson-callout--safety")) return "safety";
+  if (c.includes("lesson-callout--bridge")) return "bridge";
+  if (c.includes("lesson-section--refs")) return "refs";
+  if (c.includes("lesson-section")) return "content";
+  return "other";
+}
+
+function parseBody(html: string): { objective: string; blocks: Block[] } {
+  if (!html || typeof window === "undefined") return { objective: "", blocks: [] };
+  const doc = new DOMParser().parseFromString(`<div id="root">${html}</div>`, "text/html");
+  const root = doc.getElementById("root");
+  if (!root) return { objective: "", blocks: [] };
+  let objective = "";
+  const blocks: Block[] = [];
+  Array.from(root.children).forEach((el) => {
+    if (el.classList.contains("lesson-objective")) {
+      const p = el.querySelector("p");
+      objective = p?.innerHTML.trim() ?? el.innerHTML;
+      return;
+    }
+    const kind = classifyEl(el);
+    const h3 = el.querySelector("h3");
+    const title = h3?.textContent?.trim() ?? BLOCK_META[kind].defaultTitle;
+    if (h3) h3.remove();
+    blocks.push({ id: uid(), kind, title, html: el.innerHTML.trim() });
+  });
+  return { objective, blocks };
+}
+
+function serializeBody(objective: string, blocks: Block[]): string {
+  const parts: string[] = [];
+  if (objective.trim()) {
+    parts.push(`<div class="lesson-objective"><span class="lesson-objective__label">Objetivo desta aula</span><p>${objective.trim()}</p></div>`);
+  }
+  for (const b of blocks) {
+    const meta = BLOCK_META[b.kind];
+    parts.push(`${meta.wrapOpen(b.title || meta.defaultTitle)}${b.html}${meta.wrapClose}`);
+  }
+  return parts.join("");
+}
+
+type Flashcard = { front: string; back: string };
+type QuizItem = { question: string; options: string[]; answer: number; explanation?: string };
 
 function extractYoutubeId(input: string): string | null {
   if (!input) return null;
@@ -56,6 +156,12 @@ export const LessonEditDialog = ({
 }) => {
   const [title, setTitle] = useState(lesson.title);
   const [html, setHtml] = useState<string>(lesson.content?.html ?? lesson.content?.body ?? "");
+  const [objective, setObjective] = useState<string>("");
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [rawMode, setRawMode] = useState(false);
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [quiz, setQuiz] = useState<QuizItem[]>([]);
+  const [toolsList, setToolsList] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState<string | null>(lesson.content?.image_url ?? null);
   const [imageWidth, setImageWidth] = useState<number>(lesson.content?.image_width ?? 480);
   const [youtube, setYoutube] = useState<any>(lesson.content?.youtube ?? null);
@@ -67,7 +173,26 @@ export const LessonEditDialog = ({
   useEffect(() => {
     if (open) {
       setTitle(lesson.title);
-      setHtml(lesson.content?.html ?? lesson.content?.body ?? "");
+      const rawHtml = lesson.content?.html ?? lesson.content?.body ?? "";
+      setHtml(rawHtml);
+      const parsed = parseBody(rawHtml);
+      const objText = typeof lesson.content?.objective === "string" && lesson.content.objective.trim()
+        ? lesson.content.objective
+        : parsed.objective;
+      setObjective(objText);
+      setBlocks(parsed.blocks);
+      setRawMode(false);
+      const fc = Array.isArray(lesson.content?.flashcards) ? lesson.content.flashcards : [];
+      setFlashcards(fc.map((f: any) => ({ front: String(f.front ?? ""), back: String(f.back ?? "") })));
+      const qz = Array.isArray(lesson.content?.quiz) ? lesson.content.quiz : [];
+      setQuiz(qz.map((q: any) => ({
+        question: String(q.question ?? ""),
+        options: Array.isArray(q.options) ? q.options.map((o: any) => String(o)) : [],
+        answer: Number.isFinite(q.answer) ? Number(q.answer) : 0,
+        explanation: q.explanation ? String(q.explanation) : "",
+      })));
+      const tl = Array.isArray(lesson.content?.tools_list) ? lesson.content.tools_list : [];
+      setToolsList(tl.map((t: any) => String(t)));
       setImageUrl(lesson.content?.image_url ?? null);
       setImageWidth(lesson.content?.image_width ?? 480);
       setYoutube(lesson.content?.youtube ?? null);
@@ -75,6 +200,23 @@ export const LessonEditDialog = ({
       setExtraVideos(lesson.content?.extra_videos ?? lesson.content?.video_suggestions ?? []);
     }
   }, [open, lesson]);
+
+  // ---- block helpers ----
+  const updateBlock = (id: string, patch: Partial<Block>) =>
+    setBlocks((arr) => arr.map((b) => (b.id === id ? { ...b, ...patch } : b)));
+  const removeBlock = (id: string) => setBlocks((arr) => arr.filter((b) => b.id !== id));
+  const moveBlock = (id: string, dir: -1 | 1) =>
+    setBlocks((arr) => {
+      const i = arr.findIndex((b) => b.id === id);
+      if (i < 0) return arr;
+      const j = i + dir;
+      if (j < 0 || j >= arr.length) return arr;
+      const copy = [...arr];
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+      return copy;
+    });
+  const addBlock = (kind: BlockKind) =>
+    setBlocks((arr) => [...arr, { id: uid(), kind, title: BLOCK_META[kind].defaultTitle, html: "<p></p>" }]);
 
   const pickFile = async (f: File | null) => {
     if (!f) return;
@@ -111,10 +253,20 @@ export const LessonEditDialog = ({
     setBusy(true);
     const cleanImages = extraImages.filter(x => x.url?.trim());
     const cleanVideos = extraVideos.filter(x => x.url?.trim());
+    const finalHtml = rawMode ? html : serializeBody(objective, blocks);
+    const cleanFlashcards = flashcards.filter((f) => f.front.trim() || f.back.trim());
+    const cleanQuiz = quiz
+      .filter((q) => q.question.trim())
+      .map((q) => ({ ...q, options: q.options.map((o) => o).filter((o) => o.trim() !== "" || q.options.length <= 2) }));
+    const cleanTools = toolsList.map((t) => t.trim()).filter(Boolean);
     const newContent = {
       ...(lesson.content ?? {}),
-      html,
-      body: html, // compat
+      html: finalHtml,
+      body: finalHtml, // compat
+      objective: objective.trim() || null,
+      flashcards: cleanFlashcards,
+      quiz: cleanQuiz,
+      tools_list: cleanTools,
       image_url: imageUrl ?? null,
       image_width: imageUrl ? imageWidth : null,
       youtube: youtube?.videoId ? youtube : null,
@@ -135,7 +287,7 @@ export const LessonEditDialog = ({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Editar aula</DialogTitle></DialogHeader>
 
           <div className="space-y-4">
@@ -144,19 +296,170 @@ export const LessonEditDialog = ({
               <Input value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
 
-            <div>
-              <Label>Conteúdo (HTML)</Label>
-              <Textarea
-                rows={12}
-                value={html}
-                onChange={(e) => setHtml(e.target.value)}
-                className="font-mono text-xs"
-                placeholder="<p>Escreva o conteúdo da aula...</p>"
-              />
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Aceita HTML. Use &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;strong&gt;, etc.
-              </p>
-            </div>
+            <Tabs defaultValue="blocos" className="w-full">
+              <TabsList className="flex flex-wrap h-auto">
+                <TabsTrigger value="blocos"><Layers className="size-3.5 mr-1" /> Blocos</TabsTrigger>
+                <TabsTrigger value="objetivo"><Target className="size-3.5 mr-1" /> Objetivo</TabsTrigger>
+                <TabsTrigger value="flashcards"><RotateCwIcon /> Flashcards</TabsTrigger>
+                <TabsTrigger value="quiz"><ListChecks className="size-3.5 mr-1" /> Quiz</TabsTrigger>
+                <TabsTrigger value="ferramentas"><Wrench className="size-3.5 mr-1" /> Ferramentas</TabsTrigger>
+                <TabsTrigger value="html"><Code2 className="size-3.5 mr-1" /> HTML avançado</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="objetivo" className="pt-3">
+                <Label>Objetivo desta aula</Label>
+                <Textarea rows={4} value={objective} onChange={(e) => setObjective(e.target.value)} placeholder="O que o aluno vai aprender ou saber fazer ao final desta aula" />
+              </TabsContent>
+
+              <TabsContent value="blocos" className="pt-3 space-y-3">
+                {rawMode && (
+                  <div className="text-xs bg-yellow-500/10 border border-yellow-500/30 rounded-md p-2 text-yellow-700 dark:text-yellow-300">
+                    Você editou o HTML avançado. Salve ou volte para o HTML avançado — os blocos abaixo serão ignorados ao salvar.
+                  </div>
+                )}
+                <Accordion type="multiple" className="space-y-2">
+                  {blocks.map((b, idx) => {
+                    const meta = BLOCK_META[b.kind];
+                    const Icon = meta.icon;
+                    return (
+                      <AccordionItem key={b.id} value={b.id} className="border border-border rounded-lg bg-secondary/20">
+                        <div className="flex items-center gap-1 pr-2">
+                          <AccordionTrigger className="flex-1 px-3 py-2 hover:no-underline">
+                            <span className="flex items-center gap-2 text-left text-sm">
+                              <Icon className="size-4 text-primary" />
+                              <span className="font-medium">{b.title || meta.defaultTitle}</span>
+                              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">({meta.label})</span>
+                            </span>
+                          </AccordionTrigger>
+                          <Button variant="ghost" size="icon" className="size-7" onClick={() => moveBlock(b.id, -1)} disabled={idx === 0} title="Subir"><ArrowUp className="size-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="size-7" onClick={() => moveBlock(b.id, 1)} disabled={idx === blocks.length - 1} title="Descer"><ArrowDown className="size-3.5" /></Button>
+                          <Button variant="ghost" size="icon" className="size-7 text-destructive" onClick={() => removeBlock(b.id)} title="Remover"><Trash2 className="size-3.5" /></Button>
+                        </div>
+                        <AccordionContent className="px-3 pb-3 space-y-2">
+                          <div>
+                            <Label className="text-xs">Título do bloco</Label>
+                            <Input value={b.title} onChange={(e) => updateBlock(b.id, { title: e.target.value })} />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Tipo do bloco</Label>
+                            <select
+                              className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                              value={b.kind}
+                              onChange={(e) => updateBlock(b.id, { kind: e.target.value as BlockKind })}
+                            >
+                              {(Object.keys(BLOCK_META) as BlockKind[]).map((k) => (
+                                <option key={k} value={k}>{BLOCK_META[k].label}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <Label className="text-xs">Conteúdo (HTML deste bloco)</Label>
+                            <Textarea
+                              rows={8}
+                              value={b.html}
+                              onChange={(e) => updateBlock(b.id, { html: e.target.value })}
+                              className="font-mono text-xs"
+                            />
+                            <p className="text-[11px] text-muted-foreground mt-1">
+                              Use &lt;p&gt;, &lt;ul&gt;&lt;li&gt;, &lt;strong&gt; etc. Não precisa envolver com o container — isso é feito automaticamente.
+                            </p>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {(Object.keys(BLOCK_META) as BlockKind[]).map((k) => (
+                    <Button key={k} variant="outline" size="sm" onClick={() => addBlock(k)}>
+                      <Plus className="size-3.5 mr-1" /> {BLOCK_META[k].label}
+                    </Button>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="flashcards" className="pt-3 space-y-2">
+                {flashcards.map((f, i) => (
+                  <div key={i} className="border border-border rounded-md p-3 bg-secondary/20 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground">Flashcard {i + 1}</span>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setFlashcards((a) => a.filter((_, idx) => idx !== i))}><Trash2 className="size-3.5" /></Button>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Frente (pergunta)</Label>
+                      <Textarea rows={2} value={f.front} onChange={(e) => setFlashcards((a) => a.map((x, idx) => idx === i ? { ...x, front: e.target.value } : x))} />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Verso (resposta)</Label>
+                      <Textarea rows={2} value={f.back} onChange={(e) => setFlashcards((a) => a.map((x, idx) => idx === i ? { ...x, back: e.target.value } : x))} />
+                    </div>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" onClick={() => setFlashcards((a) => [...a, { front: "", back: "" }])}><Plus className="size-3.5 mr-1" /> Adicionar flashcard</Button>
+              </TabsContent>
+
+              <TabsContent value="quiz" className="pt-3 space-y-3">
+                {quiz.map((q, i) => (
+                  <div key={i} className="border border-border rounded-md p-3 bg-secondary/20 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-muted-foreground">Pergunta {i + 1}</span>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setQuiz((a) => a.filter((_, idx) => idx !== i))}><Trash2 className="size-3.5" /></Button>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Pergunta</Label>
+                      <Textarea rows={2} value={q.question} onChange={(e) => setQuiz((a) => a.map((x, idx) => idx === i ? { ...x, question: e.target.value } : x))} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Opções (marque a correta)</Label>
+                      {q.options.map((op, oi) => (
+                        <div key={oi} className="flex items-center gap-2">
+                          <input type="radio" name={`q-${i}`} checked={q.answer === oi} onChange={() => setQuiz((a) => a.map((x, idx) => idx === i ? { ...x, answer: oi } : x))} />
+                          <Input value={op} onChange={(e) => setQuiz((a) => a.map((x, idx) => idx === i ? { ...x, options: x.options.map((o2, oi2) => oi2 === oi ? e.target.value : o2) } : x))} />
+                          <Button variant="ghost" size="icon" className="size-7 text-destructive" onClick={() => setQuiz((a) => a.map((x, idx) => idx === i ? { ...x, options: x.options.filter((_, oi2) => oi2 !== oi), answer: x.answer > oi ? x.answer - 1 : x.answer } : x))}><Trash2 className="size-3.5" /></Button>
+                        </div>
+                      ))}
+                      <Button variant="outline" size="sm" onClick={() => setQuiz((a) => a.map((x, idx) => idx === i ? { ...x, options: [...x.options, ""] } : x))}><Plus className="size-3 mr-1" /> Opção</Button>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Explicação (opcional)</Label>
+                      <Textarea rows={2} value={q.explanation ?? ""} onChange={(e) => setQuiz((a) => a.map((x, idx) => idx === i ? { ...x, explanation: e.target.value } : x))} />
+                    </div>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" onClick={() => setQuiz((a) => [...a, { question: "", options: ["", ""], answer: 0, explanation: "" }])}><Plus className="size-3.5 mr-1" /> Adicionar pergunta</Button>
+              </TabsContent>
+
+              <TabsContent value="ferramentas" className="pt-3 space-y-2">
+                <p className="text-xs text-muted-foreground">Ferramentas/materiais desta aula (uma por linha).</p>
+                {toolsList.map((t, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input value={t} onChange={(e) => setToolsList((a) => a.map((x, idx) => idx === i ? e.target.value : x))} placeholder="ex.: Manifold" />
+                    <Button variant="ghost" size="icon" className="size-8 text-destructive" onClick={() => setToolsList((a) => a.filter((_, idx) => idx !== i))}><Trash2 className="size-3.5" /></Button>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" onClick={() => setToolsList((a) => [...a, ""])}><Plus className="size-3.5 mr-1" /> Adicionar ferramenta</Button>
+              </TabsContent>
+
+              <TabsContent value="html" className="pt-3">
+                <div className="flex items-center justify-between mb-2">
+                  <Label>HTML completo do corpo</Label>
+                  <div className="flex items-center gap-2 text-xs">
+                    <input type="checkbox" checked={rawMode} onChange={(e) => setRawMode(e.target.checked)} />
+                    <span>Salvar usando este HTML (ignora os blocos)</span>
+                  </div>
+                </div>
+                <Textarea
+                  rows={16}
+                  value={html}
+                  onChange={(e) => setHtml(e.target.value)}
+                  className="font-mono text-xs"
+                  placeholder="<p>Escreva o conteúdo da aula...</p>"
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Modo avançado. Se preferir editar por partes, use a aba <strong>Blocos</strong>.
+                </p>
+              </TabsContent>
+            </Tabs>
 
             <div className="border border-border rounded-lg p-3 space-y-3">
               <div className="flex items-center justify-between">
