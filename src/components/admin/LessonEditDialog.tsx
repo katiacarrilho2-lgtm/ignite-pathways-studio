@@ -242,6 +242,17 @@ export const LessonEditDialog = ({
   const removeExtraImage = (i: number) =>
     setExtraImages(arr => arr.filter((_, idx) => idx !== i));
 
+  const uploadInlineImage = async (file: File): Promise<string | null> => {
+    try {
+      const url = await uploadCourseImage(file, `lessons/${lesson.id}`);
+      toast.success("Imagem enviada");
+      return url;
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao enviar imagem");
+      return null;
+    }
+  };
+
   const updateExtraVideo = (i: number, patch: Partial<ExtraVideo>) =>
     setExtraVideos(arr => arr.map((it, idx) => idx === i ? { ...it, ...patch } : it));
   const removeExtraVideo = (i: number) =>
@@ -365,8 +376,8 @@ export const LessonEditDialog = ({
                             <Label className="text-xs">Conteúdo do bloco</Label>
                             <RichTextEditor
                               value={b.html}
-                              onChange={(e) => updateBlock(b.id, { html: e.target.value })}
-                              onUploadImage={(file) => uploadCourseImage(file, `lessons/${lesson.id}`)}
+                              onChange={(html) => updateBlock(b.id, { html })}
+                              onUploadImage={uploadInlineImage}
                               minHeight={180}
                             />
                             <p className="text-[11px] text-muted-foreground mt-1">
