@@ -86,6 +86,56 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          carga_horaria: string | null
+          course_id: string
+          created_at: string
+          emitido_em: string
+          emitido_por: string | null
+          id: string
+          nota_final: number | null
+          numero: string
+          observacoes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          carga_horaria?: string | null
+          course_id: string
+          created_at?: string
+          emitido_em?: string
+          emitido_por?: string | null
+          id?: string
+          nota_final?: number | null
+          numero: string
+          observacoes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          carga_horaria?: string | null
+          course_id?: string
+          created_at?: string
+          emitido_em?: string
+          emitido_por?: string | null
+          id?: string
+          nota_final?: number | null
+          numero?: string
+          observacoes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_settings: {
         Row: {
           cep: string | null
@@ -623,6 +673,51 @@ export type Database = {
           chave?: string
           updated_at?: string
           valor?: Json
+        }
+        Relationships: []
+      }
+      doc_links: {
+        Row: {
+          active: boolean
+          categoria: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          url: string
+          visible_to: string
+        }
+        Insert: {
+          active?: boolean
+          categoria?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          url: string
+          visible_to?: string
+        }
+        Update: {
+          active?: boolean
+          categoria?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          url?: string
+          visible_to?: string
         }
         Relationships: []
       }
@@ -1385,6 +1480,51 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vendedor?: string | null
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          assunto: string
+          categoria: string | null
+          created_at: string
+          id: string
+          mensagem: string
+          prioridade: string
+          respondido_em: string | null
+          respondido_por: string | null
+          resposta: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assunto: string
+          categoria?: string | null
+          created_at?: string
+          id?: string
+          mensagem: string
+          prioridade?: string
+          respondido_em?: string | null
+          respondido_por?: string | null
+          resposta?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assunto?: string
+          categoria?: string | null
+          created_at?: string
+          id?: string
+          mensagem?: string
+          prioridade?: string
+          respondido_em?: string | null
+          respondido_por?: string | null
+          resposta?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
