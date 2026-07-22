@@ -142,7 +142,7 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
   const body = pickLessonHtml(lesson.content);
   const imageUrl: string | undefined = lesson.content?.image_url;
   const flashcards: Array<{ front: string; back: string }> = lesson.content?.flashcards ?? lesson.content?.items ?? [];
-  const quiz: Array<{ question: string; options: string[]; answer: number; explanation?: string }> =
+  const quiz: Array<{ question: string; options: string[]; answer?: number; correct?: number; explanation?: string }> =
     lesson.content?.quiz ?? lesson.content?.questions ?? [];
   const theme = lesson.content?.module_theme;
   const toolsImg: string | undefined = lesson.content?.tools_image_url;
@@ -301,7 +301,7 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
           <h3 className="text-lg font-bold mb-3">Quiz da aula</h3>
           <div className="space-y-4">
             {quiz.map((q, i) => (
-              <QuizItem key={i} index={i} question={q.question} options={q.options} answer={q.answer} explanation={q.explanation} />
+              <QuizItem key={i} index={i} question={q.question} options={q.options} answer={q.answer ?? q.correct ?? 0} explanation={q.explanation} />
             ))}
           </div>
         </section>

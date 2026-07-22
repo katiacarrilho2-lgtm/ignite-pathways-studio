@@ -73,24 +73,39 @@ const TYPE_META: Record<Lesson["lesson_type"], { icon: any; label: string }> = {
   accordion: { icon: Rows, label: "Acordeão" },
 };
 
+const pickContentHtml = (content: any = {}) => {
+  const html = typeof content?.html === "string" && content.html.trim() ? content.html : "";
+  if (html) return content.html;
+  const body = typeof content?.body === "string" && content.body.trim() ? content.body : "";
+  if (body) return content.body;
+  const contentHtml = typeof content?.content_html === "string" && content.content_html.trim() ? content.content_html : "";
+  return contentHtml ? content.content_html : "";
+};
+
+const normalizeQuizItem = (q: any) => ({
+  question: String(q?.question ?? ""),
+  options: Array.isArray(q?.options) ? q.options.map((o: any) => String(o)) : [],
+  correct: Number.isFinite(Number(q?.correct ?? q?.answer)) ? Number(q?.correct ?? q?.answer) : 0,
+  answer: Number.isFinite(Number(q?.answer ?? q?.correct)) ? Number(q?.answer ?? q?.correct) : 0,
+  explanation: q?.explanation ? String(q.explanation) : "",
+});
+
 const normalizeLessonContentForSave = (lessonType: Lesson["lesson_type"] | undefined, content: any = {}) => {
+  const base = content ?? {};
+  const html = pickContentHtml(base);
+  const normalized = html ? { ...base, html, body: html, content_html: html } : base;
   if (lessonType === "text" || lessonType === "video") {
-    const html = (typeof content.html === "string" && content.html.trim())
-      ? content.html
-      : (typeof content.body === "string" && content.body.trim())
-        ? content.body
-        : (content.content_html ?? "");
-    return { ...content, html, body: html };
+    return normalized;
   }
   if (lessonType === "quiz") {
-    const questions = content.questions ?? content.quiz ?? [];
-    return { ...content, questions, quiz: questions.map((q: any) => ({ ...q, answer: q.answer ?? q.correct ?? 0 })) };
+    const questions = (normalized.questions ?? normalized.quiz ?? []).map(normalizeQuizItem);
+    return { ...normalized, questions, quiz: questions };
   }
   if (lessonType === "flip") {
-    const items = content.items ?? content.flashcards ?? [];
-    return { ...content, items, flashcards: items };
+    const items = normalized.items ?? normalized.flashcards ?? [];
+    return { ...normalized, items, flashcards: items };
   }
-  return content ?? {};
+  return normalized;
 };
 
 const Inner = () => {
@@ -925,11 +940,13 @@ const Inner = () => {
                 </div>
               )}
 
-              {editing.lesson_type === "text" && (
+              {editing.lesson_type && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <Label className="block">Conteúdo da aula</Label>
-                    {editing.id && isMaster && (
+                    <Label className="block">
+                      {editing.lesson_type === "text" ? "Conteúdo da aula" : "Texto explicativo complementar"}
+                    </Label>
+                    {editing.lesson_type === "text" && editing.id && isMaster && (
                       <Button type="button" size="sm" variant="outline"
                         onClick={() => setImgAiTarget({ lessonId: editing.id as string, title: editing.title || "Aula" })}>
                         <ImageIcon className="size-3.5" /> Gerar a partir de imagem
@@ -938,8 +955,8 @@ const Inner = () => {
                   </div>
                   <ImageDropZone onFiles={(files) => files[0] && uploadLessonImage(files[0])} multiple={false} showHint>
                     <RichTextEditor
-                      value={(typeof editing.content?.html === "string" && editing.content.html.trim()) ? editing.content.html : (editing.content?.body ?? "")}
-                      onChange={(html) => setEditing(prev => prev ? { ...prev, content: { ...(prev.content ?? {}), html, body: html } } : prev)}
+                      value={pickContentHtml(editing.content)}
+                      onChange={(html) => setEditing(prev => prev ? { ...prev, content: { ...(prev.content ?? {}), html, body: html, content_html: html } } : prev)}
                       onUploadImage={uploadLessonImage}
                     />
                   </ImageDropZone>

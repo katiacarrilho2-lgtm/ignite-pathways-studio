@@ -111,6 +111,10 @@ function parseBody(html: string): { objective: string; blocks: Block[] } {
   if (!root) return { objective: "", blocks: [] };
   let objective = "";
   const blocks: Block[] = [];
+  const looseNodes: string[] = [];
+  Array.from(root.childNodes).forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) looseNodes.push(node.textContent.trim());
+  });
   Array.from(root.children).forEach((el) => {
     if (el.classList.contains("lesson-objective")) {
       const p = el.querySelector("p");
@@ -123,6 +127,9 @@ function parseBody(html: string): { objective: string; blocks: Block[] } {
     if (h3) h3.remove();
     blocks.push({ id: uid(), kind, title, html: el.innerHTML.trim() });
   });
+  if (looseNodes.length) {
+    blocks.unshift({ id: uid(), kind: "other", title: "Texto da aula", html: looseNodes.map((t) => `<p>${t}</p>`).join("") });
+  }
   return { objective, blocks };
 }
 
@@ -137,6 +144,13 @@ function serializeBody(objective: string, blocks: Block[]): string {
   }
   return parts.join("");
 }
+
+const normalizeQuizAnswer = (q: any): QuizItem => ({
+  question: String(q?.question ?? ""),
+  options: Array.isArray(q?.options) ? q.options.map((o: any) => String(o)) : [],
+  answer: Number.isFinite(Number(q?.answer ?? q?.correct)) ? Number(q?.answer ?? q?.correct) : 0,
+  explanation: q?.explanation ? String(q.explanation) : "",
+});
 
 type Flashcard = { front: string; back: string };
 type QuizItem = { question: string; options: string[]; answer: number; explanation?: string };
@@ -193,13 +207,12 @@ export const LessonEditDialog = ({
       setRawMode(false);
       const fc = Array.isArray(lesson.content?.flashcards) ? lesson.content.flashcards : [];
       setFlashcards(fc.map((f: any) => ({ front: String(f.front ?? ""), back: String(f.back ?? "") })));
-      const qz = Array.isArray(lesson.content?.quiz) ? lesson.content.quiz : [];
-      setQuiz(qz.map((q: any) => ({
-        question: String(q.question ?? ""),
-        options: Array.isArray(q.options) ? q.options.map((o: any) => String(o)) : [],
-        answer: Number.isFinite(q.answer) ? Number(q.answer) : 0,
-        explanation: q.explanation ? String(q.explanation) : "",
-      })));
+      const qz = Array.isArray(lesson.content?.quiz)
+        ? lesson.content.quiz
+        : Array.isArray(lesson.content?.questions)
+          ? lesson.content.questions
+          : [];
+      setQuiz(qz.map(normalizeQuizAnswer));
       const tl = Array.isArray(lesson.content?.tools_list) ? lesson.content.tools_list : [];
       setToolsList(tl.map((t: any) => String(t)));
       setImageUrl(lesson.content?.image_url ?? null);
@@ -262,7 +275,8 @@ export const LessonEditDialog = ({
     setBusy(true);
     const cleanImages = extraImages.filter(x => x.url?.trim());
     const cleanVideos = extraVideos.filter(x => x.url?.trim());
-    const finalHtml = rawMode ? html : serializeBody(objective, blocks);
+    const blockHtml = serializeBody(objective, blocks);
+    const finalHtml = rawMode ? html : (blockHtml.trim() ? blockHtml : html);
     const cleanFlashcards = flashcards.filter((f) => f.front.trim() || f.back.trim());
     const cleanQuiz = quiz
       .filter((q) => q.question.trim())
@@ -278,10 +292,11 @@ export const LessonEditDialog = ({
       ...(lesson.content ?? {}),
       html: finalHtml,
       body: finalHtml, // compat
+      content_html: finalHtml, // compat
       objective: objective.trim() || null,
       flashcards: cleanFlashcards,
       items: cleanFlashcards,
-      quiz: cleanQuiz,
+      quiz: cleanQuiz.map((q) => ({ ...q, correct: q.answer ?? 0 })),
       questions: legacyQuestions,
       tools_list: cleanTools,
       image_url: imageUrl ?? null,
@@ -466,10 +481,10 @@ export const LessonEditDialog = ({
                     <span>Salvar usando este HTML (ignora os blocos)</span>
                   </div>
                 </div>
-                <Textarea
+                  <Textarea
                   rows={16}
                   value={html}
-                  onChange={(e) => setHtml(e.target.value)}
+                  onChange={(e) => { setHtml(e.target.value); setRawMode(true); }}
                   className="font-mono text-xs"
                   placeholder="<p>Escreva o conteúdo da aula...</p>"
                 />
