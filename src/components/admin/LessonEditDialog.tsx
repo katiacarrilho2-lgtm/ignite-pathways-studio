@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { Loader2, Save, ImageIcon, Trash2, Youtube, Plus, Target, AlertTriangle, Info, MessagesSquare, Wrench, Video as VideoIcon, ListChecks, Layers, Code2, ArrowUp, ArrowDown } from "lucide-react";
 import { YoutubePickerDialog, YoutubeVideo } from "./YoutubePickerDialog";
 import { RichTextEditor } from "./RichTextEditor";
-import { uploadCourseImage, youtubeIdFromUrl } from "@/lib/courseMedia";
+import { uploadCourseImage, youtubeIdFromUrl, isDataUrl, uploadDataUrlAsImage, migrateHtmlDataImages } from "@/lib/courseMedia";
 
 type Lesson = { id: string; title: string; content: any };
 
@@ -260,10 +260,39 @@ export const LessonEditDialog = ({
 
   const save = async () => {
     setBusy(true);
-    const cleanImages = extraImages.filter(x => x.url?.trim());
+    const folder = `lessons/${lesson.id}`;
+    let migrated = 0;
+    // 1) Migra imagens em base64 dentro dos blocos (colagem/upload inline)
+    const blocksMig: Block[] = [];
+    for (const b of blocks) {
+      const before = b.html;
+      const after = await migrateHtmlDataImages(before, folder);
+      if (after !== before) migrated++;
+      blocksMig.push({ ...b, html: after });
+    }
+    // 2) HTML avançado
+    const htmlMig = await migrateHtmlDataImages(html, folder);
+    if (htmlMig !== html) migrated++;
+    // 3) Capa
+    let coverUrl = imageUrl;
+    if (isDataUrl(coverUrl)) {
+      try { coverUrl = await uploadDataUrlAsImage(coverUrl as string, folder); migrated++; }
+      catch { coverUrl = null; }
+    }
+    // 4) Galeria
+    const cleanImagesRaw = extraImages.filter(x => x.url?.trim());
+    const cleanImages: ExtraImage[] = [];
+    for (const im of cleanImagesRaw) {
+      if (isDataUrl(im.url)) {
+        try { const u = await uploadDataUrlAsImage(im.url, folder); cleanImages.push({ ...im, url: u }); migrated++; }
+        catch { /* descarta imagem quebrada */ }
+      } else {
+        cleanImages.push(im);
+      }
+    }
     const cleanVideos = extraVideos.filter(x => x.url?.trim());
-    const blockHtml = serializeBody(objective, blocks);
-    const finalHtml = rawMode ? html : (blockHtml.trim() ? blockHtml : html);
+    const blockHtml = serializeBody(objective, blocksMig);
+    const finalHtml = rawMode ? htmlMig : (blockHtml.trim() ? blockHtml : htmlMig);
     const cleanFlashcards = flashcards.filter((f) => f.front.trim() || f.back.trim());
     const cleanQuiz = quiz
       .filter((q) => q.question.trim())
@@ -286,8 +315,8 @@ export const LessonEditDialog = ({
       quiz: cleanQuiz.map((q) => ({ ...q, correct: q.answer ?? 0 })),
       questions: legacyQuestions,
       tools_list: cleanTools,
-      image_url: imageUrl ?? null,
-      image_width: imageUrl ? imageWidth : null,
+      image_url: coverUrl ?? null,
+      image_width: coverUrl ? imageWidth : null,
       youtube: youtube?.videoId ? youtube : null,
       extra_images: cleanImages,
       extra_videos: cleanVideos,
@@ -299,7 +328,12 @@ export const LessonEditDialog = ({
       .eq("id", lesson.id);
     setBusy(false);
     if (error) return toast.error(error.message);
-    toast.success("Aula atualizada");
+    toast.success(migrated > 0 ? `Aula atualizada — ${migrated} imagem(ns) migrada(s) para o armazenamento` : "Aula atualizada");
+    // reflete no estado local para próximo abrir
+    setImageUrl(coverUrl ?? null);
+    setExtraImages(cleanImages);
+    setBlocks(blocksMig);
+    setHtml(htmlMig);
     onSaved({ ...lesson, title: title.trim() || lesson.title, content: newContent });
     onOpenChange(false);
   };
