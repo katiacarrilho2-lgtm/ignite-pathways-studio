@@ -940,10 +940,12 @@ const Inner = () => {
                 </div>
               )}
 
-              {(editing.lesson_type === "text" || editing.lesson_type === "video") && (
+              {editing.lesson_type && (
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <Label className="block">{editing.lesson_type === "video" ? "Texto complementar da aula" : "Conteúdo da aula"}</Label>
+                    <Label className="block">
+                      {editing.lesson_type === "text" ? "Conteúdo da aula" : "Texto explicativo complementar"}
+                    </Label>
                     {editing.lesson_type === "text" && editing.id && isMaster && (
                       <Button type="button" size="sm" variant="outline"
                         onClick={() => setImgAiTarget({ lessonId: editing.id as string, title: editing.title || "Aula" })}>
