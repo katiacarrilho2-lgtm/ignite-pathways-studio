@@ -23,6 +23,7 @@ import { AiGenerateDialog, type AiOptions } from "@/components/admin/AiGenerateD
 import { LessonImageAiDialog } from "@/components/admin/LessonImageAiDialog";
 import { YoutubePickerDialog, type YoutubeVideo } from "@/components/admin/YoutubePickerDialog";
 import { exportCourseJson } from "@/lib/courseExport";
+import { uploadCourseImage } from "@/lib/courseMedia";
 import { supabase as sb } from "@/integrations/supabase/client";
 
 const DRAFT_PREFIX = "lesson-draft:v1:";
@@ -550,14 +551,11 @@ const Inner = () => {
 
       if (opts?.silent) {
         setAutoSavedAt(new Date());
-        // Mantém edição aberta; reseta snapshot para limpar isDirty
-        if (!editing.id && savedId) {
-          const next = { ...editing, id: savedId } as any;
-          setEditing(next);
-          setOriginalSnapshot(JSON.stringify(next));
-        } else {
-          setOriginalSnapshot(JSON.stringify(editing));
-        }
+        const next = !editing.id && savedId ? ({ ...editing, id: savedId } as any) : editing;
+        setOriginalSnapshot(JSON.stringify(next));
+        if (opts.keepOpen === false) setEditing(null);
+        else setEditing(next);
+        await load({ force: true });
         return;
       }
       toast.success("Aula salva");
@@ -621,17 +619,11 @@ const Inner = () => {
 
   const uploadLessonImage = async (file: File): Promise<string | null> => {
     if (!editing || !courseId) return null;
-    if (!file.type.startsWith("image/")) { toast.error("Selecione uma imagem"); return null; }
-    if (file.size > 5 * 1024 * 1024) { toast.error("Imagem acima de 5 MB"); return null; }
     setUploadingImg(true);
     try {
-      const safe = file.name.toLowerCase().replace(/[^a-z0-9.]+/g, "-");
-      const path = `lessons/${courseId}/${Date.now()}-${safe}`;
-      const { error } = await supabase.storage.from("course-images").upload(path, file, { upsert: false, contentType: file.type });
-      if (error) throw error;
-      const { data: pub } = supabase.storage.from("course-images").getPublicUrl(path);
+      const url = await uploadCourseImage(file, `lessons/${editing.id ?? courseId}`);
       toast.success("Imagem enviada");
-      return pub.publicUrl;
+      return url;
     } catch (e: any) { toast.error(e.message); return null; }
     finally { setUploadingImg(false); }
   };
@@ -644,9 +636,10 @@ const Inner = () => {
       const path = `lessons/${courseId}/materials/${Date.now()}-${safe}`;
       const { error } = await supabase.storage.from("course-images").upload(path, file, { upsert: false, contentType: file.type });
       if (error) throw error;
-      const { data: pub } = supabase.storage.from("course-images").getPublicUrl(path);
+      const { data: signed, error: signedError } = await supabase.storage.from("course-images").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (signedError || !signed?.signedUrl) throw signedError ?? new Error("Falha ao gerar link do arquivo");
       toast.success("Arquivo enviado");
-      return { url: pub.publicUrl, mime: file.type };
+      return { url: signed.signedUrl, mime: file.type };
     } catch (e: any) { toast.error(e.message); return null; }
   };
 
@@ -953,7 +946,15 @@ const Inner = () => {
                       </Button>
                     )}
                   </div>
-                  <ImageDropZone onFiles={(files) => files[0] && uploadLessonImage(files[0])} multiple={false} showHint>
+                  <ImageDropZone
+                    onFiles={async (files) => {
+                      const url = files[0] ? await uploadLessonImage(files[0]) : null;
+                      if (url) setEditing(prev => prev ? { ...prev, content: { ...(prev.content ?? {}), image_url: url, image_width: prev.content?.image_width ?? 720 } } : prev);
+                    }}
+                    multiple={false}
+                    maxMB={8}
+                    showHint
+                  >
                     <RichTextEditor
                       value={pickContentHtml(editing.content)}
                       onChange={(html) => setEditing(prev => prev ? { ...prev, content: { ...(prev.content ?? {}), html, body: html, content_html: html } } : prev)}
@@ -961,8 +962,57 @@ const Inner = () => {
                     />
                   </ImageDropZone>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Use a barra de ferramentas para formatar (negrito, cor, destaque, listas, alinhamento, fonte). Para imagens: clique no ícone de imagem na barra, arraste, ou cole (Ctrl+V). Recomendado até 1200 px de largura e 2 MB.
+                    Use a barra para formatar. Para imagem no texto, clique no ícone de imagem; para capa da aula, arraste/cole nesta área. A imagem é salva no Storage com link assinado.
                   </p>
+                  <div className="border border-border rounded-lg p-3 bg-secondary/20 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <Label className="text-sm">Imagens da aula</Label>
+                      <div className="flex gap-2">
+                        <label className="inline-flex items-center gap-1 cursor-pointer text-xs px-2.5 py-1.5 rounded-md border border-border hover:bg-secondary">
+                          <Plus className="size-3.5" /> Galeria
+                          <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                            const url = e.target.files?.[0] ? await uploadLessonImage(e.target.files[0]) : null;
+                            e.currentTarget.value = "";
+                            if (!url) return;
+                            setEditing(prev => prev ? {
+                              ...prev,
+                              content: { ...(prev.content ?? {}), extra_images: [...(prev.content?.extra_images ?? []), { url, width: 480, caption: "" }] },
+                            } : prev);
+                          }} />
+                        </label>
+                        {editing.content?.image_url && (
+                          <Button type="button" variant="ghost" size="sm" className="text-destructive" onClick={() => setEditing(prev => prev ? { ...prev, content: { ...(prev.content ?? {}), image_url: null, image_width: null } } : prev)}>
+                            <Trash2 className="size-3.5" /> Remover capa
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    {editing.content?.image_url ? (
+                      <figure className="flex justify-center rounded-md bg-background/60 p-2">
+                        <img src={editing.content.image_url} alt="Preview" className="max-h-48 rounded object-contain" />
+                      </figure>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">Arraste/cole uma imagem na área do editor para virar capa, ou use “Galeria” para imagens complementares.</p>
+                    )}
+                    {(editing.content?.extra_images ?? []).map((img: any, i: number) => (
+                      <div key={i} className="flex items-center gap-2 border border-border rounded-md p-2 bg-background/60">
+                        {img.url ? <img src={img.url} alt="" className="size-14 rounded object-cover" /> : <div className="size-14 rounded bg-muted" />}
+                        <Input
+                          value={img.caption ?? ""}
+                          placeholder="Legenda opcional"
+                          onChange={(e) => setEditing(prev => {
+                            if (!prev) return prev;
+                            const list = [...(prev.content?.extra_images ?? [])];
+                            list[i] = { ...list[i], caption: e.target.value };
+                            return { ...prev, content: { ...(prev.content ?? {}), extra_images: list } };
+                          })}
+                        />
+                        <Button type="button" variant="ghost" size="icon" className="text-destructive shrink-0" onClick={() => setEditing(prev => prev ? { ...prev, content: { ...(prev.content ?? {}), extra_images: (prev.content?.extra_images ?? []).filter((_: any, idx: number) => idx !== i) } } : prev)}>
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 

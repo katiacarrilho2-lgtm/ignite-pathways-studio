@@ -21,6 +21,7 @@ import { useGamification } from "@/lib/gamer/useGamification";
 import { sfx, fireConfetti } from "@/lib/gamer/sfx";
 import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
 import { Pencil } from "lucide-react";
+import { youtubeIdFromUrl } from "@/lib/courseMedia";
 
 type Lesson = {
   id: string; section_id: string; title: string;
@@ -50,20 +51,6 @@ const extractEmbedUrl = (value?: string | null) => {
   if (!value) return null;
   const match = value.match(/src=["']([^"']+)["']/i);
   return match?.[1] ?? value;
-};
-
-const ytIdFromUrl = (input?: string | null): string | null => {
-  if (!input) return null;
-  const s = input.trim();
-  const pats = [
-    /youtu\.be\/([A-Za-z0-9_-]{11})/,
-    /youtube\.com\/watch\?[^ ]*v=([A-Za-z0-9_-]{11})/,
-    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
-    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
-  ];
-  for (const p of pats) { const m = s.match(p); if (m) return m[1]; }
-  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
-  return null;
 };
 
 const CursoPlayer = () => {
@@ -552,12 +539,11 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
         </div>
       )}
       {!hideMedia && lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
-      {!hideMedia && lesson.content?.image_url && !lesson.content?.youtube?.videoId && (
+      {!hideMedia && lesson.content?.image_url && (
         <figure className="flex justify-center">
-          <img
+          <LessonImage
             src={lesson.content.image_url}
             alt={lesson.title}
-            loading="lazy"
             className="rounded-lg border border-border w-full h-auto object-contain"
             style={{ maxWidth: `${lesson.content?.image_width ?? 720}px` }}
           />
@@ -575,7 +561,7 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
           <div className="grid gap-4 sm:grid-cols-2">
             {extraImages.map((im, i) => (
               <figure key={i} className="flex flex-col items-center bg-secondary/20 border border-border rounded-lg p-3">
-                <img src={im.url} alt={im.caption ?? ""} loading="lazy" className="rounded object-contain w-full h-auto" style={{ maxWidth: `${im.width ?? 480}px` }} />
+                <LessonImage src={im.url} alt={im.caption ?? "Imagem da aula"} className="rounded object-contain w-full h-auto" style={{ maxWidth: `${im.width ?? 480}px` }} />
                 {im.caption && <figcaption className="text-xs text-muted-foreground mt-2 text-center">{im.caption}</figcaption>}
               </figure>
             ))}
@@ -587,7 +573,7 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
           <p className="lesson-block-heading"><Youtube className="size-4" /> Vídeos complementares</p>
           <div className="grid gap-4 md:grid-cols-2">
             {extraVideos.map((v, i) => {
-              const id = ytIdFromUrl(v.url);
+              const id = youtubeIdFromUrl(v.url);
               if (!id) return null;
               return (
                 <figure key={i} className="space-y-1.5">
@@ -655,6 +641,18 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
       )}
     </div>
   );
+};
+
+const LessonImage = ({ src, alt, className, style }: { src: string; alt: string; className?: string; style?: React.CSSProperties }) => {
+  const [broken, setBroken] = useState(false);
+  if (broken) {
+    return (
+      <div className="w-full rounded-lg border border-dashed border-border bg-secondary/30 p-4 text-center text-xs text-muted-foreground" style={style}>
+        Imagem não carregou. Reenvie pelo botão Editar aula.
+      </div>
+    );
+  }
+  return <img src={src} alt={alt} loading="lazy" className={className} style={style} onError={() => setBroken(true)} />;
 };
 
 const Flashcard = ({ front, back }: { front: string; back: string }) => {

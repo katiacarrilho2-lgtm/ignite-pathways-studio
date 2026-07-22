@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { ImageDropZone } from "@/components/admin/ImageDropZone";
 import { exportCourseJson } from "@/lib/courseExport";
+import { uploadCourseImage } from "@/lib/courseMedia";
 
 type Course = {
   id: string; slug: string; title: string; category: string; duration: string | null;
@@ -74,18 +75,10 @@ const AdminCursosInner = () => {
     let teacher_manual_image_url = editing.teacher_manual_image_url ?? null;
     try {
       if (file) {
-        const path = `${Date.now()}-${slugify(file.name)}`;
-        const { error: upErr } = await supabase.storage.from("course-images").upload(path, file, { upsert: false });
-        if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("course-images").getPublicUrl(path);
-        image_url = pub.publicUrl;
+        image_url = await uploadCourseImage(file, "course-covers");
       }
       if (manualFile) {
-        const path = `manual-${Date.now()}-${slugify(manualFile.name)}`;
-        const { error: upErr } = await supabase.storage.from("course-images").upload(path, manualFile, { upsert: false });
-        if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("course-images").getPublicUrl(path);
-        teacher_manual_image_url = pub.publicUrl;
+        teacher_manual_image_url = await uploadCourseImage(manualFile, "teacher-manuals");
       }
       const catName = categories.find(c => c.id === editing.categoria_id)?.name ?? editing.category ?? "";
       const payload: any = {
