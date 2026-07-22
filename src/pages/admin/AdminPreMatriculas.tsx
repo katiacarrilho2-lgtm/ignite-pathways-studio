@@ -175,6 +175,14 @@ const Inner = () => {
   });
 
   const updateStatus = async (id: string, status: string) => {
+    if (status === "matriculado") {
+      const app = list.find(x => x.id === id);
+      if (app) {
+        if (!app.course_id) return toast.error("Ficha sem curso vinculado — vincule antes de matricular.");
+        openMatricular(app);
+        return;
+      }
+    }
     const { error } = await supabase.from("enrollment_applications").update({ status }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Status atualizado");

@@ -1333,6 +1333,42 @@ export type Database = {
         }
         Relationships: []
       }
+      role_definitions: {
+        Row: {
+          base_role: Database["public"]["Enums"]["app_role"]
+          created_at: string
+          description: string | null
+          is_system: boolean
+          key: string
+          label: string
+          permissions: string[]
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          base_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          description?: string | null
+          is_system?: boolean
+          key: string
+          label: string
+          permissions?: string[]
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          base_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          description?: string | null
+          is_system?: boolean
+          key?: string
+          label?: string
+          permissions?: string[]
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       student_documents: {
         Row: {
           created_at: string
@@ -1739,7 +1775,12 @@ export type Database = {
         | "manage_leads"
         | "view_analytics"
         | "manage_content"
-      app_role: "super_admin" | "admin" | "editor" | "viewer"
+        | "manage_affiliates"
+        | "view_commission"
+        | "issue_boletos"
+        | "settle_boletos"
+        | "manage_certification"
+      app_role: "super_admin" | "admin" | "editor" | "viewer" | "certificadora"
       crm_event_type:
         | "anotacao"
         | "troca_estagio"
@@ -1888,8 +1929,13 @@ export const Constants = {
         "manage_leads",
         "view_analytics",
         "manage_content",
+        "manage_affiliates",
+        "view_commission",
+        "issue_boletos",
+        "settle_boletos",
+        "manage_certification",
       ],
-      app_role: ["super_admin", "admin", "editor", "viewer"],
+      app_role: ["super_admin", "admin", "editor", "viewer", "certificadora"],
       crm_event_type: [
         "anotacao",
         "troca_estagio",
