@@ -636,9 +636,10 @@ const Inner = () => {
       const path = `lessons/${courseId}/materials/${Date.now()}-${safe}`;
       const { error } = await supabase.storage.from("course-images").upload(path, file, { upsert: false, contentType: file.type });
       if (error) throw error;
-      const { data: pub } = supabase.storage.from("course-images").getPublicUrl(path);
+      const { data: signed, error: signedError } = await supabase.storage.from("course-images").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (signedError || !signed?.signedUrl) throw signedError ?? new Error("Falha ao gerar link do arquivo");
       toast.success("Arquivo enviado");
-      return { url: pub.publicUrl, mime: file.type };
+      return { url: signed.signedUrl, mime: file.type };
     } catch (e: any) { toast.error(e.message); return null; }
   };
 
