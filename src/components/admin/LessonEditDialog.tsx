@@ -11,45 +11,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Save, ImageIcon, Trash2, Youtube, Plus, Target, AlertTriangle, Info, MessagesSquare, Wrench, Video as VideoIcon, ListChecks, Layers, Code2, ArrowUp, ArrowDown } from "lucide-react";
 import { YoutubePickerDialog, YoutubeVideo } from "./YoutubePickerDialog";
+import { RichTextEditor } from "./RichTextEditor";
+import { uploadCourseImage, youtubeIdFromUrl } from "@/lib/courseMedia";
 
 type Lesson = { id: string; title: string; content: any };
-
-async function resizeFile(file: File, maxWidth = 1400, quality = 0.85): Promise<Blob> {
-  const dataUrl = await new Promise<string>((res, rej) => {
-    const r = new FileReader(); r.onerror = () => rej(r.error);
-    r.onload = () => res(r.result as string); r.readAsDataURL(file);
-  });
-  const img = await new Promise<HTMLImageElement>((res, rej) => {
-    const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("Falha ao ler imagem")); i.src = dataUrl;
-  });
-  const scale = Math.min(1, maxWidth / img.width);
-  const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
-  const canvas = document.createElement("canvas");
-  canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(img, 0, 0, w, h);
-  const isPng = file.type === "image/png";
-  return await new Promise<Blob>((res, rej) =>
-    canvas.toBlob((b) => b ? res(b) : rej(new Error("Falha ao processar imagem")), isPng ? "image/png" : "image/jpeg", quality)
-  );
-}
-
-// Upload resized image to Storage and return a long-lived signed URL.
-// Falls back to data URL if the bucket upload fails, so the editor never breaks.
-async function uploadLessonImage(file: File, lessonId: string): Promise<string> {
-  const blob = await resizeFile(file);
-  const ext = (file.type === "image/png" ? "png" : "jpg");
-  const path = `lessons/${lessonId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error: upErr } = await supabase.storage.from("course-images").upload(path, blob, {
-    contentType: blob.type,
-    upsert: false,
-  });
-  if (upErr) throw upErr;
-  // 10 years — bucket is private but has a public SELECT policy; signed URL works everywhere.
-  const { data, error } = await supabase.storage.from("course-images").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
-  if (error || !data?.signedUrl) throw error ?? new Error("Falha ao gerar URL");
-  return data.signedUrl;
-}
 
 type ExtraImage = { url: string; width: number; caption?: string };
 type ExtraVideo = { url: string; title?: string; why?: string };
@@ -175,20 +140,6 @@ const normalizeQuizAnswer = (q: any): QuizItem => ({
 type Flashcard = { front: string; back: string };
 type QuizItem = { question: string; options: string[]; answer: number; explanation?: string };
 
-function extractYoutubeId(input: string): string | null {
-  if (!input) return null;
-  const s = input.trim();
-  const patterns = [
-    /youtu\.be\/([A-Za-z0-9_-]{11})/,
-    /youtube\.com\/watch\?[^ ]*v=([A-Za-z0-9_-]{11})/,
-    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
-    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
-  ];
-  for (const p of patterns) { const m = s.match(p); if (m) return m[1]; }
-  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
-  return null;
-}
-
 export const LessonEditDialog = ({
   open, onOpenChange, lesson, onSaved,
 }: {
@@ -266,7 +217,7 @@ export const LessonEditDialog = ({
     if (f.size > 8 * 1024 * 1024) return toast.error("Máx 8 MB");
     try {
       setBusy(true);
-      const url = await uploadLessonImage(f, lesson.id);
+      const url = await uploadCourseImage(f, `lessons/${lesson.id}`);
       setImageUrl(url);
       toast.success("Imagem enviada");
     } catch (e: any) { toast.error(e?.message ?? "Falha ao enviar imagem"); }
@@ -279,7 +230,7 @@ export const LessonEditDialog = ({
     if (f.size > 8 * 1024 * 1024) return toast.error("Máx 8 MB");
     try {
       setBusy(true);
-      const url = await uploadLessonImage(f, lesson.id);
+      const url = await uploadCourseImage(f, `lessons/${lesson.id}`);
       setExtraImages(arr => [...arr, { url, width: 480, caption: "" }]);
       toast.success("Imagem adicionada");
     } catch (e: any) { toast.error(e?.message ?? "Falha ao enviar imagem"); }
@@ -411,15 +362,15 @@ export const LessonEditDialog = ({
                             </select>
                           </div>
                           <div>
-                            <Label className="text-xs">Conteúdo (HTML deste bloco)</Label>
-                            <Textarea
-                              rows={8}
+                            <Label className="text-xs">Conteúdo do bloco</Label>
+                            <RichTextEditor
                               value={b.html}
                               onChange={(e) => updateBlock(b.id, { html: e.target.value })}
-                              className="font-mono text-xs"
+                              onUploadImage={(file) => uploadCourseImage(file, `lessons/${lesson.id}`)}
+                              minHeight={180}
                             />
                             <p className="text-[11px] text-muted-foreground mt-1">
-                              Use &lt;p&gt;, &lt;ul&gt;&lt;li&gt;, &lt;strong&gt; etc. Não precisa envolver com o container — isso é feito automaticamente.
+                              Edite como texto normal. O sistema organiza o bloco visualmente quando salvar.
                             </p>
                           </div>
                         </AccordionContent>
@@ -538,7 +489,7 @@ export const LessonEditDialog = ({
               <div className="flex flex-col sm:flex-row gap-2">
                 <label className="inline-flex items-center gap-2 cursor-pointer text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary">
                   <ImageIcon className="size-4" /> {imageUrl ? "Trocar imagem" : "Enviar do computador"}
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => pickFile(e.target.files?.[0] ?? null)} />
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => { pickFile(e.target.files?.[0] ?? null); e.currentTarget.value = ""; }} />
                 </label>
                 <Input
                   placeholder="ou cole uma URL https://..."
@@ -567,7 +518,7 @@ export const LessonEditDialog = ({
                 <div className="flex gap-2">
                   <label className="inline-flex items-center gap-1 cursor-pointer text-xs px-2.5 py-1.5 rounded-md border border-border hover:bg-secondary">
                     <Plus className="size-3.5" /> Upload
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => addExtraImageFromFile(e.target.files?.[0] ?? null)} />
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => { addExtraImageFromFile(e.target.files?.[0] ?? null); e.currentTarget.value = ""; }} />
                   </label>
                   <Button variant="secondary" size="sm" onClick={() => setExtraImages(arr => [...arr, { url: "", width: 480, caption: "" }])}>
                     <Plus className="size-3.5" /> URL
@@ -648,7 +599,7 @@ export const LessonEditDialog = ({
               )}
               <div className="space-y-2">
                 {extraVideos.map((v, i) => {
-                  const vid = extractYoutubeId(v.url);
+                  const vid = youtubeIdFromUrl(v.url);
                   return (
                     <div key={i} className="border border-border rounded-md p-3 space-y-2 bg-secondary/20">
                       <div className="flex items-start gap-3">
