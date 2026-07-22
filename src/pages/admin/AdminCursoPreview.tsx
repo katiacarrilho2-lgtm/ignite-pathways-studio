@@ -130,9 +130,9 @@ export default function AdminCursoPreview() {
 function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Lesson) => void }) {
   const [editOpen, setEditOpen] = useState(false);
   const yt = lesson.content?.youtube;
-  const body: string | undefined = lesson.content?.body;
+  const body: string | undefined = lesson.content?.html ?? lesson.content?.body ?? lesson.content?.content_html;
   const imageUrl: string | undefined = lesson.content?.image_url;
-  const flashcards: Array<{ front: string; back: string }> = lesson.content?.flashcards ?? [];
+  const flashcards: Array<{ front: string; back: string }> = lesson.content?.flashcards ?? lesson.content?.items ?? [];
   const quiz: Array<{ question: string; options: string[]; answer: number; explanation?: string }> =
     lesson.content?.quiz ?? lesson.content?.questions ?? [];
   const theme = lesson.content?.module_theme;
@@ -258,7 +258,7 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
         </section>
       )}
 
-      {videos.length > 0 && (
+      {videos.length > 0 && extraVideos.length === 0 && (
         <section>
           <p className="lesson-block-heading"><Youtube className="size-4" /> Vídeos recomendados</p>
           <div className="lesson-videos">

@@ -73,6 +73,22 @@ const TYPE_META: Record<Lesson["lesson_type"], { icon: any; label: string }> = {
   accordion: { icon: Rows, label: "Acordeão" },
 };
 
+const normalizeLessonContentForSave = (lessonType: Lesson["lesson_type"] | undefined, content: any = {}) => {
+  if (lessonType === "text" || lessonType === "video") {
+    const html = content.html ?? content.body ?? content.content_html ?? "";
+    return { ...content, html, body: html };
+  }
+  if (lessonType === "quiz") {
+    const questions = content.questions ?? content.quiz ?? [];
+    return { ...content, questions, quiz: questions.map((q: any) => ({ ...q, answer: q.answer ?? q.correct ?? 0 })) };
+  }
+  if (lessonType === "flip") {
+    const items = content.items ?? content.flashcards ?? [];
+    return { ...content, items, flashcards: items };
+  }
+  return content ?? {};
+};
+
 const Inner = () => {
   const { courseId } = useParams();
   const { isMaster } = useAuth();
@@ -490,7 +506,7 @@ const Inner = () => {
         title: editing.title.trim(),
         lesson_type: editing.lesson_type,
         section_id: editing.section_id,
-        content: editing.content ?? {},
+        content: normalizeLessonContentForSave(editing.lesson_type as Lesson["lesson_type"], editing.content),
         video_path: editing.video_path ?? null,
         duration_seconds: editing.duration_seconds ?? null,
         passing_score: editing.passing_score ?? 70,
@@ -918,8 +934,8 @@ const Inner = () => {
                   </div>
                   <ImageDropZone onFiles={(files) => files[0] && uploadLessonImage(files[0])} multiple={false} showHint>
                     <RichTextEditor
-                      value={editing.content?.html ?? ""}
-                      onChange={(html) => setEditing(prev => prev ? { ...prev, content: { html } } : prev)}
+                      value={editing.content?.html ?? editing.content?.body ?? ""}
+                      onChange={(html) => setEditing(prev => prev ? { ...prev, content: { ...(prev.content ?? {}), html, body: html } } : prev)}
                       onUploadImage={uploadLessonImage}
                     />
                   </ImageDropZone>

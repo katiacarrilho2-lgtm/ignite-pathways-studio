@@ -519,8 +519,8 @@ const VideoBlock = ({ lesson, done, onComplete }: { lesson: Lesson; done: boolea
 };
 
 const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: boolean }) => {
-  const html: string = lesson.content?.html ?? lesson.content?.body ?? "";
-  const flashcards: { front: string; back: string }[] = lesson.content?.flashcards ?? [];
+  const html: string = lesson.content?.html ?? lesson.content?.body ?? lesson.content?.content_html ?? "";
+  const flashcards: { front: string; back: string }[] = lesson.content?.flashcards ?? lesson.content?.items ?? [];
   const quiz: { question: string; options: string[]; answer?: number; correct?: number; explanation?: string }[] =
     lesson.content?.quiz ?? [];
   const theme = lesson.content?.module_theme;
@@ -613,7 +613,7 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
           </div>
         </section>
       )}
-      {videos.length > 0 && (
+      {videos.length > 0 && extraVideos.length === 0 && (
         <section>
           <p className="lesson-block-heading"><Youtube className="size-4" /> Vídeos recomendados</p>
           <div className="lesson-videos">

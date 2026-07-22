@@ -258,6 +258,12 @@ export const LessonEditDialog = ({
     const cleanQuiz = quiz
       .filter((q) => q.question.trim())
       .map((q) => ({ ...q, options: q.options.map((o) => o).filter((o) => o.trim() !== "" || q.options.length <= 2) }));
+    const legacyQuestions = cleanQuiz.map((q) => ({
+      question: q.question,
+      options: q.options,
+      correct: q.answer ?? 0,
+      explanation: q.explanation ?? "",
+    }));
     const cleanTools = toolsList.map((t) => t.trim()).filter(Boolean);
     const newContent = {
       ...(lesson.content ?? {}),
@@ -265,13 +271,16 @@ export const LessonEditDialog = ({
       body: finalHtml, // compat
       objective: objective.trim() || null,
       flashcards: cleanFlashcards,
+      items: cleanFlashcards,
       quiz: cleanQuiz,
+      questions: legacyQuestions,
       tools_list: cleanTools,
       image_url: imageUrl ?? null,
       image_width: imageUrl ? imageWidth : null,
       youtube: youtube?.videoId ? youtube : null,
       extra_images: cleanImages,
       extra_videos: cleanVideos,
+      video_suggestions: cleanVideos,
     };
     const { error } = await supabase
       .from("course_lessons")
