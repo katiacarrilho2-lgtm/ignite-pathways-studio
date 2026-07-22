@@ -531,7 +531,7 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
   const html: string = pickLessonHtml(lesson.content);
   const flashcards: { front: string; back: string }[] = lesson.content?.flashcards ?? lesson.content?.items ?? [];
   const quiz: { question: string; options: string[]; answer?: number; correct?: number; explanation?: string }[] =
-    lesson.content?.quiz ?? [];
+    lesson.content?.quiz ?? lesson.content?.questions ?? [];
   const theme = lesson.content?.module_theme;
   const toolsImg: string | undefined = lesson.content?.tools_image_url;
   const toolsList: string[] = lesson.content?.tools_list ?? [];
@@ -729,7 +729,7 @@ const YoutubeEmbed = ({ yt }: { yt: { videoId: string; title?: string; channel?:
 
 const FlipBlock = ({ lesson }: { lesson: Lesson }) => {
   const [flipped, setFlipped] = useState<Record<number, boolean>>({});
-  const items: { front: string; back: string }[] = lesson.content?.items ?? [];
+  const items: { front: string; back: string }[] = lesson.content?.items ?? lesson.content?.flashcards ?? [];
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {items.map((it, i) => (
@@ -773,14 +773,14 @@ const AccordionBlock = ({ lesson }: { lesson: Lesson }) => {
 };
 
 const QuizBlock = ({ lesson, previousScore, onPass }: { lesson: Lesson; previousScore: number | null; onPass: (score: number) => void }) => {
-  const questions: { question: string; options: string[]; correct: number }[] = lesson.content?.questions ?? [];
+  const questions: { question: string; options: string[]; correct?: number; answer?: number }[] = lesson.content?.questions ?? lesson.content?.quiz ?? [];
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(previousScore);
 
   const submit = () => {
     if (Object.keys(answers).length < questions.length) return toast.error("Responda todas as perguntas");
-    const correct = questions.reduce((acc, q, i) => acc + (answers[i] === q.correct ? 1 : 0), 0);
+    const correct = questions.reduce((acc, q, i) => acc + (answers[i] === (q.correct ?? q.answer ?? 0) ? 1 : 0), 0);
     const s = Math.round((correct / questions.length) * 100);
     setScore(s); setSubmitted(true);
     if (s >= (lesson.passing_score ?? 70)) onPass(s);
@@ -795,8 +795,9 @@ const QuizBlock = ({ lesson, previousScore, onPass }: { lesson: Lesson; previous
           <p className="font-medium">{i + 1}. {q.question}</p>
           {q.options.map((opt, oi) => {
             const checked = answers[i] === oi;
-            const isCorrect = submitted && oi === q.correct;
-            const isWrong = submitted && checked && oi !== q.correct;
+            const correctIndex = q.correct ?? q.answer ?? 0;
+            const isCorrect = submitted && oi === correctIndex;
+            const isWrong = submitted && checked && oi !== correctIndex;
             return (
               <label key={oi} className={`flex items-center gap-2 px-3 py-2 rounded-md border cursor-pointer ${isCorrect ? "border-green-500 bg-green-50" : isWrong ? "border-red-500 bg-red-50" : checked ? "border-primary bg-secondary/40" : "border-border hover:bg-secondary/30"}`}>
                 <input type="radio" name={`q-${i}`} checked={checked} disabled={submitted}
