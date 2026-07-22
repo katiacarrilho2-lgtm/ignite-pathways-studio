@@ -70,3 +70,50 @@ export function youtubeIdFromUrl(input?: string | null): string | null {
   }
   return /^[A-Za-z0-9_-]{11}$/.test(value) ? value : null;
 }
+
+// -------- Base64 (data:) image migration --------
+
+export function isDataUrl(value?: string | null): boolean {
+  return !!value && /^data:image\//i.test(value.trim());
+}
+
+function dataUrlToBlob(dataUrl: string): Blob {
+  const [meta, b64] = dataUrl.split(",");
+  const mimeMatch = meta.match(/data:([^;]+)/i);
+  const mime = mimeMatch?.[1] ?? "image/png";
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+export async function uploadDataUrlAsImage(dataUrl: string, folder: string): Promise<string> {
+  const blob = dataUrlToBlob(dataUrl);
+  const file = new File([blob], `paste-${Date.now()}.${blob.type === "image/png" ? "png" : "jpg"}`, { type: blob.type });
+  return await uploadCourseImage(file, folder);
+}
+
+/**
+ * Scans an HTML string, uploads any inline `data:image/*` src to Storage, and
+ * returns the rewritten HTML with signed URLs. Skips non-data URLs unchanged.
+ */
+export async function migrateHtmlDataImages(html: string, folder: string): Promise<string> {
+  if (!html || typeof window === "undefined") return html;
+  if (!/src=["']data:image\//i.test(html)) return html;
+  const doc = new DOMParser().parseFromString(`<div id="__root">${html}</div>`, "text/html");
+  const root = doc.getElementById("__root");
+  if (!root) return html;
+  const imgs = Array.from(root.querySelectorAll("img"));
+  for (const img of imgs) {
+    const src = img.getAttribute("src") ?? "";
+    if (!isDataUrl(src)) continue;
+    try {
+      const url = await uploadDataUrlAsImage(src, folder);
+      img.setAttribute("src", url);
+    } catch (e) {
+      // se falhar, remove a imagem pesada para não travar o salvamento
+      img.remove();
+    }
+  }
+  return root.innerHTML;
+}
