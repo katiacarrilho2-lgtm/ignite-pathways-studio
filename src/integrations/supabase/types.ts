@@ -1739,7 +1739,12 @@ export type Database = {
         | "manage_leads"
         | "view_analytics"
         | "manage_content"
-      app_role: "super_admin" | "admin" | "editor" | "viewer"
+        | "manage_affiliates"
+        | "view_commission"
+        | "issue_boletos"
+        | "settle_boletos"
+        | "manage_certification"
+      app_role: "super_admin" | "admin" | "editor" | "viewer" | "certificadora"
       crm_event_type:
         | "anotacao"
         | "troca_estagio"
@@ -1888,8 +1893,13 @@ export const Constants = {
         "manage_leads",
         "view_analytics",
         "manage_content",
+        "manage_affiliates",
+        "view_commission",
+        "issue_boletos",
+        "settle_boletos",
+        "manage_certification",
       ],
-      app_role: ["super_admin", "admin", "editor", "viewer"],
+      app_role: ["super_admin", "admin", "editor", "viewer", "certificadora"],
       crm_event_type: [
         "anotacao",
         "troca_estagio",
