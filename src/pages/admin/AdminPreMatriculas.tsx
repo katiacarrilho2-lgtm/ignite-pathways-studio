@@ -213,7 +213,7 @@ const Inner = () => {
     const { error } = await supabase.from("enrollment_applications").update({ paid_at: now, paid_amount_cents: cents }).eq("id", a.id);
     if (error) return toast.error(error.message);
     setList(prev => prev.map(x => x.id === a.id ? { ...x, paid_at: now, paid_amount_cents: cents } : x));
-    toast.success("Pagamento registrado — entra nas metas!");
+    toast.success("Pagamento registrado na pré-matrícula. Para contar nas metas, dê baixa na parcela correspondente em Financeiro.");
   };
 
   // Auto-save edição inline da ficha
