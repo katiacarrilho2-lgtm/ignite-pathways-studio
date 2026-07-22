@@ -300,7 +300,7 @@ export const LessonEditDialog = ({
               <TabsList className="flex flex-wrap h-auto">
                 <TabsTrigger value="blocos"><Layers className="size-3.5 mr-1" /> Blocos</TabsTrigger>
                 <TabsTrigger value="objetivo"><Target className="size-3.5 mr-1" /> Objetivo</TabsTrigger>
-                <TabsTrigger value="flashcards"><RotateCwIcon /> Flashcards</TabsTrigger>
+                <TabsTrigger value="flashcards"><Layers className="size-3.5 mr-1" /> Flashcards</TabsTrigger>
                 <TabsTrigger value="quiz"><ListChecks className="size-3.5 mr-1" /> Quiz</TabsTrigger>
                 <TabsTrigger value="ferramentas"><Wrench className="size-3.5 mr-1" /> Ferramentas</TabsTrigger>
                 <TabsTrigger value="html"><Code2 className="size-3.5 mr-1" /> HTML avançado</TabsTrigger>
