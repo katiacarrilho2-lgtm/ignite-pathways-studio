@@ -33,6 +33,17 @@ Deno.serve(async (req) => {
     const { data: targetIsSA } = await admin.rpc("has_role", { _user_id: user_id, _role: "super_admin" });
     if (targetIsSA) return json({ error: "Outro super admin não pode ser excluído por aqui" }, 400);
 
+    // Limpa dados relacionados antes (sem FK cascade em auth.users)
+    const tables = [
+      "lesson_progress", "lesson_reflections", "enrollments", "installments",
+      "certificates", "student_documents", "user_gamification",
+      "user_permissions", "user_roles", "student_profiles", "profiles",
+    ];
+    for (const t of tables) {
+      const { error: delErr } = await admin.from(t).delete().eq("user_id", user_id);
+      if (delErr) console.warn(`delete ${t}:`, delErr.message);
+    }
+
     const { error } = await admin.auth.admin.deleteUser(user_id);
     if (error) return json({ error: error.message }, 400);
     return json({ ok: true });
