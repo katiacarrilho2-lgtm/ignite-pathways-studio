@@ -955,7 +955,9 @@ export type Database = {
         Row: {
           account_id: string | null
           created_at: string
+          desconto_cents: number
           enrollment_id: string
+          forma_pagamento: string | null
           id: string
           numero: number
           observacoes: string | null
@@ -963,12 +965,15 @@ export type Database = {
           status: string
           updated_at: string
           valor_cents: number
+          valor_final_cents: number | null
           vencimento: string | null
         }
         Insert: {
           account_id?: string | null
           created_at?: string
+          desconto_cents?: number
           enrollment_id: string
+          forma_pagamento?: string | null
           id?: string
           numero?: number
           observacoes?: string | null
@@ -976,12 +981,15 @@ export type Database = {
           status?: string
           updated_at?: string
           valor_cents?: number
+          valor_final_cents?: number | null
           vencimento?: string | null
         }
         Update: {
           account_id?: string | null
           created_at?: string
+          desconto_cents?: number
           enrollment_id?: string
+          forma_pagamento?: string | null
           id?: string
           numero?: number
           observacoes?: string | null
@@ -989,6 +997,7 @@ export type Database = {
           status?: string
           updated_at?: string
           valor_cents?: number
+          valor_final_cents?: number | null
           vencimento?: string | null
         }
         Relationships: [
