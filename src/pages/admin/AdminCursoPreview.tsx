@@ -2,10 +2,24 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink, Pencil } from "lucide-react";
+import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink, Pencil, Image as ImageIconLucide } from "lucide-react";
 import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
 
 const MODULE_ICONS: Record<string, any> = { Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle: CheckCircle2 };
+
+const ytIdFromUrl = (input?: string | null): string | null => {
+  if (!input) return null;
+  const s = input.trim();
+  const pats = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/watch\?[^ ]*v=([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+  ];
+  for (const p of pats) { const m = s.match(p); if (m) return m[1]; }
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  return null;
+};
 
 type Course = { id: string; title: string; description: string | null; image_url: string | null; category: string | null };
 type Section = { id: string; title: string; sort_order: number };
