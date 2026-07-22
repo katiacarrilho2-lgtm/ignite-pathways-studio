@@ -1,70 +1,37 @@
-## Objetivo
+**Estimativa antes de executar:** ~1 crédito para corrigir o fluxo básico de upload/salvamento/renderização. Não vou gerar imagens nem conteúdo por IA.
 
-1. Corrigir o erro ao dar desconto e salvar uma parcela em **Alunos → detalhe do recebimento**.
-2. Fazer uma auditoria leitura-apenas de **todas as abas do menu admin** e entregar um relatório com o status de cada uma, com estimativa de créditos por item — sem religar nada ainda. Você decide o que autorizar depois.
+## Diagnóstico confirmado
+- O curso `Instalação de Ar-Condicionado Split` tem 41 aulas.
+- Só 1 aula tem `extra_images`; então as imagens extras realmente não estão sendo gravadas/organizadas na maioria das aulas.
+- Existem dois fluxos de edição: o editor do builder (`/admin/cursos/.../conteudo`) e o editor rápido dentro do player. Eles salvam imagens de jeitos diferentes.
+- O bucket `course-images` está privado; alguns pontos usam URL pública em vez de URL assinada. Isso explica imagem enviada que salva, mas não aparece.
+- Ainda há imagens em base64 dentro do conteúdo de algumas aulas, o que deixa o salvamento pesado e instável.
 
-## Etapa 1 — Corrigir o bug do desconto na parcela
+## Plano de correção
+1. **Unificar upload de imagem**
+   - Criar um helper único no frontend para enviar imagem para `course-images`.
+   - Sempre gerar URL assinada persistente após o upload.
+   - Parar de usar `getPublicUrl` em bucket privado.
 
-Passos:
-- Reproduzir o fluxo em Alunos → aluno → Financeiro → parcela → registrar pagamento com desconto e capturar a mensagem exata de erro (console + resposta do backend).
-- Investigar `src/pages/admin/AdminAlunoEdit.tsx` e componentes relacionados à tabela `installments` (campos usados no update: `paid_amount`, `discount_amount`, `status`, `paid_at`).
-- Comparar com o schema real de `public.installments` no banco (colunas existentes, tipos, RLS).
-- Causas prováveis: coluna `discount_amount` inexistente na tabela, RLS bloqueando o update, ou valor sendo enviado como string em vez de número.
-- Aplicar a correção mínima: ou ajustar o payload no frontend, ou adicionar a coluna/policy que faltar via migration (uma única migration bem focada).
-- Validar: efetuar o pagamento com desconto e confirmar que a parcela salva e reaparece na lista com status `pago`.
+2. **Corrigir o editor principal do curso**
+   - Atualizar o fluxo de imagem do `AdminCursoBuilder` para usar o mesmo upload seguro do editor rápido.
+   - Garantir que imagem principal, galeria, vídeos extras e conteúdo HTML sejam salvos no mesmo JSON da aula.
+   - Evitar que autosave sobrescreva alterações recém-feitas no editor.
 
-Escopo restrito: **só** o fluxo de recebimento/desconto de parcela. Nada de mexer em outras telas nesta etapa.
+3. **Corrigir o player/aluno**
+   - Renderizar imagem principal e galeria mesmo quando houver vídeo principal, em ordem clara: vídeo, texto, imagens extras, vídeos extras, flashcards, quiz.
+   - Tratar imagem quebrada com uma mensagem simples para o admin perceber que o link está inválido.
 
-## Etapa 2 — Auditoria das abas do admin (somente leitura)
+4. **Limpar visual do editor**
+   - Trocar os blocos que mostram “HTML deste bloco” por campos mais amigáveis onde possível, sem quebrar o HTML já existente.
+   - Deixar claro o botão correto para salvar.
 
-Vou percorrer cada rota do menu lateral e classificar em uma destas categorias:
+5. **Verificação sem gastar IA**
+   - Testar via banco se uma aula passa a salvar `extra_images` com URL assinada.
+   - Conferir que o player usa os campos salvos.
+   - Não gerar novas imagens, vídeos ou texto.
 
-- **OK** — funciona
-- **STUB** — está com "Módulo em manutenção" no código (arquivo é um placeholder)
-- **FALTA TABELA/COLUNA** — página existe mas backend não tem o schema
-- **FALTA GRANT/RLS** — backend existe mas está bloqueado por permissão
-- **BUG DE CÓDIGO** — precisa correção pontual
-
-Abas a auditar (baseadas nos prints e no menu):
-
-```text
-Dashboard                    Certificação / Documentação Conselhos
-Links de Documentos          CRM
-Multplick Connect            Cursos
-Gerar Curso IA               Corporativo
-Categorias                   Andamento
-Imagens                      Carrossel Home
-Parceiros                    Cupons
-Marketing IA                 Alunos
-Pré-matrículas               Turmas
-Usuários                     Cargos
-Leads                        Mensagens
-Suporte                      Financeiro
-Relatórios                   Afiliados
-Meu Afiliado                 Treinamentos
-```
-
-Para cada aba vou verificar:
-- Se o arquivo em `src/pages/admin/` é um stub de "manutenção" ou é a implementação real.
-- Se as tabelas que a página consulta existem no banco (comparando `useful-context` com o código).
-- Se há GRANT/RLS bloqueando.
-
-Entrego um relatório em formato de tabela na próxima resposta, com:
-- Status por aba
-- O que falta pra religar
-- Estimativa de créditos para religar cada uma (baixo / médio / alto)
-- Sugestão de ordem (o que dá mais valor primeiro, o que é dependência de outros)
-
-## O que NÃO farei nesta etapa
-
-- Não vou religar módulos em manutenção agora.
-- Não vou gerar imagens, conteúdo de curso ou usar IA.
-- Não vou mexer em CRM, Connect, cursos, corporativo, marketing IA — só leitura.
-
-## Estimativa
-
-- Etapa 1 (bug do desconto): ~1–2 créditos.
-- Etapa 2 (auditoria + relatório): ~2–3 créditos.
-- **Total esperado: 3–5 créditos.**
-
-Depois do relatório, você escolhe item por item o que autorizar religar e eu estimo cada um antes de executar.
+## Fora deste ajuste
+- Não vou recriar o curso inteiro.
+- Não vou gerar novas imagens com IA.
+- Não vou mexer em outros módulos do dashboard neste passo.
