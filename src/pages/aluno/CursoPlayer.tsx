@@ -643,6 +643,18 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
   );
 };
 
+const LessonImage = ({ src, alt, className, style }: { src: string; alt: string; className?: string; style?: React.CSSProperties }) => {
+  const [broken, setBroken] = useState(false);
+  if (broken) {
+    return (
+      <div className="w-full rounded-lg border border-dashed border-border bg-secondary/30 p-4 text-center text-xs text-muted-foreground" style={style}>
+        Imagem não carregou. Reenvie pelo botão Editar aula.
+      </div>
+    );
+  }
+  return <img src={src} alt={alt} loading="lazy" className={className} style={style} onError={() => setBroken(true)} />;
+};
+
 const Flashcard = ({ front, back }: { front: string; back: string }) => {
   const [flipped, setFlipped] = useState(false);
   return (
