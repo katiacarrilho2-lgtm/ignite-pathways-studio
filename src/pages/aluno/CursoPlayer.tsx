@@ -8,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Video, FileText, HelpCircle,
   RotateCw, Rows, Award, BookOpen, Loader2, ListTree, Download, ExternalLink, Paperclip, Link2, Radio,
-  Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, Youtube,
+  Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, Youtube, Image as ImageIconLucide,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
@@ -41,6 +41,20 @@ const extractEmbedUrl = (value?: string | null) => {
   if (!value) return null;
   const match = value.match(/src=["']([^"']+)["']/i);
   return match?.[1] ?? value;
+};
+
+const ytIdFromUrl = (input?: string | null): string | null => {
+  if (!input) return null;
+  const s = input.trim();
+  const pats = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/watch\?[^ ]*v=([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+  ];
+  for (const p of pats) { const m = s.match(p); if (m) return m[1]; }
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  return null;
 };
 
 const CursoPlayer = () => {
