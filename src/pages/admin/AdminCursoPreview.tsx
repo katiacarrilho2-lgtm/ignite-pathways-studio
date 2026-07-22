@@ -2,10 +2,24 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink, Pencil } from "lucide-react";
+import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink, Pencil, Image as ImageIconLucide } from "lucide-react";
 import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
 
 const MODULE_ICONS: Record<string, any> = { Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle: CheckCircle2 };
+
+const ytIdFromUrl = (input?: string | null): string | null => {
+  if (!input) return null;
+  const s = input.trim();
+  const pats = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/watch\?[^ ]*v=([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+  ];
+  for (const p of pats) { const m = s.match(p); if (m) return m[1]; }
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  return null;
+};
 
 type Course = { id: string; title: string; description: string | null; image_url: string | null; category: string | null };
 type Section = { id: string; title: string; sort_order: number };
@@ -125,6 +139,8 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
   const toolsImg: string | undefined = lesson.content?.tools_image_url;
   const toolsList: string[] = lesson.content?.tools_list ?? [];
   const videos: { title: string; url: string; why?: string }[] = lesson.content?.video_suggestions ?? [];
+  const extraImages: { url: string; width?: number; caption?: string }[] = lesson.content?.extra_images ?? [];
+  const extraVideos: { url: string; title?: string; why?: string }[] = lesson.content?.extra_videos ?? [];
   const ModIcon = theme?.icon ? (MODULE_ICONS[theme.icon] ?? FileText) : null;
   const themeStyle = theme?.color ? ({ "--lesson-accent": `hsl(${theme.color})` } as React.CSSProperties) : undefined;
 
@@ -184,6 +200,45 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
           className="lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary"
           dangerouslySetInnerHTML={{ __html: body }}
         />
+      )}
+
+      {extraImages.length > 0 && (
+        <section>
+          <p className="lesson-block-heading"><ImageIconLucide className="size-4" /> Galeria da aula</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {extraImages.map((im, i) => (
+              <figure key={i} className="flex flex-col items-center bg-secondary/20 border border-border rounded-lg p-3">
+                <img src={im.url} alt={im.caption ?? ""} loading="lazy" className="rounded object-contain w-full h-auto" style={{ maxWidth: `${im.width ?? 480}px` }} />
+                {im.caption && <figcaption className="text-xs text-muted-foreground mt-2 text-center">{im.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {extraVideos.length > 0 && (
+        <section>
+          <p className="lesson-block-heading"><Youtube className="size-4" /> Vídeos complementares</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {extraVideos.map((v, i) => {
+              const id = ytIdFromUrl(v.url);
+              if (!id) return null;
+              return (
+                <figure key={i} className="space-y-1.5">
+                  <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                    <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${id}?rel=0`} title={v.title ?? "Vídeo"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" />
+                  </div>
+                  {(v.title || v.why) && (
+                    <figcaption className="text-xs text-muted-foreground">
+                      {v.title && <span className="font-medium text-foreground/80">{v.title}</span>}
+                      {v.why && <span className="block">{v.why}</span>}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {(toolsImg || toolsList.length > 0) && (

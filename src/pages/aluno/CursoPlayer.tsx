@@ -8,7 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Video, FileText, HelpCircle,
   RotateCw, Rows, Award, BookOpen, Loader2, ListTree, Download, ExternalLink, Paperclip, Link2, Radio,
-  Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, Youtube,
+  Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, Youtube, Image as ImageIconLucide,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
@@ -41,6 +41,20 @@ const extractEmbedUrl = (value?: string | null) => {
   if (!value) return null;
   const match = value.match(/src=["']([^"']+)["']/i);
   return match?.[1] ?? value;
+};
+
+const ytIdFromUrl = (input?: string | null): string | null => {
+  if (!input) return null;
+  const s = input.trim();
+  const pats = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/watch\?[^ ]*v=([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+  ];
+  for (const p of pats) { const m = s.match(p); if (m) return m[1]; }
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  return null;
 };
 
 const CursoPlayer = () => {
@@ -509,6 +523,8 @@ const TextBlock = ({ lesson }: { lesson: Lesson }) => {
   const toolsImg: string | undefined = lesson.content?.tools_image_url;
   const toolsList: string[] = lesson.content?.tools_list ?? [];
   const videos: { title: string; url: string; why?: string }[] = lesson.content?.video_suggestions ?? [];
+  const extraImages: { url: string; width?: number; caption?: string }[] = lesson.content?.extra_images ?? [];
+  const extraVideos: { url: string; title?: string; why?: string }[] = lesson.content?.extra_videos ?? [];
   const ModIcon = theme?.icon ? (MODULE_ICONS[theme.icon] ?? BookOpen) : null;
   const themeStyle = theme?.color ? ({ "--lesson-accent": `hsl(${theme.color})` } as React.CSSProperties) : undefined;
   return (
@@ -539,6 +555,43 @@ const TextBlock = ({ lesson }: { lesson: Lesson }) => {
           className="lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/85 prose-li:text-foreground/85 prose-strong:text-foreground prose-a:text-primary"
           dangerouslySetInnerHTML={{ __html: html }}
         />
+      )}
+      {extraImages.length > 0 && (
+        <section className="space-y-3">
+          <p className="lesson-block-heading"><ImageIconLucide className="size-4" /> Galeria da aula</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {extraImages.map((im, i) => (
+              <figure key={i} className="flex flex-col items-center bg-secondary/20 border border-border rounded-lg p-3">
+                <img src={im.url} alt={im.caption ?? ""} loading="lazy" className="rounded object-contain w-full h-auto" style={{ maxWidth: `${im.width ?? 480}px` }} />
+                {im.caption && <figcaption className="text-xs text-muted-foreground mt-2 text-center">{im.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+      {extraVideos.length > 0 && (
+        <section className="space-y-3">
+          <p className="lesson-block-heading"><Youtube className="size-4" /> Vídeos complementares</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {extraVideos.map((v, i) => {
+              const id = ytIdFromUrl(v.url);
+              if (!id) return null;
+              return (
+                <figure key={i} className="space-y-1.5">
+                  <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
+                    <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${id}?rel=0`} title={v.title ?? "Vídeo"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" />
+                  </div>
+                  {(v.title || v.why) && (
+                    <figcaption className="text-xs text-muted-foreground">
+                      {v.title && <span className="font-medium text-foreground/80">{v.title}</span>}
+                      {v.why && <span className="block">{v.why}</span>}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            })}
+          </div>
+        </section>
       )}
       {(toolsImg || toolsList.length > 0) && (
         <section>

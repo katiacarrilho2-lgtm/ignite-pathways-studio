@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Save, ImageIcon, Trash2, Youtube } from "lucide-react";
+import { Loader2, Save, ImageIcon, Trash2, Youtube, Plus } from "lucide-react";
 import { YoutubePickerDialog, YoutubeVideo } from "./YoutubePickerDialog";
 
 type Lesson = { id: string; title: string; content: any };
@@ -29,6 +29,23 @@ async function fileToResizedDataUrl(file: File, maxWidth = 1400, quality = 0.85)
   return canvas.toDataURL(file.type === "image/png" ? "image/png" : "image/jpeg", quality);
 }
 
+type ExtraImage = { url: string; width: number; caption?: string };
+type ExtraVideo = { url: string; title?: string; why?: string };
+
+function extractYoutubeId(input: string): string | null {
+  if (!input) return null;
+  const s = input.trim();
+  const patterns = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/watch\?[^ ]*v=([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+  ];
+  for (const p of patterns) { const m = s.match(p); if (m) return m[1]; }
+  if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+  return null;
+}
+
 export const LessonEditDialog = ({
   open, onOpenChange, lesson, onSaved,
 }: {
@@ -43,6 +60,8 @@ export const LessonEditDialog = ({
   const [imageWidth, setImageWidth] = useState<number>(lesson.content?.image_width ?? 480);
   const [youtube, setYoutube] = useState<any>(lesson.content?.youtube ?? null);
   const [ytOpen, setYtOpen] = useState(false);
+  const [extraImages, setExtraImages] = useState<ExtraImage[]>(lesson.content?.extra_images ?? []);
+  const [extraVideos, setExtraVideos] = useState<ExtraVideo[]>(lesson.content?.extra_videos ?? lesson.content?.video_suggestions ?? []);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -52,6 +71,8 @@ export const LessonEditDialog = ({
       setImageUrl(lesson.content?.image_url ?? null);
       setImageWidth(lesson.content?.image_width ?? 480);
       setYoutube(lesson.content?.youtube ?? null);
+      setExtraImages(lesson.content?.extra_images ?? []);
+      setExtraVideos(lesson.content?.extra_videos ?? lesson.content?.video_suggestions ?? []);
     }
   }, [open, lesson]);
 
@@ -66,8 +87,30 @@ export const LessonEditDialog = ({
     } catch (e: any) { toast.error(e?.message ?? "Falha ao processar imagem"); }
   };
 
+  const addExtraImageFromFile = async (f: File | null) => {
+    if (!f) return;
+    if (!f.type.startsWith("image/")) return toast.error("Selecione uma imagem");
+    if (f.size > 8 * 1024 * 1024) return toast.error("Máx 8 MB");
+    try {
+      const url = await fileToResizedDataUrl(f);
+      setExtraImages(arr => [...arr, { url, width: 480, caption: "" }]);
+    } catch (e: any) { toast.error(e?.message ?? "Falha ao processar imagem"); }
+  };
+
+  const updateExtraImage = (i: number, patch: Partial<ExtraImage>) =>
+    setExtraImages(arr => arr.map((it, idx) => idx === i ? { ...it, ...patch } : it));
+  const removeExtraImage = (i: number) =>
+    setExtraImages(arr => arr.filter((_, idx) => idx !== i));
+
+  const updateExtraVideo = (i: number, patch: Partial<ExtraVideo>) =>
+    setExtraVideos(arr => arr.map((it, idx) => idx === i ? { ...it, ...patch } : it));
+  const removeExtraVideo = (i: number) =>
+    setExtraVideos(arr => arr.filter((_, idx) => idx !== i));
+
   const save = async () => {
     setBusy(true);
+    const cleanImages = extraImages.filter(x => x.url?.trim());
+    const cleanVideos = extraVideos.filter(x => x.url?.trim());
     const newContent = {
       ...(lesson.content ?? {}),
       html,
@@ -75,6 +118,8 @@ export const LessonEditDialog = ({
       image_url: imageUrl ?? null,
       image_width: imageUrl ? imageWidth : null,
       youtube: youtube?.videoId ? youtube : null,
+      extra_images: cleanImages,
+      extra_videos: cleanVideos,
     };
     const { error } = await supabase
       .from("course_lessons")
@@ -115,7 +160,7 @@ export const LessonEditDialog = ({
 
             <div className="border border-border rounded-lg p-3 space-y-3">
               <div className="flex items-center justify-between">
-                <Label className="flex items-center gap-2"><ImageIcon className="size-4" /> Imagem da aula</Label>
+                <Label className="flex items-center gap-2"><ImageIcon className="size-4" /> Imagem principal da aula</Label>
                 {imageUrl && (
                   <Button variant="ghost" size="sm" className="text-destructive" onClick={() => setImageUrl(null)}>
                     <Trash2 className="size-3.5" /> Remover
@@ -155,9 +200,61 @@ export const LessonEditDialog = ({
               )}
             </div>
 
+            <div className="border border-border rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-2"><ImageIcon className="size-4" /> Imagens extras (galeria)</Label>
+                <div className="flex gap-2">
+                  <label className="inline-flex items-center gap-1 cursor-pointer text-xs px-2.5 py-1.5 rounded-md border border-border hover:bg-secondary">
+                    <Plus className="size-3.5" /> Upload
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => addExtraImageFromFile(e.target.files?.[0] ?? null)} />
+                  </label>
+                  <Button variant="secondary" size="sm" onClick={() => setExtraImages(arr => [...arr, { url: "", width: 480, caption: "" }])}>
+                    <Plus className="size-3.5" /> URL
+                  </Button>
+                </div>
+              </div>
+              {extraImages.length === 0 && (
+                <p className="text-xs text-muted-foreground">Nenhuma imagem extra. Adicione fotos ou diagramas complementares.</p>
+              )}
+              <div className="space-y-3">
+                {extraImages.map((img, i) => (
+                  <div key={i} className="border border-border rounded-md p-3 space-y-2 bg-secondary/20">
+                    <div className="flex items-start gap-3">
+                      {img.url ? (
+                        <img src={img.url} alt="" className="w-24 h-24 object-cover rounded" />
+                      ) : (
+                        <div className="w-24 h-24 rounded bg-muted grid place-items-center text-muted-foreground text-xs">sem imagem</div>
+                      )}
+                      <div className="flex-1 space-y-2 min-w-0">
+                        <Input
+                          placeholder="URL da imagem"
+                          value={img.url}
+                          onChange={(e) => updateExtraImage(i, { url: e.target.value })}
+                        />
+                        <Input
+                          placeholder="Legenda (opcional)"
+                          value={img.caption ?? ""}
+                          onChange={(e) => updateExtraImage(i, { caption: e.target.value })}
+                        />
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-destructive shrink-0" onClick={() => removeExtraImage(i)}>
+                        <Trash2 className="size-3.5" />
+                      </Button>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
+                        <span>Largura</span><span className="font-mono">{img.width}px</span>
+                      </div>
+                      <Slider min={200} max={900} step={20} value={[img.width]} onValueChange={(v) => updateExtraImage(i, { width: v[0] })} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="border border-border rounded-lg p-3 space-y-2">
               <div className="flex items-center justify-between">
-                <Label className="flex items-center gap-2"><Youtube className="size-4 text-red-600" /> Vídeo do YouTube</Label>
+                <Label className="flex items-center gap-2"><Youtube className="size-4 text-red-600" /> Vídeo principal (YouTube)</Label>
                 <Button variant="secondary" size="sm" onClick={() => setYtOpen(true)}>
                   {youtube?.videoId ? "Trocar vídeo" : "Adicionar vídeo"}
                 </Button>
@@ -176,6 +273,42 @@ export const LessonEditDialog = ({
               ) : (
                 <p className="text-xs text-muted-foreground">Nenhum vídeo. Clique em Adicionar vídeo para colar um link ou buscar.</p>
               )}
+            </div>
+
+            <div className="border border-border rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-2"><Youtube className="size-4 text-red-600" /> Vídeos extras</Label>
+                <Button variant="secondary" size="sm" onClick={() => setExtraVideos(arr => [...arr, { url: "", title: "", why: "" }])}>
+                  <Plus className="size-3.5" /> Adicionar
+                </Button>
+              </div>
+              {extraVideos.length === 0 && (
+                <p className="text-xs text-muted-foreground">Cole links do YouTube para complementar a aula.</p>
+              )}
+              <div className="space-y-2">
+                {extraVideos.map((v, i) => {
+                  const vid = extractYoutubeId(v.url);
+                  return (
+                    <div key={i} className="border border-border rounded-md p-3 space-y-2 bg-secondary/20">
+                      <div className="flex items-start gap-3">
+                        {vid ? (
+                          <img src={`https://img.youtube.com/vi/${vid}/mqdefault.jpg`} alt="" className="w-28 aspect-video object-cover rounded" />
+                        ) : (
+                          <div className="w-28 aspect-video rounded bg-muted grid place-items-center text-muted-foreground text-[10px]">preview</div>
+                        )}
+                        <div className="flex-1 space-y-2 min-w-0">
+                          <Input placeholder="URL do YouTube" value={v.url} onChange={(e) => updateExtraVideo(i, { url: e.target.value })} />
+                          <Input placeholder="Título (opcional)" value={v.title ?? ""} onChange={(e) => updateExtraVideo(i, { title: e.target.value })} />
+                          <Input placeholder="Descrição curta (opcional)" value={v.why ?? ""} onChange={(e) => updateExtraVideo(i, { why: e.target.value })} />
+                        </div>
+                        <Button variant="ghost" size="sm" className="text-destructive shrink-0" onClick={() => removeExtraVideo(i)}>
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
