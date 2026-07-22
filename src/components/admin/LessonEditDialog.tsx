@@ -34,6 +34,15 @@ async function fileToResizedDataUrl(file: File, maxWidth = 1400, quality = 0.85)
 type ExtraImage = { url: string; width: number; caption?: string };
 type ExtraVideo = { url: string; title?: string; why?: string };
 
+const pickLessonHtml = (content: any): string => {
+  const html = typeof content?.html === "string" ? content.html.trim() : "";
+  if (html) return content.html;
+  const body = typeof content?.body === "string" ? content.body.trim() : "";
+  if (body) return content.body;
+  const contentHtml = typeof content?.content_html === "string" ? content.content_html.trim() : "";
+  return contentHtml ? content.content_html : "";
+};
+
 // -------- Block parsing / serialization --------
 type BlockKind = "intro" | "content" | "safety" | "bridge" | "refs" | "other";
 type Block = { id: string; kind: BlockKind; title: string; html: string };
@@ -155,7 +164,7 @@ export const LessonEditDialog = ({
   onSaved: (updated: Lesson) => void;
 }) => {
   const [title, setTitle] = useState(lesson.title);
-  const [html, setHtml] = useState<string>(lesson.content?.html ?? lesson.content?.body ?? "");
+  const [html, setHtml] = useState<string>(pickLessonHtml(lesson.content));
   const [objective, setObjective] = useState<string>("");
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [rawMode, setRawMode] = useState(false);
@@ -173,7 +182,7 @@ export const LessonEditDialog = ({
   useEffect(() => {
     if (open) {
       setTitle(lesson.title);
-      const rawHtml = lesson.content?.html ?? lesson.content?.body ?? "";
+      const rawHtml = pickLessonHtml(lesson.content);
       setHtml(rawHtml);
       const parsed = parseBody(rawHtml);
       const objText = typeof lesson.content?.objective === "string" && lesson.content.objective.trim()
@@ -258,6 +267,12 @@ export const LessonEditDialog = ({
     const cleanQuiz = quiz
       .filter((q) => q.question.trim())
       .map((q) => ({ ...q, options: q.options.map((o) => o).filter((o) => o.trim() !== "" || q.options.length <= 2) }));
+    const legacyQuestions = cleanQuiz.map((q) => ({
+      question: q.question,
+      options: q.options,
+      correct: q.answer ?? 0,
+      explanation: q.explanation ?? "",
+    }));
     const cleanTools = toolsList.map((t) => t.trim()).filter(Boolean);
     const newContent = {
       ...(lesson.content ?? {}),
@@ -265,13 +280,16 @@ export const LessonEditDialog = ({
       body: finalHtml, // compat
       objective: objective.trim() || null,
       flashcards: cleanFlashcards,
+      items: cleanFlashcards,
       quiz: cleanQuiz,
+      questions: legacyQuestions,
       tools_list: cleanTools,
       image_url: imageUrl ?? null,
       image_width: imageUrl ? imageWidth : null,
       youtube: youtube?.videoId ? youtube : null,
       extra_images: cleanImages,
       extra_videos: cleanVideos,
+      video_suggestions: cleanVideos,
     };
     const { error } = await supabase
       .from("course_lessons")
