@@ -679,6 +679,30 @@ const Inner = () => {
           <DialogHeader><DialogTitle>Ficha de pré-matrícula</DialogTitle></DialogHeader>
           {viewing && (
             <div className="space-y-5 text-sm">
+              <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="font-semibold text-primary flex items-center gap-2">
+                    <UserPlus className="size-4" /> Matricular este aluno
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Cria o acesso ao portal, vincula ao curso e move a ficha para <b>Matriculado</b>.
+                  </p>
+                  {!viewing.course_id && (
+                    <p className="text-xs text-destructive mt-1">Vincule um curso na seção "Curso" abaixo antes de matricular.</p>
+                  )}
+                  {viewing.status === "matriculado" && (
+                    <p className="text-xs text-emerald-700 mt-1">Este aluno já foi matriculado.</p>
+                  )}
+                </div>
+                <Button
+                  size="lg"
+                  variant="hero"
+                  disabled={!viewing.course_id || viewing.status === "matriculado"}
+                  onClick={() => { setOpen(false); openMatricular(viewing); }}
+                >
+                  <UserPlus className="size-5" /> Matricular aluno agora
+                </Button>
+              </div>
               <Section title="Acompanhamento (admin)">
                 <div>
                   <Label className="text-xs">Data de entrada do aluno</Label>
