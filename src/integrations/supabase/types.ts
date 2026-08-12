@@ -211,6 +211,388 @@ export type Database = {
         }
         Relationships: []
       }
+      connect_api_config: {
+        Row: {
+          business_account_id: string | null
+          created_at: string
+          id: string
+          numero: string | null
+          phone_number_id: string | null
+          provider: string
+          status: string
+          token_set: boolean
+          updated_at: string
+          webhook_verify_token: string | null
+        }
+        Insert: {
+          business_account_id?: string | null
+          created_at?: string
+          id?: string
+          numero?: string | null
+          phone_number_id?: string | null
+          provider?: string
+          status?: string
+          token_set?: boolean
+          updated_at?: string
+          webhook_verify_token?: string | null
+        }
+        Update: {
+          business_account_id?: string | null
+          created_at?: string
+          id?: string
+          numero?: string | null
+          phone_number_id?: string | null
+          provider?: string
+          status?: string
+          token_set?: boolean
+          updated_at?: string
+          webhook_verify_token?: string | null
+        }
+        Relationships: []
+      }
+      connect_campaign_attachments: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          file_path: string | null
+          id: string
+          mime: string | null
+          nome: string | null
+          size_bytes: number | null
+          url: string | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          mime?: string | null
+          nome?: string | null
+          size_bytes?: number | null
+          url?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          file_path?: string | null
+          id?: string
+          mime?: string | null
+          nome?: string | null
+          size_bytes?: number | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connect_campaign_attachments_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "connect_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connect_campaign_messages: {
+        Row: {
+          agendada_para: string | null
+          campaign_id: string | null
+          contact_id: string | null
+          created_at: string
+          enviada_em: string | null
+          erro: string | null
+          id: string
+          mensagem: string | null
+          status: string
+          tentativas: number
+          variant_id: string | null
+          whatsapp_message_id: string | null
+        }
+        Insert: {
+          agendada_para?: string | null
+          campaign_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          enviada_em?: string | null
+          erro?: string | null
+          id?: string
+          mensagem?: string | null
+          status?: string
+          tentativas?: number
+          variant_id?: string | null
+          whatsapp_message_id?: string | null
+        }
+        Update: {
+          agendada_para?: string | null
+          campaign_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          enviada_em?: string | null
+          erro?: string | null
+          id?: string
+          mensagem?: string | null
+          status?: string
+          tentativas?: number
+          variant_id?: string | null
+          whatsapp_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connect_campaign_messages_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "connect_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connect_campaign_messages_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "connect_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "connect_campaign_messages_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "connect_campaign_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connect_campaign_variants: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          mensagem: string
+          ordem: number
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          mensagem?: string
+          ordem?: number
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          mensagem?: string
+          ordem?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connect_campaign_variants_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "connect_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connect_campaigns: {
+        Row: {
+          concluido_em: string | null
+          created_at: string
+          created_by: string | null
+          data_fim: string | null
+          data_inicio: string | null
+          dias_semana: number[]
+          etiquetas: string[]
+          filtros: Json
+          horarios: string[]
+          id: string
+          iniciado_em: string | null
+          intervalo_max: number
+          intervalo_min: number
+          mensagem: string | null
+          nome: string
+          pausa_apos_msgs: number
+          pausa_minutos: number
+          recorrencia: string
+          status: string
+          tipo_publico: string
+          total_destinatarios: number
+          total_enviadas: number
+          total_falhas: number
+          updated_at: string
+        }
+        Insert: {
+          concluido_em?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          dias_semana?: number[]
+          etiquetas?: string[]
+          filtros?: Json
+          horarios?: string[]
+          id?: string
+          iniciado_em?: string | null
+          intervalo_max?: number
+          intervalo_min?: number
+          mensagem?: string | null
+          nome: string
+          pausa_apos_msgs?: number
+          pausa_minutos?: number
+          recorrencia?: string
+          status?: string
+          tipo_publico?: string
+          total_destinatarios?: number
+          total_enviadas?: number
+          total_falhas?: number
+          updated_at?: string
+        }
+        Update: {
+          concluido_em?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_fim?: string | null
+          data_inicio?: string | null
+          dias_semana?: number[]
+          etiquetas?: string[]
+          filtros?: Json
+          horarios?: string[]
+          id?: string
+          iniciado_em?: string | null
+          intervalo_max?: number
+          intervalo_min?: number
+          mensagem?: string | null
+          nome?: string
+          pausa_apos_msgs?: number
+          pausa_minutos?: number
+          recorrencia?: string
+          status?: string
+          tipo_publico?: string
+          total_destinatarios?: number
+          total_enviadas?: number
+          total_falhas?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      connect_contact_tags: {
+        Row: {
+          cor: string
+          created_at: string
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          cor?: string
+          created_at?: string
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      connect_contacts: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          estado: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          opt_out: boolean
+          origem: string | null
+          stage_id: string | null
+          stage_ordem: number
+          status: string
+          tags: string[]
+          tipo: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          estado?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          opt_out?: boolean
+          origem?: string | null
+          stage_id?: string | null
+          stage_ordem?: number
+          status?: string
+          tags?: string[]
+          tipo?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          estado?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          opt_out?: boolean
+          origem?: string | null
+          stage_id?: string | null
+          stage_ordem?: number
+          status?: string
+          tags?: string[]
+          tipo?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "connect_contacts_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "connect_pipeline_stages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      connect_pipeline_stages: {
+        Row: {
+          cor: string
+          created_at: string
+          id: string
+          is_final: boolean
+          nome: string
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          cor?: string
+          created_at?: string
+          id?: string
+          is_final?: boolean
+          nome: string
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          id?: string
+          is_final?: boolean
+          nome?: string
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contas_comerciais: {
         Row: {
           atualizado_em: string
@@ -655,6 +1037,54 @@ export type Database = {
           urgente_resolvido_at?: string | null
           urgente_resolvido_em?: string | null
           valor_cents?: number
+        }
+        Relationships: []
+      }
+      crm_promo_banners: {
+        Row: {
+          active: boolean
+          badge: string | null
+          color: string
+          created_at: string
+          cta_url: string | null
+          id: string
+          image_url: string | null
+          price: string | null
+          price_label: string | null
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          badge?: string | null
+          color?: string
+          created_at?: string
+          cta_url?: string | null
+          id?: string
+          image_url?: string | null
+          price?: string | null
+          price_label?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          badge?: string | null
+          color?: string
+          created_at?: string
+          cta_url?: string | null
+          id?: string
+          image_url?: string | null
+          price?: string | null
+          price_label?: string | null
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1141,6 +1571,41 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_bank_origins: {
+        Row: {
+          created_at: string
+          detalhe: string | null
+          id: string
+          last_seen_at: string
+          lead_id: string
+          origem: string
+        }
+        Insert: {
+          created_at?: string
+          detalhe?: string | null
+          id?: string
+          last_seen_at?: string
+          lead_id: string
+          origem: string
+        }
+        Update: {
+          created_at?: string
+          detalhe?: string | null
+          id?: string
+          last_seen_at?: string
+          lead_id?: string
+          origem?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_bank_origins_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           created_at: string
@@ -1170,6 +1635,98 @@ export type Database = {
           source?: string | null
         }
         Relationships: []
+      }
+      leads_bank: {
+        Row: {
+          cidade: string | null
+          created_at: string
+          created_by: string | null
+          curso_interesse: string | null
+          email: string | null
+          estado: string | null
+          id: string
+          interesse_tipo: string | null
+          nome: string
+          notas: string | null
+          origem: string
+          responsavel_id: string | null
+          situacao: string
+          status_atendimento: string
+          ultimo_contato_em: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          created_at?: string
+          created_by?: string | null
+          curso_interesse?: string | null
+          email?: string | null
+          estado?: string | null
+          id?: string
+          interesse_tipo?: string | null
+          nome: string
+          notas?: string | null
+          origem?: string
+          responsavel_id?: string | null
+          situacao?: string
+          status_atendimento?: string
+          ultimo_contato_em?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          created_at?: string
+          created_by?: string | null
+          curso_interesse?: string | null
+          email?: string | null
+          estado?: string | null
+          id?: string
+          interesse_tipo?: string | null
+          nome?: string
+          notas?: string | null
+          origem?: string
+          responsavel_id?: string | null
+          situacao?: string
+          status_atendimento?: string
+          ultimo_contato_em?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      leads_bank_comments: {
+        Row: {
+          autor_id: string | null
+          created_at: string
+          id: string
+          lead_id: string
+          texto: string
+        }
+        Insert: {
+          autor_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id: string
+          texto: string
+        }
+        Update: {
+          autor_id?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_bank_comments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads_bank"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lesson_progress: {
         Row: {
@@ -1799,6 +2356,18 @@ export type Database = {
       }
       is_master: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      lead_bank_get_crm_statuses: {
+        Args: { _lead_ids: string[] }
+        Returns: {
+          crm_lead_id: string
+          crm_nome: string
+          estagio: string
+          lead_bank_id: string
+          seller_name: string
+          stage_changed_at: string
+          status_atendimento: string
+        }[]
+      }
       next_username: { Args: never; Returns: string }
     }
     Enums: {
