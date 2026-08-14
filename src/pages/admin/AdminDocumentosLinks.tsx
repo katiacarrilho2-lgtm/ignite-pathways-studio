@@ -188,6 +188,8 @@ const Inner = () => {
         </table>
       </div>
 
+      <StudentDocsPanel />
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>{editing.id ? "Editar" : "Novo"} documento/link</DialogTitle></DialogHeader>
