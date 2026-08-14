@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Download, TrendingUp } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { RequirePermission } from "@/components/admin/AdminLayout";
+import { downloadCsv, brlCsv, dateCsv } from "@/lib/exportCsv";
+import { toast } from "sonner";
 
 const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -73,6 +75,49 @@ const Inner = () => {
     URL.revokeObjectURL(url);
   };
 
+  // Relatório completo: uma linha por parcela, com dados do aluno e do curso.
+  const exportDetalhado = async () => {
+    const { data: inst } = await supabase.from("installments")
+      .select("enrollment_id, numero, valor_cents, valor_final_cents, desconto_cents, vencimento, status, paid_at, forma_pagamento")
+      .order("vencimento");
+    if (!inst || inst.length === 0) return toast.error("Nenhuma parcela encontrada");
+    const enrIds = Array.from(new Set(inst.map((i: any) => i.enrollment_id)));
+    const { data: enrs } = await supabase.from("enrollments").select("id, user_id, course:courses(title)").in("id", enrIds);
+    const userIds = Array.from(new Set((enrs ?? []).map((e: any) => e.user_id)));
+    const [{ data: profs }, { data: sps }] = await Promise.all([
+      supabase.from("profiles").select("user_id, display_name, email").in("user_id", userIds),
+      supabase.from("student_profiles").select("user_id, full_name, phone, phone1, contact_email, cidade, estado").in("user_id", userIds),
+    ]);
+    const eMap = new Map((enrs ?? []).map((e: any) => [e.id, e]));
+    const pMap = new Map((profs ?? []).map((p: any) => [p.user_id, p]));
+    const sMap = new Map((sps ?? []).map((s: any) => [s.user_id, s]));
+    const hoje = new Date();
+    const rows = inst.map((i: any) => {
+      const e: any = eMap.get(i.enrollment_id);
+      const p: any = e ? pMap.get(e.user_id) : null;
+      const s: any = e ? sMap.get(e.user_id) : null;
+      const atrasado = i.status !== "pago" && i.vencimento && new Date(i.vencimento) < hoje;
+      return [
+        s?.full_name ?? p?.display_name ?? "—",
+        s?.phone1 ?? s?.phone ?? "",
+        p?.email ?? s?.contact_email ?? "",
+        `${s?.cidade ?? ""}${s?.estado ? "/" + s.estado : ""}`,
+        e?.course?.title ?? "—",
+        i.numero,
+        brlCsv(i.valor_cents),
+        brlCsv(i.desconto_cents),
+        brlCsv(i.valor_final_cents ?? i.valor_cents),
+        dateCsv(i.vencimento),
+        i.status === "pago" ? "pago" : atrasado ? "atrasado" : "pendente",
+        dateCsv(i.paid_at),
+        i.forma_pagamento ?? "",
+      ];
+    });
+    downloadCsv("relatorio_financeiro_completo",
+      ["Aluno", "Telefone", "E-mail", "Cidade/UF", "Curso", "Parcela", "Valor", "Desconto", "Valor final", "Vencimento", "Situação", "Pago em", "Forma"],
+      rows);
+  };
+
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
@@ -80,7 +125,10 @@ const Inner = () => {
           <h1 className="text-3xl font-bold text-primary">Relatório de pagamentos</h1>
           <p className="text-muted-foreground">Resumo por aluno e receita mensal.</p>
         </div>
-        <Button onClick={exportCSV} variant="outline"><Download className="size-4" /> Exportar CSV</Button>
+        <div className="flex gap-2">
+          <Button onClick={exportCSV} variant="outline"><Download className="size-4" /> Resumo por aluno</Button>
+          <Button onClick={exportDetalhado} variant="hero"><Download className="size-4" /> Relatório completo (parcelas)</Button>
+        </div>
       </div>
 
       <div className="bg-card border border-border rounded-xl p-6">
