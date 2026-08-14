@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
+import { downloadCsv, dateCsv } from "@/lib/exportCsv";
+import { Download } from "lucide-react";
 
 type Enr = {
   id: string; user_id: string; course_id: string; progress: number; status: string; enrolled_at: string;
@@ -169,7 +171,14 @@ const Inner = () => {
           <h1 className="text-3xl font-bold text-primary">Matrículas</h1>
           <p className="text-muted-foreground">Cadastre alunos e vincule a cursos. O número de usuário é gerado automaticamente.</p>
         </div>
-        <Button onClick={openNew} variant="hero"><UserPlus className="size-4" /> Nova matrícula</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => downloadCsv("matriculas",
+            ["Aluno", "Curso", "Status", "Progresso", "Matriculado em"],
+            filtered.map(e => [studentLabel(e.user_id), e.courses?.title ?? "", e.status, `${e.progress}%`, dateCsv(e.enrolled_at)]))}>
+            <Download className="size-4" /> Exportar
+          </Button>
+          <Button onClick={openNew} variant="hero"><UserPlus className="size-4" /> Nova matrícula</Button>
+        </div>
       </div>
 
       <div className="relative max-w-md">
