@@ -7,7 +7,10 @@ import { toast } from "sonner";
 import { Copy, Users, DollarSign, Share2 } from "lucide-react";
 
 type Aff = { id: string; code: string; commission_pct: number; status: string; pix_key: string | null };
-type Ref = { id: string; valor_cents: number; commission_cents: number; status: string; created_at: string; paid_at: string | null };
+type Ref = {
+  id: string; valor_cents: number; commission_cents: number; status: string; created_at: string; paid_at: string | null;
+  student_name?: string | null; course_title?: string | null; parcela_label?: string | null; comprovante_path?: string | null;
+};
 
 export default function AlunoAfiliado() {
   const { user } = useAuth();
@@ -49,6 +52,10 @@ export default function AlunoAfiliado() {
   const totalPago = refs.filter((r) => r.status === "pago").reduce((s, r) => s + (r.commission_cents ?? 0), 0);
 
   const copy = async () => { await navigator.clipboard.writeText(link); toast.success("Link copiado!"); };
+  const verComprovante = async (path: string) => {
+    const { data } = await supabase.storage.from("comprovantes").createSignedUrl(path, 3600);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank"); else toast.error("Comprovante indisponível");
+  };
   const share = async () => {
     if (navigator.share) { try { await navigator.share({ title: "Multplick", url: link }); } catch { /* */ } }
     else copy();
@@ -82,18 +89,25 @@ export default function AlunoAfiliado() {
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-secondary/60">
-            <tr><th className="text-left p-3">Data</th><th className="text-left p-3">Valor da venda</th><th className="text-left p-3">Comissão</th><th className="text-left p-3">Status</th></tr>
+            <tr><th className="text-left p-3">Data</th><th className="text-left p-3">Aluno / Curso</th><th className="text-left p-3">Parcela</th><th className="text-left p-3">Valor recebido</th><th className="text-left p-3">Comissão</th><th className="text-left p-3">Status</th><th className="text-left p-3">Comprovante</th></tr>
           </thead>
           <tbody>
             {refs.map((r) => (
               <tr key={r.id} className="border-t border-border">
                 <td className="p-3 text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
+                <td className="p-3"><p className="font-medium">{r.student_name ?? "—"}</p><p className="text-xs text-muted-foreground">{r.course_title ?? ""}</p></td>
+                <td className="p-3 text-muted-foreground">{r.parcela_label ?? "—"}</td>
                 <td className="p-3">R$ {(r.valor_cents / 100).toFixed(2)}</td>
                 <td className="p-3 font-semibold">R$ {(r.commission_cents / 100).toFixed(2)}</td>
                 <td className="p-3">{r.status}</td>
+                <td className="p-3">
+                  {r.comprovante_path
+                    ? <Button size="sm" variant="ghost" onClick={() => verComprovante(r.comprovante_path!)}>Ver</Button>
+                    : <span className="text-muted-foreground">—</span>}
+                </td>
               </tr>
             ))}
-            {refs.length === 0 && <tr><td colSpan={4} className="p-8 text-center text-muted-foreground">Nenhuma indicação ainda.</td></tr>}
+            {refs.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Nenhuma indicação ainda.</td></tr>}
           </tbody>
         </table>
       </div>

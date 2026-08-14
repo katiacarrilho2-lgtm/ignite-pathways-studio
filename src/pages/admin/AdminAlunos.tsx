@@ -14,6 +14,8 @@ import { withAccount } from "@/lib/multiAccount";
 import { startImpersonation } from "@/lib/impersonate";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { downloadCsv } from "@/lib/exportCsv";
+import { Download } from "lucide-react";
 
 type Row = {
   user_id: string; username: string | null; display_name: string | null;
@@ -202,7 +204,14 @@ const Inner = () => {
           <h1 className="text-3xl font-bold text-primary">Alunos</h1>
           <p className="text-muted-foreground">Cadastre, edite e gerencie os alunos. Cada aluno recebe um número de login automático.</p>
         </div>
-        <Button onClick={openNew} variant="hero"><UserPlus className="size-4" /> Novo aluno</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => downloadCsv("alunos",
+            ["Login", "Nome", "E-mail", "Telefone", "Polo", "Status", "Cursos"],
+            filtered.map(r => [r.username ?? "", r.display_name ?? "", r.contact_email ?? "", r.phone1 ?? "", r.polo ?? "", r.status ?? "", r.cursos]))}>
+            <Download className="size-4" /> Exportar
+          </Button>
+          <Button onClick={openNew} variant="hero"><UserPlus className="size-4" /> Novo aluno</Button>
+        </div>
       </div>
 
       <div className="relative max-w-md">

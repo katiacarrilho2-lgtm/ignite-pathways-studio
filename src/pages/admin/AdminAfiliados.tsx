@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, RefreshCcw, Users } from "lucide-react";
+import { Plus, Trash2, RefreshCcw, Users, Download, Upload, Eye, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
+import { downloadCsv, brlCsv, dateCsv } from "@/lib/exportCsv";
 
 type Aff = {
   id: string; user_id: string; code: string; commission_pct: number; status: string; pix_key: string | null; notes: string | null;
@@ -15,14 +16,19 @@ type Aff = {
 };
 type Ref = {
   id: string; affiliate_id: string; valor_cents: number; commission_cents: number; status: string; paid_at: string | null; created_at: string;
+  student_name: string | null; course_title: string | null; parcela_label: string | null;
+  comprovante_path: string | null; comprovante_nome: string | null;
 };
+type Enr = { id: string; user_id: string; affiliate_id: string | null; course_title: string; student_name: string };
 
 const Inner = () => {
   const [list, setList] = useState<Aff[]>([]);
   const [refs, setRefs] = useState<Ref[]>([]);
   const [students, setStudents] = useState<{ user_id: string; label: string }[]>([]);
+  const [enrs, setEnrs] = useState<Enr[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ user_id: "", code: "", commission_pct: 10, pix_key: "" });
+  const [busy, setBusy] = useState<string | null>(null);
 
   const load = async () => {
     const [{ data: a }, { data: r }, { data: p }] = await Promise.all([
@@ -33,6 +39,16 @@ const Inner = () => {
     setList((a ?? []) as any);
     setRefs((r ?? []) as any);
     setStudents((p ?? []).map((x: any) => ({ user_id: x.user_id, label: `${x.username ?? ""} · ${x.display_name ?? x.email ?? ""}` })));
+    const { data: e } = await supabase
+      .from("enrollments")
+      .select("id,user_id,affiliate_id, course:courses(title)")
+      .order("enrolled_at", { ascending: false })
+      .limit(300);
+    const pMap = new Map((p ?? []).map((x: any) => [x.user_id, x.display_name ?? x.email ?? x.user_id]));
+    setEnrs((e ?? []).map((x: any) => ({
+      id: x.id, user_id: x.user_id, affiliate_id: x.affiliate_id,
+      course_title: x.course?.title ?? "—", student_name: String(pMap.get(x.user_id) ?? x.user_id.slice(0, 8)),
+    })));
   };
   useEffect(() => { load(); }, []);
 
@@ -59,6 +75,56 @@ const Inner = () => {
   const totalPend = refs.filter((r) => r.status === "pendente").reduce((s, r) => s + (r.commission_cents ?? 0), 0);
   const totalPago = refs.filter((r) => r.status === "pago").reduce((s, r) => s + (r.commission_cents ?? 0), 0);
 
+  const affLabel = (id: string) => {
+    const a = list.find((x) => x.id === id);
+    return a ? `${a.code} · ${a.profile?.display_name ?? a.profile?.email ?? ""}` : id.slice(0, 8);
+  };
+
+  const vincular = async (enrollmentId: string, affiliateId: string) => {
+    const { error } = await supabase.from("enrollments")
+      .update({ affiliate_id: affiliateId === "none" ? null : affiliateId }).eq("id", enrollmentId);
+    if (error) return toast.error(error.message);
+    toast.success("Matrícula vinculada — novas parcelas pagas geram comissão automaticamente");
+    load();
+  };
+
+  const marcarPago = async (r: Ref) => {
+    const { error } = await supabase.from("affiliate_referrals")
+      .update({ status: r.status === "pago" ? "pendente" : "pago", paid_at: r.status === "pago" ? null : new Date().toISOString() })
+      .eq("id", r.id);
+    if (error) return toast.error(error.message);
+    load();
+  };
+
+  const enviarComprovante = async (r: Ref, file: File) => {
+    setBusy(r.id);
+    try {
+      const ext = file.name.split(".").pop() || "pdf";
+      const path = `${r.affiliate_id}/${r.id}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("comprovantes").upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { error } = await supabase.from("affiliate_referrals")
+        .update({ comprovante_path: path, comprovante_nome: file.name, status: "pago", paid_at: new Date().toISOString() })
+        .eq("id", r.id);
+      if (error) throw error;
+      toast.success("Comprovante anexado");
+      load();
+    } catch (e: any) { toast.error(e.message ?? "Falha no envio"); }
+    finally { setBusy(null); }
+  };
+
+  const verComprovante = async (path: string) => {
+    const { data } = await supabase.storage.from("comprovantes").createSignedUrl(path, 3600);
+    if (data?.signedUrl) window.open(data.signedUrl, "_blank"); else toast.error("Comprovante indisponível");
+  };
+
+  const exportarAfiliados = () => downloadCsv("afiliados", ["Afiliado", "Código", "Comissão %", "PIX", "Status"],
+    list.map((a) => [a.profile?.display_name ?? a.profile?.email ?? a.user_id, a.code, a.commission_pct, a.pix_key ?? "", a.status]));
+
+  const exportarComissoes = () => downloadCsv("comissoes", ["Data", "Afiliado", "Aluno", "Curso", "Parcela", "Valor recebido", "Comissão", "Status", "Pago em", "Comprovante"],
+    refs.map((r) => [dateCsv(r.created_at), affLabel(r.affiliate_id), r.student_name ?? "", r.course_title ?? "", r.parcela_label ?? "",
+      brlCsv(r.valor_cents), brlCsv(r.commission_cents), r.status, dateCsv(r.paid_at), r.comprovante_nome ?? ""]));
+
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -68,6 +134,7 @@ const Inner = () => {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={load}><RefreshCcw className="size-4" /></Button>
+          <Button variant="outline" onClick={exportarAfiliados}><Download className="size-4" /> Exportar</Button>
           <Button variant="hero" onClick={() => setOpen(true)}><Plus className="size-4" /> Novo afiliado</Button>
         </div>
       </div>
@@ -113,6 +180,80 @@ const Inner = () => {
             {list.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">Nenhum afiliado.</td></tr>}
           </tbody>
         </table>
+      </div>
+
+      <div className="space-y-3">
+        <h2 className="text-xl font-bold text-primary flex items-center gap-2"><Link2 className="size-5" /> Vincular matrículas a afiliados</h2>
+        <p className="text-sm text-muted-foreground">Ao marcar uma parcela como paga no financeiro, a comissão do afiliado é gerada automaticamente sobre o valor recebido.</p>
+        <div className="bg-card rounded-xl border border-border overflow-x-auto max-h-72 overflow-y-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-secondary/60"><tr><th className="text-left p-3">Aluno</th><th className="text-left p-3">Curso</th><th className="text-left p-3">Afiliado</th></tr></thead>
+            <tbody>
+              {enrs.map((e) => (
+                <tr key={e.id} className="border-t border-border">
+                  <td className="p-3">{e.student_name}</td>
+                  <td className="p-3 text-muted-foreground">{e.course_title}</td>
+                  <td className="p-3">
+                    <Select value={e.affiliate_id ?? "none"} onValueChange={(v) => vincular(e.id, v)}>
+                      <SelectTrigger className="w-64 h-8 text-xs"><SelectValue placeholder="Sem afiliado" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Sem afiliado</SelectItem>
+                        {list.map((a) => <SelectItem key={a.id} value={a.id}>{affLabel(a.id)}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+              ))}
+              {enrs.length === 0 && <tr><td colSpan={3} className="p-8 text-center text-muted-foreground">Nenhuma matrícula.</td></tr>}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h2 className="text-xl font-bold text-primary">Comissões por parcela recebida</h2>
+          <Button variant="outline" onClick={exportarComissoes}><Download className="size-4" /> Exportar</Button>
+        </div>
+        <div className="bg-card rounded-xl border border-border overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-secondary/60">
+              <tr>
+                <th className="text-left p-3">Data</th><th className="text-left p-3">Afiliado</th>
+                <th className="text-left p-3">Aluno / Curso</th><th className="text-left p-3">Parcela</th>
+                <th className="text-right p-3">Recebido</th><th className="text-right p-3">Comissão</th>
+                <th className="text-left p-3">Status</th><th className="text-left p-3">Comprovante</th>
+              </tr>
+            </thead>
+            <tbody>
+              {refs.map((r) => (
+                <tr key={r.id} className="border-t border-border">
+                  <td className="p-3 text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
+                  <td className="p-3">{affLabel(r.affiliate_id)}</td>
+                  <td className="p-3"><p className="font-medium">{r.student_name ?? "—"}</p><p className="text-xs text-muted-foreground">{r.course_title ?? ""}</p></td>
+                  <td className="p-3">{r.parcela_label ?? "—"}</td>
+                  <td className="p-3 text-right">R$ {(r.valor_cents / 100).toFixed(2)}</td>
+                  <td className="p-3 text-right font-semibold">R$ {(r.commission_cents / 100).toFixed(2)}</td>
+                  <td className="p-3">
+                    <Button size="sm" variant={r.status === "pago" ? "outline" : "hero"} onClick={() => marcarPago(r)}>
+                      {r.status === "pago" ? "pago" : "marcar pago"}
+                    </Button>
+                  </td>
+                  <td className="p-3">
+                    <div className="flex items-center gap-1">
+                      {r.comprovante_path && <Button size="sm" variant="ghost" onClick={() => verComprovante(r.comprovante_path!)}><Eye className="size-4" /></Button>}
+                      <label className="inline-flex items-center gap-1 text-xs cursor-pointer rounded border border-dashed px-2 py-1 hover:bg-secondary/60">
+                        <Upload className="size-3" /> {busy === r.id ? "…" : "anexar"}
+                        <input type="file" accept=".pdf,image/*" className="hidden" onChange={(ev) => ev.target.files?.[0] && enviarComprovante(r, ev.target.files[0])} />
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {refs.length === 0 && <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">Nenhuma comissão gerada ainda.</td></tr>}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>

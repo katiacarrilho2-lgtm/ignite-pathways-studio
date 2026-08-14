@@ -18,37 +18,63 @@ export type Database = {
         Row: {
           affiliate_id: string
           commission_cents: number
+          comprovante_nome: string | null
+          comprovante_path: string | null
+          course_title: string | null
           created_at: string
           enrollment_id: string | null
           id: string
+          installment_id: string | null
           notes: string | null
           paid_at: string | null
+          parcela_label: string | null
           status: string
+          student_name: string | null
           valor_cents: number
         }
         Insert: {
           affiliate_id: string
           commission_cents?: number
+          comprovante_nome?: string | null
+          comprovante_path?: string | null
+          course_title?: string | null
           created_at?: string
           enrollment_id?: string | null
           id?: string
+          installment_id?: string | null
           notes?: string | null
           paid_at?: string | null
+          parcela_label?: string | null
           status?: string
+          student_name?: string | null
           valor_cents?: number
         }
         Update: {
           affiliate_id?: string
           commission_cents?: number
+          comprovante_nome?: string | null
+          comprovante_path?: string | null
+          course_title?: string | null
           created_at?: string
           enrollment_id?: string | null
           id?: string
+          installment_id?: string | null
           notes?: string | null
           paid_at?: string | null
+          parcela_label?: string | null
           status?: string
+          student_name?: string | null
           valor_cents?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_referrals_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: false
+            referencedRelation: "installments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       affiliates: {
         Row: {
@@ -1373,6 +1399,7 @@ export type Database = {
       enrollments: {
         Row: {
           account_id: string | null
+          affiliate_id: string | null
           completed_at: string | null
           course_id: string
           enrolled_at: string
@@ -1385,6 +1412,7 @@ export type Database = {
         }
         Insert: {
           account_id?: string | null
+          affiliate_id?: string | null
           completed_at?: string | null
           course_id: string
           enrolled_at?: string
@@ -1397,6 +1425,7 @@ export type Database = {
         }
         Update: {
           account_id?: string | null
+          affiliate_id?: string | null
           completed_at?: string | null
           course_id?: string
           enrolled_at?: string
@@ -1408,6 +1437,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "enrollments_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "enrollments_course_id_fkey"
             columns: ["course_id"]
@@ -1803,6 +1839,77 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "course_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_threads: {
+        Row: {
+          assunto: string
+          created_at: string
+          id: string
+          last_message_at: string
+          status: string
+          unread_for_staff: number
+          unread_for_student: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assunto?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          status?: string
+          unread_for_staff?: number
+          unread_for_student?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assunto?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          status?: string
+          unread_for_staff?: number
+          unread_for_student?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          autor_id: string
+          corpo: string
+          created_at: string
+          from_staff: boolean
+          id: string
+          thread_id: string
+        }
+        Insert: {
+          autor_id: string
+          corpo: string
+          created_at?: string
+          from_staff?: boolean
+          id?: string
+          thread_id: string
+        }
+        Update: {
+          autor_id?: string
+          corpo?: string
+          created_at?: string
+          from_staff?: boolean
+          id?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "message_threads"
             referencedColumns: ["id"]
           },
         ]
