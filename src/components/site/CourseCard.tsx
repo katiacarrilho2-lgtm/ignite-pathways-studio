@@ -19,6 +19,7 @@ const formatPrice = (cents: number) => (cents / 100).toLocaleString("pt-BR", { s
 export const CourseCard = ({ course }: { course: DbCourse }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [imgSrc, setImgSrc] = useState<string>(resolveImage(course.image_url));
   const hasPrice = !!course.price_cents && course.price_cents > 0;
   const slug = (course.slug ?? "").toLowerCase();
   const isNrHighlight = slug === "nr-10" || slug === "nr-35";
@@ -48,13 +49,14 @@ export const CourseCard = ({ course }: { course: DbCourse }) => {
   };
 
   return (
-  <article className="game-card group rounded-xl overflow-hidden transition-smooth">
-    <div className="aspect-[4/3] overflow-hidden relative">
+  <article className="game-card group rounded-xl overflow-hidden transition-smooth flex flex-col h-full">
+    <div className="aspect-[4/3] overflow-hidden relative bg-secondary">
       <span className="game-card__badge">{course.category}</span>
       <img
-        src={resolveImage(course.image_url)}
+        src={imgSrc}
         alt={course.title}
         loading="lazy"
+        onError={() => setImgSrc(placeholder)}
         className="w-full h-full object-cover group-hover:scale-105 transition-smooth"
       />
       {isNrHighlight && (
@@ -62,14 +64,14 @@ export const CourseCard = ({ course }: { course: DbCourse }) => {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="absolute top-3 left-0 right-0 mx-3 rounded-md bg-yellow-400 text-black text-xs font-extrabold uppercase tracking-wide py-1.5 px-2 text-center animate-nr-blink border border-yellow-500 hover:bg-yellow-300 transition-colors"
+          className="absolute bottom-3 left-0 right-0 mx-3 rounded-md bg-yellow-400 text-black text-xs font-extrabold uppercase tracking-wide py-1.5 px-2 text-center animate-nr-blink border border-yellow-500 hover:bg-yellow-300 transition-colors"
           title="Fale no WhatsApp e ganhe desconto"
         >
           🔥 Desconto especial — Fale no WhatsApp
         </a>
       )}
     </div>
-    <div className="p-6 space-y-3">
+    <div className="p-6 space-y-3 flex flex-col flex-1">
       <span className="text-xs font-semibold uppercase tracking-wider text-primary-glow">{course.category}</span>
       <h3 className="text-xl font-bold text-primary leading-snug">{course.title}</h3>
       {course.description && <p className="text-sm text-muted-foreground line-clamp-3">{course.description}</p>}
