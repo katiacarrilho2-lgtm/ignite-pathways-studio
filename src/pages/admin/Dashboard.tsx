@@ -33,10 +33,10 @@ export default function Dashboard() {
       cnt(supabase.from("crm_leads").select("id", { count: "exact", head: true }).gte("created_at", startIso).lt("created_at", endIso)),
       cnt(supabase.from("crm_leads").select("id", { count: "exact", head: true }).in("estagio", ["novo", "lead"]).eq("atendimentos", 0)),
       cnt(supabase.from("enrollments").select("id", { count: "exact", head: true }).gte("enrolled_at", startIso).lt("enrolled_at", endIso)),
-      supabase.from("installments").select("valor_cents, valor_final_cents").gte("paid_at", startIso).lt("paid_at", endIso).then(({ data }) => data ?? []).catch(() => []),
+      supabase.from("installments").select("valor_cents, valor_final_cents").gte("paid_at", startIso).lt("paid_at", endIso).then(({ data }) => data ?? [], () => []),
       cnt(supabase.from("installments").select("id", { count: "exact", head: true }).neq("status", "pago").lt("vencimento", today)),
       cnt(supabase.from("turmas").select("id", { count: "exact", head: true }).lte("data_inicio", today).gte("data_fim", today)),
-      supabase.from("lesson_progress").select("user_id").gte("updated_at", startIso).lt("updated_at", endIso).then(({ data }) => data ?? []).catch(() => []),
+      supabase.from("lesson_progress").select("user_id").gte("updated_at", startIso).lt("updated_at", endIso).then(({ data }) => data ?? [], () => []),
       cnt(supabase.from("enrollment_applications").select("id", { count: "exact", head: true }).not("status", "in", "(matriculado,cancelado,recusado)")),
       cnt(supabase.from("crm_appointments").select("id", { count: "exact", head: true }).eq("done", false).gte("scheduled_at", startIso).lt("scheduled_at", endIso)),
     ]);
