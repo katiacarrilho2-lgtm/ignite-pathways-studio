@@ -35,6 +35,7 @@ import AdminCursoPreview from "./pages/admin/AdminCursoPreview.tsx";
 import AdminCursoIA from "./pages/admin/AdminCursoIA.tsx";
 import AdminAndamento from "./pages/admin/AdminAndamento.tsx";
 import AdminCorporativo from "./pages/admin/AdminCorporativo.tsx";
+import CorpCrm from "./pages/admin/corp/CorpCrm";
 import AdminCorpPropostas from "./pages/admin/AdminCorpPropostas.tsx";
 import AdminCorpPropostaEditor from "./pages/admin/AdminCorpPropostaEditor.tsx";
 import AdminCorpControle from "./pages/admin/AdminCorpControle.tsx";
@@ -160,6 +161,7 @@ const App = () => (
               <Route path="cursos/:courseId/preview" element={<AdminCursoPreview />} />
               <Route path="andamento" element={<AdminAndamento />} />
               <Route path="corporativo" element={<AdminCorporativo />} />
+              <Route path="corporativo/crm" element={<CorpCrm />} />
               <Route path="corporativo/propostas" element={<AdminCorpPropostas />} />
               <Route path="corporativo/propostas/:id" element={<AdminCorpPropostaEditor />} />
              <Route path="corporativo/controle" element={<AdminCorpControle />} />

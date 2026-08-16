@@ -675,6 +675,304 @@ export type Database = {
           },
         ]
       }
+      corp_contratos: {
+        Row: {
+          created_at: string
+          empresa_id: string | null
+          fim_em: string | null
+          id: string
+          inicio_em: string | null
+          observacoes: string | null
+          proposta_id: string | null
+          status: string
+          tipo: string | null
+          titulo: string
+          updated_at: string
+          valor_cents: number
+        }
+        Insert: {
+          created_at?: string
+          empresa_id?: string | null
+          fim_em?: string | null
+          id?: string
+          inicio_em?: string | null
+          observacoes?: string | null
+          proposta_id?: string | null
+          status?: string
+          tipo?: string | null
+          titulo: string
+          updated_at?: string
+          valor_cents?: number
+        }
+        Update: {
+          created_at?: string
+          empresa_id?: string | null
+          fim_em?: string | null
+          id?: string
+          inicio_em?: string | null
+          observacoes?: string | null
+          proposta_id?: string | null
+          status?: string
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string
+          valor_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corp_contratos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "corp_empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corp_contratos_proposta_id_fkey"
+            columns: ["proposta_id"]
+            isOneToOne: false
+            referencedRelation: "corp_propostas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      corp_empresas: {
+        Row: {
+          cidade: string | null
+          cnpj: string | null
+          colaboradores: number | null
+          contato_cargo: string | null
+          contato_email: string | null
+          contato_nome: string | null
+          contato_telefone: string | null
+          created_at: string
+          created_by: string | null
+          estagio: string
+          id: string
+          nome_fantasia: string | null
+          observacoes: string | null
+          origem: string | null
+          owner_id: string | null
+          proxima_acao_em: string | null
+          razao_social: string
+          segmento: string | null
+          uf: string | null
+          updated_at: string
+          valor_negociacao_cents: number
+        }
+        Insert: {
+          cidade?: string | null
+          cnpj?: string | null
+          colaboradores?: number | null
+          contato_cargo?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          created_by?: string | null
+          estagio?: string
+          id?: string
+          nome_fantasia?: string | null
+          observacoes?: string | null
+          origem?: string | null
+          owner_id?: string | null
+          proxima_acao_em?: string | null
+          razao_social: string
+          segmento?: string | null
+          uf?: string | null
+          updated_at?: string
+          valor_negociacao_cents?: number
+        }
+        Update: {
+          cidade?: string | null
+          cnpj?: string | null
+          colaboradores?: number | null
+          contato_cargo?: string | null
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          created_by?: string | null
+          estagio?: string
+          id?: string
+          nome_fantasia?: string | null
+          observacoes?: string | null
+          origem?: string | null
+          owner_id?: string | null
+          proxima_acao_em?: string | null
+          razao_social?: string
+          segmento?: string | null
+          uf?: string | null
+          updated_at?: string
+          valor_negociacao_cents?: number
+        }
+        Relationships: []
+      }
+      corp_faturamento: {
+        Row: {
+          contrato_id: string | null
+          created_at: string
+          descricao: string | null
+          empresa_id: string | null
+          id: string
+          nota_fiscal: string | null
+          pago_em: string | null
+          status: string
+          updated_at: string
+          valor_cents: number
+          vencimento: string | null
+        }
+        Insert: {
+          contrato_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nota_fiscal?: string | null
+          pago_em?: string | null
+          status?: string
+          updated_at?: string
+          valor_cents?: number
+          vencimento?: string | null
+        }
+        Update: {
+          contrato_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          empresa_id?: string | null
+          id?: string
+          nota_fiscal?: string | null
+          pago_em?: string | null
+          status?: string
+          updated_at?: string
+          valor_cents?: number
+          vencimento?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corp_faturamento_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "corp_contratos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "corp_faturamento_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "corp_empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      corp_propostas: {
+        Row: {
+          created_at: string
+          empresa_id: string | null
+          enviada_em: string | null
+          id: string
+          observacoes: string | null
+          owner_id: string | null
+          status: string
+          tipo: string | null
+          titulo: string
+          updated_at: string
+          validade_em: string | null
+          valor_cents: number
+        }
+        Insert: {
+          created_at?: string
+          empresa_id?: string | null
+          enviada_em?: string | null
+          id?: string
+          observacoes?: string | null
+          owner_id?: string | null
+          status?: string
+          tipo?: string | null
+          titulo: string
+          updated_at?: string
+          validade_em?: string | null
+          valor_cents?: number
+        }
+        Update: {
+          created_at?: string
+          empresa_id?: string | null
+          enviada_em?: string | null
+          id?: string
+          observacoes?: string | null
+          owner_id?: string | null
+          status?: string
+          tipo?: string | null
+          titulo?: string
+          updated_at?: string
+          validade_em?: string | null
+          valor_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corp_propostas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "corp_empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      corp_reunioes: {
+        Row: {
+          created_at: string
+          empresa_id: string | null
+          id: string
+          notas: string | null
+          owner_id: string | null
+          participantes: string | null
+          proxima_acao: string | null
+          proxima_acao_em: string | null
+          resultado: string
+          scheduled_at: string
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          notas?: string | null
+          owner_id?: string | null
+          participantes?: string | null
+          proxima_acao?: string | null
+          proxima_acao_em?: string | null
+          resultado?: string
+          scheduled_at: string
+          tipo?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          empresa_id?: string | null
+          id?: string
+          notas?: string | null
+          owner_id?: string | null
+          participantes?: string | null
+          proxima_acao?: string | null
+          proxima_acao_em?: string | null
+          resultado?: string
+          scheduled_at?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "corp_reunioes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "corp_empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_categories: {
         Row: {
           active: boolean

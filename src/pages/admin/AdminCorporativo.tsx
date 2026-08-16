@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, ScrollText, Handshake, Library, Sparkles, ArrowRight, LineChart, Building2 } from "lucide-react";
 
 const items = [
+  { to: "/admin/corporativo/crm", title: "CRM Corporativo", desc: "Empresas prospectadas, reuniões, propostas, valor em negociação, contratos e faturamento B2B.", icon: LineChart, status: "Disponível" },
   { to: "/admin/corporativo/propostas", title: "Propostas Comerciais", desc: "Gere propostas profissionais para empresas, indústrias, prefeituras e parceiros.", icon: FileText, status: "Disponível" },
   { to: "/admin/corporativo/contratos", title: "Contratos e Termos", desc: "Minutas editáveis: prestação de serviços, licenciamento, NDA, revenda, PJ.", icon: ScrollText, status: "Disponível" },
   { to: "/admin/corporativo/controle", title: "Controle de Propostas", desc: "Histórico, métricas, taxa de fechamento e responsável por cada proposta.", icon: LineChart, status: "Disponível" },
