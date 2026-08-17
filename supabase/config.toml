@@ -2,3 +2,5 @@ project_id = "lddawqvklmfibhgnhgsa"
 
 [functions.bulk-update-lessons]
 verify_jwt = false
+[functions.student-docs-public]
+verify_jwt = false
