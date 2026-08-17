@@ -36,7 +36,7 @@ const StudentDocsPanel = () => {
     const { data } = await supabase.from("student_documents").select("*").order("created_at", { ascending: false });
     const list = (data ?? []) as StudentDoc[];
     setRows(list);
-    const ids = Array.from(new Set(list.map((r) => r.user_id)));
+    const ids = Array.from(new Set(list.map((r) => r.user_id).filter(Boolean)));
     if (ids.length) {
       const { data: p } = await supabase.from("profiles").select("user_id,display_name,email").in("user_id", ids);
       const m: any = {}; (p ?? []).forEach((x: any) => { m[x.user_id] = x; }); setProfs(m);
