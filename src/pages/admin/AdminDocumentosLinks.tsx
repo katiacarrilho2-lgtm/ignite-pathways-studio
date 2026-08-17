@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { DOC_LABEL, signedDocUrl } from "@/lib/studentDocs";
+import DocUploadLinksPanel from "@/components/admin/DocUploadLinksPanel";
 import { downloadCsv, dateCsv } from "@/lib/exportCsv";
 import { Download, Eye } from "lucide-react";
 
@@ -35,7 +36,7 @@ const StudentDocsPanel = () => {
     const { data } = await supabase.from("student_documents").select("*").order("created_at", { ascending: false });
     const list = (data ?? []) as StudentDoc[];
     setRows(list);
-    const ids = Array.from(new Set(list.map((r) => r.user_id)));
+    const ids = Array.from(new Set(list.map((r) => r.user_id).filter(Boolean)));
     if (ids.length) {
       const { data: p } = await supabase.from("profiles").select("user_id,display_name,email").in("user_id", ids);
       const m: any = {}; (p ?? []).forEach((x: any) => { m[x.user_id] = x; }); setProfs(m);
@@ -85,7 +86,7 @@ const StudentDocsPanel = () => {
           <tbody>
             {filtered.map((r) => (
               <tr key={r.id} className="border-t border-border">
-                <td className="p-3">{profs[r.user_id]?.display_name ?? profs[r.user_id]?.email ?? r.user_id.slice(0, 8)}</td>
+                <td className="p-3">{profs[r.user_id]?.display_name ?? profs[r.user_id]?.email ?? (r.user_id ? r.user_id.slice(0, 8) : "Link público")}</td>
                 <td className="p-3">{DOC_LABEL(r.doc_type)}</td>
                 <td className="p-3 text-muted-foreground truncate max-w-[220px]">{r.file_name ?? "—"}</td>
                 <td className="p-3">
@@ -156,6 +157,8 @@ const Inner = () => {
         </div>
         <Button variant="hero" onClick={() => { setEditing(empty); setOpen(true); }}><Plus className="size-4" /> Novo item</Button>
       </div>
+
+      <DocUploadLinksPanel />
 
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">

@@ -1,18 +1,26 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export const DOC_TYPES = [
-  { key: "rg", label: "RG" },
-  { key: "cpf", label: "CPF" },
-  { key: "comprovante_residencia", label: "Comprovante de residência" },
-  { key: "reservista", label: "Reservista" },
-  { key: "certidao", label: "Certidão de nascimento ou casamento" },
-  { key: "foto_3x4", label: "Foto 3x4" },
-  { key: "historico_escolar", label: "Histórico escolar" },
-  { key: "diploma_medio", label: "Diploma do Ensino Médio (para faculdade)" },
-  { key: "outros", label: "Outros" },
+export type DocDef = { key: string; label: string; desc?: string; opcional?: boolean };
+
+export const DOC_TYPES: DocDef[] = [
+  { key: "certidao", label: "Certidão de nascimento ou casamento", desc: "Documento obrigatório" },
+  { key: "certificado_medio", label: "Certificado do Ensino Médio", desc: "Documento opcional", opcional: true },
+  { key: "comprovante_experiencia", label: "Comprovante de Experiência", desc: "Declaração assinada, CTPS ou contrato" },
+  { key: "comprovante_residencia", label: "Comprovante de Residência", desc: "Últimos 90 dias" },
+  { key: "cpf", label: "CPF", desc: "Documento obrigatório" },
+  { key: "foto_3x4", label: "Foto 3x4", desc: "Foto recente para o certificado" },
+  { key: "historico_medio", label: "Histórico do Ensino Médio", desc: "Documento obrigatório" },
+  { key: "reservista", label: "Reservista", desc: "Obrigatório para candidato masculino", opcional: true },
+  { key: "rg", label: "RG ou CNH", desc: "Documento obrigatório" },
+  { key: "titulo_eleitor", label: "Título de Eleitor", desc: "Documento obrigatório" },
 ];
 
-export const DOC_LABEL = (key: string) => DOC_TYPES.find((d) => d.key === key)?.label ?? key;
+export const EXTRA_DOC_TYPE = "documento_adicional";
+
+export const ALL_DOC_KEYS = [...DOC_TYPES.map((d) => d.key), EXTRA_DOC_TYPE];
+
+export const DOC_LABEL = (key: string) =>
+  key === EXTRA_DOC_TYPE ? "Documento adicional" : DOC_TYPES.find((d) => d.key === key)?.label ?? key;
 
 export async function signedDocUrl(path: string, seconds = 3600) {
   const { data } = await supabase.storage.from("student-docs").createSignedUrl(path, seconds);

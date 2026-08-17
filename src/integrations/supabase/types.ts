@@ -1475,6 +1475,51 @@ export type Database = {
         }
         Relationships: []
       }
+      document_upload_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          label: string | null
+          revoked: boolean
+          student_email: string | null
+          student_name: string | null
+          student_phone: string | null
+          token: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          label?: string | null
+          revoked?: boolean
+          student_email?: string | null
+          student_name?: string | null
+          student_phone?: string | null
+          token?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          label?: string | null
+          revoked?: boolean
+          student_email?: string | null
+          student_name?: string | null
+          student_phone?: string | null
+          token?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       enrollment_applications: {
         Row: {
           birth_date: string | null
@@ -2371,6 +2416,7 @@ export type Database = {
           file_name: string | null
           file_path: string
           id: string
+          link_id: string | null
           mime: string | null
           notes: string | null
           reviewed_at: string | null
@@ -2378,7 +2424,7 @@ export type Database = {
           size_bytes: number | null
           status: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -2386,6 +2432,7 @@ export type Database = {
           file_name?: string | null
           file_path: string
           id?: string
+          link_id?: string | null
           mime?: string | null
           notes?: string | null
           reviewed_at?: string | null
@@ -2393,7 +2440,7 @@ export type Database = {
           size_bytes?: number | null
           status?: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -2401,6 +2448,7 @@ export type Database = {
           file_name?: string | null
           file_path?: string
           id?: string
+          link_id?: string | null
           mime?: string | null
           notes?: string | null
           reviewed_at?: string | null
@@ -2408,9 +2456,17 @@ export type Database = {
           size_bytes?: number | null
           status?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "student_documents_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "document_upload_links"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_profiles: {
         Row: {
