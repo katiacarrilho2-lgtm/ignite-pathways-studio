@@ -1,0 +1,2 @@
+ALTER TABLE public.student_documents DROP CONSTRAINT IF EXISTS student_documents_doc_type_check;
+ALTER TABLE public.student_documents ADD CONSTRAINT student_documents_doc_type_check CHECK (doc_type = ANY (ARRAY['rg','cpf','reservista','comprovante_pagamento','comprovante_residencia','historico_escolar','foto_3x4','certidao','certificado_medio','comprovante_experiencia','historico_medio','titulo_eleitor','diploma_medio','documento_adicional','outros']));
