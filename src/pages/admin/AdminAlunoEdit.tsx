@@ -19,6 +19,7 @@ import { withAccount } from "@/lib/multiAccount";
 import jsPDF from "jspdf";
 import logoUrl from "@/assets/multplick-logo.png";
 import { StudentAnexos } from "@/components/admin/StudentAnexos";
+import { StudentContractDialog } from "@/components/admin/StudentContractDialog";
 import { useCrmSellers } from "@/hooks/useCrmSellers";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -840,6 +841,21 @@ const Inner = () => {
             <p className="text-sm text-muted-foreground">Login: <span className="font-mono">{profile.username}</span></p>
           </div>
         </div>
+        <StudentContractDialog
+          student={{
+            full_name: sp.full_name || profile.display_name || "",
+            cpf: sp.cpf, rg: sp.rg,
+            address: [sp.rua, sp.numero, sp.bairro].filter(Boolean).join(", ") || null,
+            city: sp.cidade, state: sp.estado,
+            phone: sp.phone1,
+            email: sp.contact_email || profile.email,
+          }}
+          courses={enrollments.map(e => e.courses?.title).filter(Boolean) as string[]}
+          defaultValorTotal={installments.length ? money(installments.reduce((s, i) => s + i.valor_cents, 0)) : ""}
+          defaultParcelas={installments.length ? `${installments.length}x` : ""}
+          defaultValorParcela={installments.length ? money(installments[0].valor_cents) : ""}
+          defaultPrimeiroVenc={installments.find(i => i.vencimento)?.vencimento ?? ""}
+        />
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
