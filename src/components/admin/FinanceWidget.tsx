@@ -27,6 +27,8 @@ import {
   ChevronRight,
   Download,
   CalendarDays,
+  Copy,
+  Printer,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -214,11 +216,16 @@ function EntryDialog({
   );
 }
 
-function KindCard({ kind, entries, reload, ym }: { kind: Kind; entries: Entry[]; reload: () => void; ym: string }) {
+type Filter = "todos" | "pagas" | "debito";
+
+const matchFilter = (e: Entry, f: Filter) =>
+  f === "todos" ? true : f === "pagas" ? !!e.paid_at : !e.paid_at;
+
+function KindCard({ kind, entries, reload, ym, filter }: { kind: Kind; entries: Entry[]; reload: () => void; ym: string; filter: Filter }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Entry | null>(null);
 
-  const list = entries.filter((e) => e.kind === kind && e.due_date.slice(0, 7) === ym);
+  const list = entries.filter((e) => e.kind === kind && e.due_date.slice(0, 7) === ym && matchFilter(e, filter));
   const aberto = list.filter((e) => !e.paid_at && statusOf(e) !== "vencido").reduce((s, e) => s + e.amount_cents, 0);
   const vencido = list.filter((e) => statusOf(e) === "vencido").reduce((s, e) => s + e.amount_cents, 0);
   const pagoMes = list.filter((e) => !!e.paid_at).reduce((s, e) => s + e.amount_cents, 0);
@@ -353,6 +360,9 @@ function KindCard({ kind, entries, reload, ym }: { kind: Kind; entries: Entry[];
 export default function FinanceWidget() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [ym, setYm] = useState<string>(ymOf(new Date()));
+  const [filter, setFilter] = useState<Filter>("todos");
+  const [replicating, setReplicating] = useState(false);
+  const { activeAccountId } = useCommercialAccounts();
 
   const load = async () => {
     const { data, error } = await supabase
@@ -373,8 +383,95 @@ export default function FinanceWidget() {
 
   const isCurrent = ym === ymOf(new Date());
 
+  const monthRows = entries.filter((e) => e.due_date.slice(0, 7) === ym && matchFilter(e, filter));
+  const sum = (k: Kind, paid?: boolean) =>
+    monthRows
+      .filter((e) => e.kind === k && (paid === undefined || !!e.paid_at === paid))
+      .reduce((s, e) => s + (e.amount_cents || 0), 0);
+  const entradas = sum("receber");
+  const saidas = sum("pagar");
+
+  const replicateNextMonths = async () => {
+    const base = entries.filter((e) => e.due_date.slice(0, 7) === ym);
+    if (base.length === 0) return toast.error("Nada para replicar neste mês");
+    const qtdStr = prompt("Replicar os lançamentos deste mês para quantos meses seguintes?", "1");
+    if (!qtdStr) return;
+    const qtd = Math.max(1, Math.min(24, parseInt(qtdStr, 10) || 0));
+    setReplicating(true);
+    const rows: any[] = [];
+    for (let i = 1; i <= qtd; i++) {
+      base.forEach((e) => {
+        const nextDue = addMonths(e.due_date, i);
+        const exists = entries.some(
+          (x) => x.kind === e.kind && x.name === e.name && x.due_date === nextDue,
+        );
+        if (exists) return;
+        const nextNo = e.installment_no ? e.installment_no + i : null;
+        if (e.installment_total && nextNo && nextNo > e.installment_total) return;
+        rows.push(withAccount({
+          kind: e.kind, name: e.name, amount_cents: e.amount_cents,
+          due_date: nextDue, notes: e.notes, installment_no: nextNo,
+          installment_total: e.installment_total, series_id: e.series_id,
+        }, activeAccountId));
+      });
+    }
+    if (rows.length === 0) { setReplicating(false); return toast.info("Os meses seguintes já estão preenchidos"); }
+    const { error } = await supabase.from("finance_entries").insert(rows);
+    setReplicating(false);
+    if (error) return toast.error(error.message);
+    toast.success(`${rows.length} lançamento(s) replicado(s)`);
+    load();
+  };
+
+  const printReport = () => {
+    if (monthRows.length === 0) { toast.error("Nada para imprimir"); return; }
+    const filterLabel = filter === "todos" ? "Completo" : filter === "pagas" ? "Somente contas pagas" : "Somente em débito";
+    const line = (e: Entry) => {
+      const st = statusOf(e);
+      const color = st === "pago" ? "#059669" : st === "vencido" ? "#dc2626" : "#ea580c";
+      return `<tr>
+        <td>${e.kind === "pagar" ? "Saída" : "Entrada"}</td>
+        <td>${e.name}</td>
+        <td style="text-align:center">${e.installment_no && e.installment_total ? `${e.installment_no}/${e.installment_total}` : "—"}</td>
+        <td>${new Date(e.due_date + "T00:00:00").toLocaleDateString("pt-BR")}</td>
+        <td style="color:${color};font-weight:600">${statusLabel[st]}</td>
+        <td style="text-align:right">${brl(e.amount_cents)}</td>
+      </tr>`;
+    };
+    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+      <title>Contas ${monthLabel(ym)}</title>
+      <style>
+        body{font-family:Arial,Helvetica,sans-serif;padding:24px;color:#111}
+        h1{font-size:18px;margin:0 0 4px} h2{font-size:14px;margin:22px 0 6px}
+        p.sub{margin:0 0 12px;color:#555;font-size:12px}
+        table{width:100%;border-collapse:collapse;font-size:12px}
+        th,td{border:1px solid #ddd;padding:6px 8px}
+        th{background:#f3f4f6;text-align:left}
+        tfoot td{font-weight:700;background:#fafafa}
+        .totais{margin-top:20px;font-size:13px}
+      </style></head><body>
+      <h1>Contas a Pagar e a Receber — ${monthLabel(ym)}</h1>
+      <p class="sub">Relatório: ${filterLabel} · Emitido em ${new Date().toLocaleString("pt-BR")}</p>
+      <h2>Entradas (a receber)</h2>
+      <table><thead><tr><th>Tipo</th><th>Descrição</th><th>Parc.</th><th>Vencimento</th><th>Status</th><th style="text-align:right">Valor</th></tr></thead>
+      <tbody>${monthRows.filter((e) => e.kind === "receber").map(line).join("") || `<tr><td colspan="6">Nenhum lançamento</td></tr>`}</tbody>
+      <tfoot><tr><td colspan="5">Total entradas</td><td style="text-align:right">${brl(entradas)}</td></tr></tfoot></table>
+      <h2>Saídas (a pagar)</h2>
+      <table><thead><tr><th>Tipo</th><th>Descrição</th><th>Parc.</th><th>Vencimento</th><th>Status</th><th style="text-align:right">Valor</th></tr></thead>
+      <tbody>${monthRows.filter((e) => e.kind === "pagar").map(line).join("") || `<tr><td colspan="6">Nenhum lançamento</td></tr>`}</tbody>
+      <tfoot><tr><td colspan="5">Total saídas</td><td style="text-align:right">${brl(saidas)}</td></tr></tfoot></table>
+      <div class="totais">
+        <p><strong>Entradas:</strong> ${brl(entradas)} &nbsp;|&nbsp; <strong>Saídas:</strong> ${brl(saidas)} &nbsp;|&nbsp;
+        <strong>Saldo:</strong> ${brl(entradas - saidas)}</p>
+      </div>
+      <script>window.onload=()=>window.print()<\/script>
+      </body></html>`;
+    const w = window.open("", "_blank");
+    if (!w) { toast.error("Permita pop-ups para imprimir"); return; }
+    w.document.write(html); w.document.close();
+  };
+
   const exportExcel = () => {
-    const monthRows = entries.filter((e) => e.due_date.slice(0, 7) === ym);
     if (monthRows.length === 0) { toast.error("Nada para exportar neste mês"); return; }
     const data = monthRows.map((e) => ({
       Tipo: e.kind === "pagar" ? "A pagar" : "A receber",
@@ -386,6 +483,10 @@ export default function FinanceWidget() {
       "Pago em": e.paid_at ? new Date(e.paid_at).toLocaleDateString("pt-BR") : "",
       Observação: e.notes ?? "",
     }));
+    data.push({} as any);
+    data.push({ Tipo: "TOTAL ENTRADAS", "Valor (R$)": entradas / 100 } as any);
+    data.push({ Tipo: "TOTAL SAÍDAS", "Valor (R$)": saidas / 100 } as any);
+    data.push({ Tipo: "SALDO", "Valor (R$)": (entradas - saidas) / 100 } as any);
     const ws = XLSX.utils.json_to_sheet(data);
     ws["!cols"] = [{ wch: 10 }, { wch: 32 }, { wch: 8 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 30 }];
     const wb = XLSX.utils.book_new();
@@ -418,13 +519,45 @@ export default function FinanceWidget() {
             <Button size="sm" variant="ghost" onClick={() => setYm(ymOf(new Date()))}>Voltar para hoje</Button>
           )}
         </div>
-        <Button size="sm" variant="outline" onClick={exportExcel}>
-          <Download className="size-4 mr-1" /> Exportar Excel
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex rounded-md border border-border overflow-hidden">
+            {([["todos", "Tudo"], ["pagas", "Pagas"], ["debito", "Em débito"]] as [Filter, string][]).map(([v, label]) => (
+              <button key={v} onClick={() => setFilter(v)}
+                className={`px-3 py-1.5 text-xs font-medium ${filter === v ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:bg-muted"}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <Button size="sm" variant="outline" onClick={replicateNextMonths} disabled={replicating}>
+            <Copy className="size-4 mr-1" /> Replicar meses
+          </Button>
+          <Button size="sm" variant="outline" onClick={printReport}>
+            <Printer className="size-4 mr-1" /> Imprimir
+          </Button>
+          <Button size="sm" variant="outline" onClick={exportExcel}>
+            <Download className="size-4 mr-1" /> Excel
+          </Button>
+        </div>
       </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">
+          <p className="text-xs text-emerald-700">Entradas do mês</p>
+          <p className="text-lg font-bold text-emerald-700">{brl(entradas)}</p>
+        </div>
+        <div className="rounded-xl border border-destructive/30 bg-destructive/10 p-3">
+          <p className="text-xs text-destructive">Saídas do mês</p>
+          <p className="text-lg font-bold text-destructive">{brl(saidas)}</p>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-3">
+          <p className="text-xs text-muted-foreground">Saldo</p>
+          <p className={`text-lg font-bold ${entradas - saidas >= 0 ? "text-emerald-700" : "text-destructive"}`}>{brl(entradas - saidas)}</p>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-4">
-        <KindCard kind="pagar" entries={entries} reload={load} ym={ym} />
-        <KindCard kind="receber" entries={entries} reload={load} ym={ym} />
+        <KindCard kind="pagar" entries={entries} reload={load} ym={ym} filter={filter} />
+        <KindCard kind="receber" entries={entries} reload={load} ym={ym} filter={filter} />
       </div>
     </div>
   );
