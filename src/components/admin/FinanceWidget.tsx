@@ -27,6 +27,8 @@ import {
   ChevronRight,
   Download,
   CalendarDays,
+  Copy,
+  Printer,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
