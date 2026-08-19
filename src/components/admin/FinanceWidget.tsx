@@ -214,11 +214,16 @@ function EntryDialog({
   );
 }
 
-function KindCard({ kind, entries, reload, ym }: { kind: Kind; entries: Entry[]; reload: () => void; ym: string }) {
+type Filter = "todos" | "pagas" | "debito";
+
+const matchFilter = (e: Entry, f: Filter) =>
+  f === "todos" ? true : f === "pagas" ? !!e.paid_at : !e.paid_at;
+
+function KindCard({ kind, entries, reload, ym, filter }: { kind: Kind; entries: Entry[]; reload: () => void; ym: string; filter: Filter }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Entry | null>(null);
 
-  const list = entries.filter((e) => e.kind === kind && e.due_date.slice(0, 7) === ym);
+  const list = entries.filter((e) => e.kind === kind && e.due_date.slice(0, 7) === ym && matchFilter(e, filter));
   const aberto = list.filter((e) => !e.paid_at && statusOf(e) !== "vencido").reduce((s, e) => s + e.amount_cents, 0);
   const vencido = list.filter((e) => statusOf(e) === "vencido").reduce((s, e) => s + e.amount_cents, 0);
   const pagoMes = list.filter((e) => !!e.paid_at).reduce((s, e) => s + e.amount_cents, 0);
