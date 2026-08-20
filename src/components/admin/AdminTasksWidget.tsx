@@ -106,7 +106,13 @@ export default function AdminTasksWidget() {
       ...appts.filter((a) => !a.done).map((a) => ({ title: a.title, when: new Date(a.scheduled_at), notes: a.notes ?? "" })),
     ];
     if (items.length === 0) return toast.error("Nada para exportar");
-    const body = items.map((i) => buildICS(i.title, i.when, i.notes)).join("\n");
+    const events = items
+      .map((i) => buildICS(i.title, i.when, i.notes)
+        .split("\r\n")
+        .filter((l) => !["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Multplick CRM//PT-BR", "END:VCALENDAR"].includes(l))
+        .join("\r\n"))
+      .join("\r\n");
+    const body = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Multplick//PT-BR", events, "END:VCALENDAR"].join("\r\n");
     downloadICS("agenda-multplick.ics", body);
     toast.success("Arquivo .ics baixado — importe no Google Agenda");
   };

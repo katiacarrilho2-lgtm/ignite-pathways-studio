@@ -7,6 +7,9 @@ import {
   AlertTriangle, Users2, UserCheck, ClipboardList, Building2, RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AdminTasksWidget from "@/components/admin/AdminTasksWidget";
+import FinanceWidget from "@/components/admin/FinanceWidget";
 
 const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -93,6 +96,15 @@ export default function Dashboard() {
           </Link>
         ))}
       </div>
+
+      <Tabs defaultValue="agenda" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="agenda">Agenda e tarefas</TabsTrigger>
+          <TabsTrigger value="contas">Contas a pagar / receber</TabsTrigger>
+        </TabsList>
+        <TabsContent value="agenda"><AdminTasksWidget /></TabsContent>
+        <TabsContent value="contas"><FinanceWidget /></TabsContent>
+      </Tabs>
     </div>
   );
 }
