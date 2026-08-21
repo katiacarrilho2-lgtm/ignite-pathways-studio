@@ -206,13 +206,17 @@ export default function AdminTasksWidget() {
                 <span className="font-medium">{new Date(a.scheduled_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span> · {a.title}
               </div>
             ))}
-            {selDay.tasks.map((t) => (
-              <div key={t.id} className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-1.5 text-sm">
-                <Checkbox checked={t.done} onCheckedChange={() => toggle(t)} />
-                <span className={t.done ? "line-through text-muted-foreground" : ""}>{t.title}</span>
-                {t.due_time && <span className="text-xs text-muted-foreground ml-auto">{t.due_time.slice(0, 5)}</span>}
-              </div>
-            ))}
+            {selDay.tasks.map((t) => {
+              const late = !t.done && t.due_date && t.due_date < todayIso;
+              return (
+                <div key={t.id} className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm
+                  ${t.done ? "border-emerald-500/50 bg-emerald-500/15" : late ? "border-destructive/50 bg-destructive/15" : "border-sky-500/40 bg-sky-500/10"}`}>
+                  <StarBox done={t.done} onToggle={() => toggle(t)} />
+                  <span className={t.done ? "line-through text-muted-foreground" : ""}>{t.title}</span>
+                  {t.due_time && <span className="text-xs text-muted-foreground ml-auto">{t.due_time.slice(0, 5)}</span>}
+                </div>
+              );
+            })}
           </div>
         </div>
 
