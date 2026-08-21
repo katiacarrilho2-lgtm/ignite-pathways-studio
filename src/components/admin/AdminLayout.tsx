@@ -1,7 +1,7 @@
 import { Link, NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth, Permission } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, GraduationCap, Users, Inbox, LogOut, ExternalLink, Image as ImageIcon, UserCheck, Users2, Activity, MessageSquare, LifeBuoy, DollarSign, FileBarChart, Share2, Kanban, Menu, Megaphone, Tag, Sparkles, ClipboardList, FolderTree, Handshake, Briefcase, MessagesSquare, Trophy, Shield, FileCheck2, Link as LinkIcon } from "lucide-react";
+import { LayoutDashboard, GraduationCap, Users, Inbox, LogOut, ExternalLink, Image as ImageIcon, UserCheck, Users2, Activity, MessageSquare, LifeBuoy, DollarSign, FileBarChart, Share2, Kanban, Menu, Megaphone, Tag, Sparkles, ClipboardList, FolderTree, Handshake, Briefcase, MessagesSquare, Trophy, Shield, FileCheck2, Link as LinkIcon, Rocket } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import logo from "@/assets/multplick-logo.png";
 import { AdminBadgesProvider, useAdminBadges, BadgeChannel } from "@/hooks/useAdminBadges";
@@ -23,7 +23,7 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; badge
   { to: "/admin/promo", label: "Carrossel Home", icon: Megaphone, perm: "manage_courses" },
   { to: "/admin/parceiros", label: "Parceiros", icon: Handshake, perm: "manage_courses" },
   { to: "/admin/cupons", label: "Cupons", icon: Tag, perm: "manage_courses" },
-  { to: "/admin/marketing", label: "Marketing IA", icon: Sparkles, perm: "manage_courses" },
+  { to: "/admin/marketing", label: "Central de Marketing", icon: Rocket, perm: "manage_courses" },
   { to: "/admin/alunos", label: "Alunos", icon: UserCheck, perm: "manage_courses" },
   { to: "/admin/pre-matriculas", label: "Pré-matrículas", icon: ClipboardList, perm: "manage_courses" },
   { to: "/admin/turmas", label: "Turmas", icon: Users2, perm: "manage_courses" },

@@ -58,6 +58,10 @@ import AdminAfiliados from "./pages/admin/AdminAfiliados.tsx";
 import AdminPromo from "./pages/admin/AdminPromo.tsx";
 import AdminCupons from "./pages/admin/AdminCupons.tsx";
 import AdminMarketing from "./pages/admin/AdminMarketing.tsx";
+import MarketingLayout from "./pages/admin/marketing/MarketingLayout.tsx";
+import MarketingDashboard from "./pages/admin/marketing/MarketingDashboard.tsx";
+import MarketingCampanhas from "./pages/admin/marketing/MarketingCampanhas.tsx";
+import MarketingTarefas from "./pages/admin/marketing/MarketingTarefas.tsx";
 import AdminPreMatriculas from "./pages/admin/AdminPreMatriculas.tsx";
 import AdminCategorias from "./pages/admin/AdminCategorias.tsx";
 import AdminParceiros from "./pages/admin/AdminParceiros.tsx";
@@ -187,7 +191,12 @@ const App = () => (
               <Route path="meu-afiliado" element={<AlunoAfiliado />} />
               <Route path="promo" element={<AdminPromo />} />
               <Route path="cupons" element={<AdminCupons />} />
-              <Route path="marketing" element={<AdminMarketing />} />
+              <Route path="marketing" element={<MarketingLayout />}>
+                <Route index element={<MarketingDashboard />} />
+                <Route path="campanhas" element={<MarketingCampanhas />} />
+                <Route path="tarefas" element={<MarketingTarefas />} />
+                <Route path="ia" element={<AdminMarketing />} />
+              </Route>
               <Route path="pre-matriculas" element={<AdminPreMatriculas />} />
               <Route path="crm" element={<CrmLayout />}>
                 <Route index element={<CrmKanban />} />

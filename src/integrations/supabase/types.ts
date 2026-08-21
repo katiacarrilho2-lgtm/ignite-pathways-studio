@@ -2302,6 +2302,122 @@ export type Database = {
           },
         ]
       }
+      mkt_campaigns: {
+        Row: {
+          budget_cents: number
+          canal: string
+          created_at: string
+          created_by: string | null
+          fim: string | null
+          gasto_cents: number
+          id: string
+          inicio: string | null
+          leads: number
+          nome: string
+          objetivo: string | null
+          observacoes: string | null
+          receita_cents: number
+          responsavel_id: string | null
+          status: string
+          updated_at: string
+          vendas: number
+        }
+        Insert: {
+          budget_cents?: number
+          canal?: string
+          created_at?: string
+          created_by?: string | null
+          fim?: string | null
+          gasto_cents?: number
+          id?: string
+          inicio?: string | null
+          leads?: number
+          nome: string
+          objetivo?: string | null
+          observacoes?: string | null
+          receita_cents?: number
+          responsavel_id?: string | null
+          status?: string
+          updated_at?: string
+          vendas?: number
+        }
+        Update: {
+          budget_cents?: number
+          canal?: string
+          created_at?: string
+          created_by?: string | null
+          fim?: string | null
+          gasto_cents?: number
+          id?: string
+          inicio?: string | null
+          leads?: number
+          nome?: string
+          objetivo?: string | null
+          observacoes?: string | null
+          receita_cents?: number
+          responsavel_id?: string | null
+          status?: string
+          updated_at?: string
+          vendas?: number
+        }
+        Relationships: []
+      }
+      mkt_tasks: {
+        Row: {
+          campaign_id: string | null
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          done_at: string | null
+          due_date: string | null
+          id: string
+          ordem: number
+          prioridade: string
+          responsavel_id: string | null
+          status: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          ordem?: number
+          prioridade?: string
+          responsavel_id?: string | null
+          status?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          done_at?: string | null
+          due_date?: string | null
+          id?: string
+          ordem?: number
+          prioridade?: string
+          responsavel_id?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_tasks_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           active: boolean
