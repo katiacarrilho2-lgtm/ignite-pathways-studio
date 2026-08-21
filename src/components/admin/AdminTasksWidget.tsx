@@ -230,8 +230,8 @@ export default function AdminTasksWidget() {
               const late = !t.done && t.due_date && t.due_date < todayIso;
               return (
                 <div key={t.id} className={`flex items-start gap-2 rounded-lg border px-2.5 py-1.5 text-sm
-                  ${t.done ? "border-emerald-500/30 bg-emerald-500/10" : late ? "border-destructive/30 bg-destructive/10" : "border-border"}`}>
-                  <Checkbox className="mt-0.5" checked={t.done} onCheckedChange={() => toggle(t)} />
+                  ${t.done ? "border-emerald-500/50 bg-emerald-500/15" : late ? "border-destructive/50 bg-destructive/15" : "border-sky-500/40 bg-sky-500/10"}`}>
+                  <StarBox done={t.done} onToggle={() => toggle(t)} />
                   <div className="min-w-0 flex-1">
                     <p className={`truncate ${t.done ? "line-through text-muted-foreground" : ""}`}>{t.title}</p>
                     {t.due_date && (
