@@ -2302,6 +2302,65 @@ export type Database = {
           },
         ]
       }
+      mkt_assets: {
+        Row: {
+          campaign_id: string | null
+          created_at: string
+          created_by: string | null
+          file_path: string | null
+          id: string
+          mime: string | null
+          nome: string
+          observacoes: string | null
+          pasta: string
+          size_bytes: number | null
+          tags: string[]
+          tipo: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          file_path?: string | null
+          id?: string
+          mime?: string | null
+          nome: string
+          observacoes?: string | null
+          pasta?: string
+          size_bytes?: number | null
+          tags?: string[]
+          tipo?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          file_path?: string | null
+          id?: string
+          mime?: string | null
+          nome?: string
+          observacoes?: string | null
+          pasta?: string
+          size_bytes?: number | null
+          tags?: string[]
+          tipo?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_assets_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mkt_campaigns: {
         Row: {
           budget_cents: number
@@ -2362,6 +2421,72 @@ export type Database = {
         }
         Relationships: []
       }
+      mkt_social_posts: {
+        Row: {
+          asset_id: string | null
+          campaign_id: string | null
+          created_at: string
+          created_by: string | null
+          formato: string
+          id: string
+          legenda: string | null
+          link: string | null
+          rede: string
+          responsavel_id: string | null
+          scheduled_at: string | null
+          status: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          asset_id?: string | null
+          campaign_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          formato?: string
+          id?: string
+          legenda?: string | null
+          link?: string | null
+          rede?: string
+          responsavel_id?: string | null
+          scheduled_at?: string | null
+          status?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          asset_id?: string | null
+          campaign_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          formato?: string
+          id?: string
+          legenda?: string | null
+          link?: string | null
+          rede?: string
+          responsavel_id?: string | null
+          scheduled_at?: string | null
+          status?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_social_posts_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mkt_social_posts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mkt_tasks: {
         Row: {
           campaign_id: string | null
@@ -2417,6 +2542,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mkt_vault: {
+        Row: {
+          categoria: string
+          created_at: string
+          created_by: string | null
+          id: string
+          login: string | null
+          notas: string | null
+          senha: string | null
+          servico: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          categoria?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          login?: string | null
+          notas?: string | null
+          senha?: string | null
+          servico: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          login?: string | null
+          notas?: string | null
+          senha?: string | null
+          servico?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
       }
       partners: {
         Row: {

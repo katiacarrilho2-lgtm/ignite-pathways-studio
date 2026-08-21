@@ -1,12 +1,16 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { LayoutDashboard, Megaphone, Kanban, Sparkles, Rocket } from "lucide-react";
+import { LayoutDashboard, Megaphone, Kanban, Sparkles, Rocket, FolderOpen, CalendarDays, KeyRound } from "lucide-react";
 
 const tabs = [
   { to: "/admin/marketing", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/marketing/campanhas", label: "Campanhas", icon: Megaphone },
+  { to: "/admin/marketing/arquivos", label: "Arquivos", icon: FolderOpen },
+  { to: "/admin/marketing/redes", label: "Redes Sociais", icon: CalendarDays },
   { to: "/admin/marketing/tarefas", label: "Tarefas", icon: Kanban },
+  { to: "/admin/marketing/cofre", label: "Cofre de Acessos", icon: KeyRound },
   { to: "/admin/marketing/ia", label: "Estúdio IA", icon: Sparkles },
 ];
+
 
 export default function MarketingLayout() {
   return (
