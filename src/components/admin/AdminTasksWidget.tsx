@@ -8,7 +8,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { buildICS, downloadICS } from "@/lib/crm";
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Trash2, Download, ListChecks } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Trash2, Download, ListChecks, Star } from "lucide-react";
+
+const StarBox = ({ done, onToggle }: { done: boolean; onToggle: () => void }) => (
+  <button
+    type="button"
+    onClick={onToggle}
+    aria-label={done ? "Marcar como pendente" : "Concluir tarefa"}
+    className={`mt-0.5 size-5 shrink-0 rounded-md border grid place-items-center transition
+      ${done ? "bg-emerald-500 border-emerald-500 text-white" : "border-muted-foreground/40 hover:border-primary"}`}
+  >
+    {done && <Star className="size-3.5 fill-current" />}
+  </button>
+);
 
 type Task = {
   id: string; title: string; notes: string | null; due_date: string | null;
