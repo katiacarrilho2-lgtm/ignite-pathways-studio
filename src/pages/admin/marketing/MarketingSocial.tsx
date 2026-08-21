@@ -97,7 +97,7 @@ export default function MarketingSocial() {
 
   async function salvar() {
     if (!edit?.titulo?.trim()) { toast.error("Informe o título"); return; }
-    const payload: Record<string, unknown> = {
+    const payload = {
       titulo: edit.titulo,
       legenda: edit.legenda ?? null,
       rede: edit.rede ?? "instagram",
@@ -109,7 +109,7 @@ export default function MarketingSocial() {
     };
     const { error } = edit.id
       ? await supabase.from("mkt_social_posts").update(payload).eq("id", edit.id)
-      : await supabase.from("mkt_social_posts").insert(payload as never);
+      : await supabase.from("mkt_social_posts").insert(payload);
     if (error) { toast.error(error.message); return; }
     setEdit(null);
     toast.success("Publicação salva");
