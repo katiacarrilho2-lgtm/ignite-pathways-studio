@@ -61,7 +61,7 @@ export default function MarketingCampanhas() {
     if (!form.nome.trim()) { toast.error("Informe o nome da campanha"); return; }
     setSaving(true);
     const { data: auth } = await supabase.auth.getUser();
-    const payload: Record<string, unknown> = {
+    const payload = {
       nome: form.nome.trim(),
       objetivo: form.objetivo || null,
       canal: form.canal,
@@ -79,8 +79,7 @@ export default function MarketingCampanhas() {
     if (editing) {
       ({ error } = await supabase.from("mkt_campaigns").update(payload).eq("id", editing.id));
     } else {
-      payload.created_by = auth.user?.id ?? null;
-      ({ error } = await supabase.from("mkt_campaigns").insert(payload as never));
+      ({ error } = await supabase.from("mkt_campaigns").insert({ ...payload, created_by: auth.user?.id ?? null }));
     }
     setSaving(false);
     if (error) { toast.error(error.message); return; }
