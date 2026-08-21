@@ -62,6 +62,9 @@ import MarketingLayout from "./pages/admin/marketing/MarketingLayout.tsx";
 import MarketingDashboard from "./pages/admin/marketing/MarketingDashboard.tsx";
 import MarketingCampanhas from "./pages/admin/marketing/MarketingCampanhas.tsx";
 import MarketingTarefas from "./pages/admin/marketing/MarketingTarefas.tsx";
+import MarketingArquivos from "./pages/admin/marketing/MarketingArquivos.tsx";
+import MarketingSocial from "./pages/admin/marketing/MarketingSocial.tsx";
+import MarketingCofre from "./pages/admin/marketing/MarketingCofre.tsx";
 import AdminPreMatriculas from "./pages/admin/AdminPreMatriculas.tsx";
 import AdminCategorias from "./pages/admin/AdminCategorias.tsx";
 import AdminParceiros from "./pages/admin/AdminParceiros.tsx";
@@ -195,6 +198,9 @@ const App = () => (
                 <Route index element={<MarketingDashboard />} />
                 <Route path="campanhas" element={<MarketingCampanhas />} />
                 <Route path="tarefas" element={<MarketingTarefas />} />
+                <Route path="arquivos" element={<MarketingArquivos />} />
+                <Route path="redes" element={<MarketingSocial />} />
+                <Route path="cofre" element={<MarketingCofre />} />
                 <Route path="ia" element={<AdminMarketing />} />
               </Route>
               <Route path="pre-matriculas" element={<AdminPreMatriculas />} />
