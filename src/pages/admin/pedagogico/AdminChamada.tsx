@@ -163,5 +163,5 @@ const Inner = () => {
 };
 
 export default function AdminChamada() {
-  return <RequirePermission perm="mod_chamada"><Inner /></RequirePermission>;
+  return <RequirePermission perm="mod_frequencia"><Inner /></RequirePermission>;
 }
