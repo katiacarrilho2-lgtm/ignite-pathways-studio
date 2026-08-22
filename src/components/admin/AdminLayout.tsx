@@ -83,6 +83,7 @@ const AdminLayoutInner = () => {
           // Itens restritos ao master (não aparecem nem para quem tem permissões amplas)
           const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios"];
           if (masterOnly.includes(i.to) && !isMaster) return false;
+          if (i.mod && hasPermission(i.mod)) return true;
           return !i.perm || hasPermission(i.perm);
         }).map(i => {
           const count = i.badge ? counts[i.badge] : 0;
