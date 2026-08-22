@@ -3168,6 +3168,34 @@ export type Database = {
         | "issue_boletos"
         | "settle_boletos"
         | "manage_certification"
+        | "mod_dashboard"
+        | "mod_certificacao"
+        | "mod_documentos_links"
+        | "mod_crm"
+        | "mod_connect"
+        | "mod_cursos"
+        | "mod_cursos_ia"
+        | "mod_corporativo"
+        | "mod_categorias"
+        | "mod_andamento"
+        | "mod_imagens"
+        | "mod_promo"
+        | "mod_parceiros"
+        | "mod_cupons"
+        | "mod_marketing"
+        | "mod_alunos"
+        | "mod_pre_matriculas"
+        | "mod_turmas"
+        | "mod_usuarios"
+        | "mod_cargos"
+        | "mod_leads"
+        | "mod_mensagens"
+        | "mod_suporte"
+        | "mod_financeiro"
+        | "mod_relatorios"
+        | "mod_afiliados"
+        | "mod_meu_afiliado"
+        | "mod_treinamentos"
       app_role: "super_admin" | "admin" | "editor" | "viewer" | "certificadora"
       crm_event_type:
         | "anotacao"
@@ -3322,6 +3350,34 @@ export const Constants = {
         "issue_boletos",
         "settle_boletos",
         "manage_certification",
+        "mod_dashboard",
+        "mod_certificacao",
+        "mod_documentos_links",
+        "mod_crm",
+        "mod_connect",
+        "mod_cursos",
+        "mod_cursos_ia",
+        "mod_corporativo",
+        "mod_categorias",
+        "mod_andamento",
+        "mod_imagens",
+        "mod_promo",
+        "mod_parceiros",
+        "mod_cupons",
+        "mod_marketing",
+        "mod_alunos",
+        "mod_pre_matriculas",
+        "mod_turmas",
+        "mod_usuarios",
+        "mod_cargos",
+        "mod_leads",
+        "mod_mensagens",
+        "mod_suporte",
+        "mod_financeiro",
+        "mod_relatorios",
+        "mod_afiliados",
+        "mod_meu_afiliado",
+        "mod_treinamentos",
       ],
       app_role: ["super_admin", "admin", "editor", "viewer", "certificadora"],
       crm_event_type: [
