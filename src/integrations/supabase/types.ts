@@ -157,6 +157,133 @@ export type Database = {
         }
         Relationships: []
       }
+      agenda_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          descricao: string | null
+          fim: string | null
+          id: string
+          inicio: string
+          local: string | null
+          responsavel_id: string | null
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          fim?: string | null
+          id?: string
+          inicio: string
+          local?: string | null
+          responsavel_id?: string | null
+          tipo?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          fim?: string | null
+          id?: string
+          inicio?: string
+          local?: string | null
+          responsavel_id?: string | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_events_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance: {
+        Row: {
+          created_at: string
+          id: string
+          observacao: string | null
+          presente: boolean
+          registrado_por: string | null
+          session_id: string
+          student_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          presente?: boolean
+          registrado_por?: string | null
+          session_id: string
+          student_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          presente?: boolean
+          registrado_por?: string | null
+          session_id?: string
+          student_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "class_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          acao: string
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          modulo: string
+          registro_id: string | null
+        }
+        Insert: {
+          acao: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          modulo: string
+          registro_id?: string | null
+        }
+        Update: {
+          acao?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          modulo?: string
+          registro_id?: string | null
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           carga_horaria: string | null
@@ -206,6 +333,93 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      class_sessions: {
+        Row: {
+          classroom_id: string | null
+          created_at: string
+          created_by: string | null
+          data: string
+          id: string
+          observacoes: string | null
+          professor_id: string | null
+          titulo: string | null
+          turma_id: string
+        }
+        Insert: {
+          classroom_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data: string
+          id?: string
+          observacoes?: string | null
+          professor_id?: string | null
+          titulo?: string | null
+          turma_id: string
+        }
+        Update: {
+          classroom_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          id?: string
+          observacoes?: string | null
+          professor_id?: string | null
+          titulo?: string | null
+          turma_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_sessions_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_sessions_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "turmas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classrooms: {
+        Row: {
+          capacidade: number
+          created_at: string
+          id: string
+          localizacao: string | null
+          nome: string
+          observacoes: string | null
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          capacidade?: number
+          created_at?: string
+          id?: string
+          localizacao?: string | null
+          nome: string
+          observacoes?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          capacidade?: number
+          created_at?: string
+          id?: string
+          localizacao?: string | null
+          nome?: string
+          observacoes?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       company_settings: {
         Row: {
@@ -2045,6 +2259,59 @@ export type Database = {
           },
         ]
       }
+      internal_documents: {
+        Row: {
+          categoria: string
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          descricao: string | null
+          file_path: string
+          id: string
+          mime: string | null
+          nome: string
+          restrito: boolean
+          size_bytes: number | null
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          file_path: string
+          id?: string
+          mime?: string | null
+          nome: string
+          restrito?: boolean
+          size_bytes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          file_path?: string
+          id?: string
+          mime?: string | null
+          nome?: string
+          restrito?: boolean
+          size_bytes?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_documents_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       internal_messages: {
         Row: {
           attachment_path: string | null
@@ -2118,6 +2385,209 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "internal_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_request_events: {
+        Row: {
+          autor_id: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          request_id: string
+          tipo: string
+        }
+        Insert: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          request_id: string
+          tipo?: string
+        }
+        Update: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          request_id?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_request_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "internal_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_requests: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          from_department_id: string | null
+          id: string
+          numero: number
+          prazo: string | null
+          prioridade: string
+          responsavel_id: string | null
+          solicitante_id: string | null
+          status: string
+          titulo: string
+          to_department_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          from_department_id?: string | null
+          id?: string
+          numero?: number
+          prazo?: string | null
+          prioridade?: string
+          responsavel_id?: string | null
+          solicitante_id?: string | null
+          status?: string
+          titulo: string
+          to_department_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          from_department_id?: string | null
+          id?: string
+          numero?: number
+          prazo?: string | null
+          prioridade?: string
+          responsavel_id?: string | null
+          solicitante_id?: string | null
+          status?: string
+          titulo?: string
+          to_department_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_requests_from_department_id_fkey"
+            columns: ["from_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_requests_to_department_id_fkey"
+            columns: ["to_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_items: {
+        Row: {
+          ativo: boolean
+          categoria: string | null
+          created_at: string
+          estoque_minimo: number
+          fornecedor: string | null
+          id: string
+          localizacao: string | null
+          nome: string
+          observacoes: string | null
+          quantidade: number
+          unidade: string
+          updated_at: string
+          valor_unit_cents: number
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          estoque_minimo?: number
+          fornecedor?: string | null
+          id?: string
+          localizacao?: string | null
+          nome: string
+          observacoes?: string | null
+          quantidade?: number
+          unidade?: string
+          updated_at?: string
+          valor_unit_cents?: number
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          estoque_minimo?: number
+          fornecedor?: string | null
+          id?: string
+          localizacao?: string | null
+          nome?: string
+          observacoes?: string | null
+          quantidade?: number
+          unidade?: string
+          updated_at?: string
+          valor_unit_cents?: number
+        }
+        Relationships: []
+      }
+      inventory_movements: {
+        Row: {
+          created_at: string
+          data: string
+          documento: string | null
+          fornecedor: string | null
+          id: string
+          item_id: string
+          motivo: string | null
+          quantidade: number
+          responsavel_id: string | null
+          setor_id: string | null
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          documento?: string | null
+          fornecedor?: string | null
+          id?: string
+          item_id: string
+          motivo?: string | null
+          quantidade: number
+          responsavel_id?: string | null
+          setor_id?: string | null
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          documento?: string | null
+          fornecedor?: string | null
+          id?: string
+          item_id?: string
+          motivo?: string | null
+          quantidade?: number
+          responsavel_id?: string | null
+          setor_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_movements_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
             referencedColumns: ["id"]
           },
         ]
@@ -2390,6 +2860,75 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "course_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_requests: {
+        Row: {
+          classroom_id: string | null
+          created_at: string
+          created_by: string | null
+          custo_cents: number
+          data: string
+          id: string
+          local: string | null
+          patrimonio_id: string | null
+          prioridade: string
+          problema: string
+          responsavel_id: string | null
+          solucao: string | null
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          classroom_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          custo_cents?: number
+          data?: string
+          id?: string
+          local?: string | null
+          patrimonio_id?: string | null
+          prioridade?: string
+          problema: string
+          responsavel_id?: string | null
+          solucao?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          classroom_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          custo_cents?: number
+          data?: string
+          id?: string
+          local?: string | null
+          patrimonio_id?: string | null
+          prioridade?: string
+          problema?: string
+          responsavel_id?: string | null
+          solucao?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_requests_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_patrimonio_id_fkey"
+            columns: ["patrimonio_id"]
+            isOneToOne: false
+            referencedRelation: "patrimonio"
             referencedColumns: ["id"]
           },
         ]
@@ -2879,6 +3418,118 @@ export type Database = {
         }
         Relationships: []
       }
+      patrimonio: {
+        Row: {
+          categoria: string | null
+          classroom_id: string | null
+          codigo: string | null
+          created_at: string
+          data_aquisicao: string | null
+          estado: string
+          id: string
+          localizacao: string | null
+          nome: string
+          numero_patrimonio: string | null
+          observacoes: string | null
+          responsavel_id: string | null
+          status: string
+          updated_at: string
+          valor_cents: number
+        }
+        Insert: {
+          categoria?: string | null
+          classroom_id?: string | null
+          codigo?: string | null
+          created_at?: string
+          data_aquisicao?: string | null
+          estado?: string
+          id?: string
+          localizacao?: string | null
+          nome: string
+          numero_patrimonio?: string | null
+          observacoes?: string | null
+          responsavel_id?: string | null
+          status?: string
+          updated_at?: string
+          valor_cents?: number
+        }
+        Update: {
+          categoria?: string | null
+          classroom_id?: string | null
+          codigo?: string | null
+          created_at?: string
+          data_aquisicao?: string | null
+          estado?: string
+          id?: string
+          localizacao?: string | null
+          nome?: string
+          numero_patrimonio?: string | null
+          observacoes?: string | null
+          responsavel_id?: string | null
+          status?: string
+          updated_at?: string
+          valor_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patrimonio_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pedagogic_occurrences: {
+        Row: {
+          autor_id: string | null
+          created_at: string
+          descricao: string | null
+          gravidade: string
+          id: string
+          status: string
+          student_user_id: string | null
+          tipo: string
+          titulo: string
+          turma_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          gravidade?: string
+          id?: string
+          status?: string
+          student_user_id?: string | null
+          tipo?: string
+          titulo: string
+          turma_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          gravidade?: string
+          id?: string
+          status?: string
+          student_user_id?: string | null
+          tipo?: string
+          titulo?: string
+          turma_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedagogic_occurrences_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "turmas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       platform_reviews: {
         Row: {
           allow_public: boolean
@@ -3014,6 +3665,70 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      room_reservations: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          department_id: string | null
+          fim: string
+          finalidade: string
+          id: string
+          inicio: string
+          observacoes: string | null
+          responsavel_id: string | null
+          titulo: string
+          turma_id: string | null
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          department_id?: string | null
+          fim: string
+          finalidade?: string
+          id?: string
+          inicio: string
+          observacoes?: string | null
+          responsavel_id?: string | null
+          titulo: string
+          turma_id?: string | null
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          department_id?: string | null
+          fim?: string
+          finalidade?: string
+          id?: string
+          inicio?: string
+          observacoes?: string | null
+          responsavel_id?: string | null
+          titulo?: string
+          turma_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_reservations_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_reservations_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_reservations_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "turmas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_documents: {
         Row: {
