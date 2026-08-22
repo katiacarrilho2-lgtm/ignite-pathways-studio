@@ -83,14 +83,42 @@ export const PERMISSION_GROUPS: PermGroup[] = [
     ],
   },
   {
+    group: "Rede interna",
+    items: [
+      { id: "mod_rede_interna", label: "Rede Interna (chat da equipe)" },
+      { id: "mod_agenda", label: "Agenda Geral" },
+      { id: "mod_solicitacoes", label: "Solicitações internas" },
+      { id: "mod_documentos_internos", label: "Documentos internos" },
+      { id: "mod_departamentos", label: "Departamentos" },
+    ],
+  },
+  {
+    group: "Escola física e patrimônio",
+    items: [
+      { id: "mod_escola_fisica", label: "Escola Física (salas e reservas)" },
+      { id: "mod_patrimonio", label: "Patrimônio" },
+      { id: "mod_manutencao", label: "Manutenção" },
+      { id: "mod_almoxarifado", label: "Almoxarifado / estoque" },
+    ],
+  },
+  {
+    group: "Pedagógico",
+    items: [
+      { id: "mod_pedagogia", label: "Pedagogia (ocorrências)" },
+      { id: "mod_frequencia", label: "Lista de chamada presencial" },
+    ],
+  },
+  {
     group: "Administração",
     items: [
       { id: "mod_usuarios", label: "Usuários" },
       { id: "mod_cargos", label: "Cargos e permissões" },
+      { id: "mod_auditoria", label: "Auditoria do sistema" },
       { id: "manage_users", label: "Ação: gerenciar usuários e cargos" },
     ],
   },
 ];
+
 
 export const ALL_PERMISSIONS = PERMISSION_GROUPS.flatMap(g => g.items);
 

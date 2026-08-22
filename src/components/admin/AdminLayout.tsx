@@ -1,15 +1,21 @@
 import { Link, NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth, Permission } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, GraduationCap, Users, Inbox, LogOut, ExternalLink, Image as ImageIcon, UserCheck, Users2, Activity, MessageSquare, LifeBuoy, DollarSign, FileBarChart, Share2, Kanban, Menu, Megaphone, Tag, Sparkles, ClipboardList, FolderTree, Handshake, Briefcase, MessagesSquare, Trophy, Shield, FileCheck2, Link as LinkIcon, Rocket } from "lucide-react";
+import { LayoutDashboard, GraduationCap, Users, Inbox, LogOut, ExternalLink, Image as ImageIcon, UserCheck, Users2, Activity, MessageSquare, LifeBuoy, DollarSign, FileBarChart, Share2, Kanban, Menu, Megaphone, Tag, Sparkles, ClipboardList, FolderTree, Handshake, Briefcase, MessagesSquare, Trophy, Shield, FileCheck2, Link as LinkIcon, Rocket, Network, Inbox as InboxIcon, Boxes, Building2, CalendarCheck, AlertTriangle, CalendarDays, FolderLock, ShieldCheck } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import logo from "@/assets/multplick-logo.png";
 import { AdminBadgesProvider, useAdminBadges, BadgeChannel } from "@/hooks/useAdminBadges";
+import { NotificationsProvider } from "@/hooks/useNotifications";
+import { NotificationBell } from "@/components/admin/NotificationBell";
 import { useEffect, useState } from "react";
 import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
 
+
 const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?: Permission; badge?: BadgeChannel }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/rede-interna", label: "Rede Interna", icon: Network, mod: "mod_rede_interna" },
+  { to: "/admin/agenda", label: "Agenda Geral", icon: CalendarDays, mod: "mod_agenda" },
+
   { to: "/admin/certificacao", label: "Certificação e Documentação para Conselhos", icon: FileCheck2, perm: "manage_certification", mod: "mod_certificacao" },
   { to: "/admin/documentos-links", label: "Links de Documentos", icon: LinkIcon, perm: "manage_courses", mod: "mod_documentos_links" },
   { to: "/admin/crm", label: "CRM", icon: Kanban, perm: "manage_leads", mod: "mod_crm" },
@@ -37,6 +43,14 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/afiliados", label: "Afiliados", icon: Share2, perm: "manage_affiliates", mod: "mod_afiliados" },
   { to: "/admin/meu-afiliado", label: "Meu Afiliado", icon: Share2 },
   { to: "/admin/treinamentos", label: "Treinamentos", icon: Trophy, perm: "manage_users", mod: "mod_treinamentos" },
+  { to: "/admin/chamada", label: "Lista de Chamada", icon: CalendarCheck, mod: "mod_frequencia" },
+  { to: "/admin/pedagogico/ocorrencias", label: "Pedagogia", icon: AlertTriangle, mod: "mod_pedagogia" },
+  { to: "/admin/escola-fisica", label: "Escola Física", icon: Building2, mod: "mod_escola_fisica" },
+  { to: "/admin/almoxarifado", label: "Almoxarifado", icon: Boxes, mod: "mod_almoxarifado" },
+  { to: "/admin/solicitacoes", label: "Solicitações Internas", icon: InboxIcon, mod: "mod_solicitacoes" },
+  { to: "/admin/documentos-internos", label: "Documentos Internos", icon: FolderLock, mod: "mod_documentos_internos" },
+  { to: "/admin/auditoria", label: "Auditoria", icon: ShieldCheck, mod: "mod_auditoria" },
+
 ];
 
 const AdminLayoutInner = () => {
@@ -81,11 +95,14 @@ const AdminLayoutInner = () => {
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {navItems.filter(i => {
           // Itens restritos ao master (não aparecem nem para quem tem permissões amplas)
-          const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios"];
+          const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios", "/admin/auditoria"];
           if (masterOnly.includes(i.to) && !isMaster) return false;
           if (i.mod && hasPermission(i.mod)) return true;
+          // Item exclusivo de módulo (sem permissão legada) exige o mod_ correspondente
+          if (i.mod && !i.perm) return false;
           return !i.perm || hasPermission(i.perm);
         }).map(i => {
+
           const count = i.badge ? counts[i.badge] : 0;
           return (
             <NavLink key={i.to} to={i.to} end={i.to === "/admin"}
@@ -122,10 +139,14 @@ const AdminLayoutInner = () => {
           <SheetContent side="left" className="p-0 w-72 flex flex-col">{SidebarBody}</SheetContent>
         </Sheet>
         <img src={logo} alt="Multplick" className="h-8 w-auto" />
-        <div className="w-9" />
+        <NotificationBell />
       </header>
       <main className="flex-1 min-w-0 overflow-x-hidden">
+        <div className="hidden md:flex sticky top-0 z-30 h-12 items-center justify-end px-4 bg-background/80 backdrop-blur border-b border-border">
+          <NotificationBell />
+        </div>
         <Outlet />
+
       </main>
       <CrmUrgentAlerts />
     </div>
@@ -133,8 +154,9 @@ const AdminLayoutInner = () => {
 };
 
 export const AdminLayout = () => (
-  <AdminBadgesProvider><AdminLayoutInner /></AdminBadgesProvider>
+  <NotificationsProvider><AdminBadgesProvider><AdminLayoutInner /></AdminBadgesProvider></NotificationsProvider>
 );
+
 
 export const RequirePermission = ({ perm, children }: { perm: Permission; children: React.ReactNode }) => {
   const { hasPermission } = useAuth();
