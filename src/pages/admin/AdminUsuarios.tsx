@@ -16,18 +16,7 @@ type RoleRow = { user_id: string; role: string };
 type PermRow = { user_id: string; permission: string };
 type RoleDef = { key: string; label: string; description: string | null; base_role: string; permissions: string[]; is_system: boolean; sort_order: number };
 
-const ALL_PERMS: { id: string; label: string }[] = [
-  { id: "manage_courses", label: "Gerenciar cursos" },
-  { id: "manage_users", label: "Gerenciar usuários e cargos" },
-  { id: "manage_leads", label: "Gerenciar leads / CRM" },
-  { id: "manage_content", label: "Editar conteúdo do site" },
-  { id: "manage_affiliates", label: "Gerenciar afiliados" },
-  { id: "manage_certification", label: "Certificação / documentos p/ conselhos" },
-  { id: "view_analytics", label: "Ver relatórios e analytics" },
-  { id: "view_commission", label: "Ver comissões" },
-  { id: "issue_boletos", label: "Emitir boletos" },
-  { id: "settle_boletos", label: "Baixar boletos (marcar como pago)" },
-];
+const ALL_PERMS = ALL_PERMISSIONS;
 
 const Inner = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
