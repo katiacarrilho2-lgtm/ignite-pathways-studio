@@ -157,6 +157,133 @@ export type Database = {
         }
         Relationships: []
       }
+      agenda_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          descricao: string | null
+          fim: string | null
+          id: string
+          inicio: string
+          local: string | null
+          responsavel_id: string | null
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          fim?: string | null
+          id?: string
+          inicio: string
+          local?: string | null
+          responsavel_id?: string | null
+          tipo?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          fim?: string | null
+          id?: string
+          inicio?: string
+          local?: string | null
+          responsavel_id?: string | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_events_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      attendance: {
+        Row: {
+          created_at: string
+          id: string
+          observacao: string | null
+          presente: boolean
+          registrado_por: string | null
+          session_id: string
+          student_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          presente?: boolean
+          registrado_por?: string | null
+          session_id: string
+          student_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          presente?: boolean
+          registrado_por?: string | null
+          session_id?: string
+          student_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "class_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_logs: {
+        Row: {
+          acao: string
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          modulo: string
+          registro_id: string | null
+        }
+        Insert: {
+          acao: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          modulo: string
+          registro_id?: string | null
+        }
+        Update: {
+          acao?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          modulo?: string
+          registro_id?: string | null
+        }
+        Relationships: []
+      }
       certificates: {
         Row: {
           carga_horaria: string | null
@@ -206,6 +333,93 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      class_sessions: {
+        Row: {
+          classroom_id: string | null
+          created_at: string
+          created_by: string | null
+          data: string
+          id: string
+          observacoes: string | null
+          professor_id: string | null
+          titulo: string | null
+          turma_id: string
+        }
+        Insert: {
+          classroom_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data: string
+          id?: string
+          observacoes?: string | null
+          professor_id?: string | null
+          titulo?: string | null
+          turma_id: string
+        }
+        Update: {
+          classroom_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          data?: string
+          id?: string
+          observacoes?: string | null
+          professor_id?: string | null
+          titulo?: string | null
+          turma_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_sessions_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_sessions_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "turmas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classrooms: {
+        Row: {
+          capacidade: number
+          created_at: string
+          id: string
+          localizacao: string | null
+          nome: string
+          observacoes: string | null
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          capacidade?: number
+          created_at?: string
+          id?: string
+          localizacao?: string | null
+          nome: string
+          observacoes?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          capacidade?: number
+          created_at?: string
+          id?: string
+          localizacao?: string | null
+          nome?: string
+          observacoes?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       company_settings: {
         Row: {
@@ -1475,6 +1689,42 @@ export type Database = {
         }
         Relationships: []
       }
+      departments: {
+        Row: {
+          ativo: boolean
+          cor: string
+          created_at: string
+          icone: string | null
+          id: string
+          nome: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cor?: string
+          created_at?: string
+          icone?: string | null
+          id?: string
+          nome: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cor?: string
+          created_at?: string
+          icone?: string | null
+          id?: string
+          nome?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       doc_links: {
         Row: {
           active: boolean
@@ -1959,6 +2209,389 @@ export type Database = {
           },
         ]
       }
+      internal_conversations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          id: string
+          last_message_at: string
+          last_message_preview: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          tipo: string
+          titulo: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          tipo?: string
+          titulo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          tipo?: string
+          titulo?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_conversations_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_documents: {
+        Row: {
+          categoria: string
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          descricao: string | null
+          file_path: string
+          id: string
+          mime: string | null
+          nome: string
+          restrito: boolean
+          size_bytes: number | null
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          file_path: string
+          id?: string
+          mime?: string | null
+          nome: string
+          restrito?: boolean
+          size_bytes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          descricao?: string | null
+          file_path?: string
+          id?: string
+          mime?: string | null
+          nome?: string
+          restrito?: boolean
+          size_bytes?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_documents_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_messages: {
+        Row: {
+          attachment_path: string | null
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          reply_to: string | null
+          sender_id: string
+        }
+        Insert: {
+          attachment_path?: string | null
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          reply_to?: string | null
+          sender_id: string
+        }
+        Update: {
+          attachment_path?: string | null
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          reply_to?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "internal_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_messages_reply_to_fkey"
+            columns: ["reply_to"]
+            isOneToOne: false
+            referencedRelation: "internal_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_participants: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          last_read_at: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          last_read_at?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          last_read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "internal_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_request_events: {
+        Row: {
+          autor_id: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          request_id: string
+          tipo: string
+        }
+        Insert: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          request_id: string
+          tipo?: string
+        }
+        Update: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          request_id?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_request_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "internal_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_requests: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          from_department_id: string | null
+          id: string
+          numero: number
+          prazo: string | null
+          prioridade: string
+          responsavel_id: string | null
+          solicitante_id: string | null
+          status: string
+          titulo: string
+          to_department_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          from_department_id?: string | null
+          id?: string
+          numero?: number
+          prazo?: string | null
+          prioridade?: string
+          responsavel_id?: string | null
+          solicitante_id?: string | null
+          status?: string
+          titulo: string
+          to_department_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          from_department_id?: string | null
+          id?: string
+          numero?: number
+          prazo?: string | null
+          prioridade?: string
+          responsavel_id?: string | null
+          solicitante_id?: string | null
+          status?: string
+          titulo?: string
+          to_department_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_requests_from_department_id_fkey"
+            columns: ["from_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_requests_to_department_id_fkey"
+            columns: ["to_department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_items: {
+        Row: {
+          ativo: boolean
+          categoria: string | null
+          created_at: string
+          estoque_minimo: number
+          fornecedor: string | null
+          id: string
+          localizacao: string | null
+          nome: string
+          observacoes: string | null
+          quantidade: number
+          unidade: string
+          updated_at: string
+          valor_unit_cents: number
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          estoque_minimo?: number
+          fornecedor?: string | null
+          id?: string
+          localizacao?: string | null
+          nome: string
+          observacoes?: string | null
+          quantidade?: number
+          unidade?: string
+          updated_at?: string
+          valor_unit_cents?: number
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          estoque_minimo?: number
+          fornecedor?: string | null
+          id?: string
+          localizacao?: string | null
+          nome?: string
+          observacoes?: string | null
+          quantidade?: number
+          unidade?: string
+          updated_at?: string
+          valor_unit_cents?: number
+        }
+        Relationships: []
+      }
+      inventory_movements: {
+        Row: {
+          created_at: string
+          data: string
+          documento: string | null
+          fornecedor: string | null
+          id: string
+          item_id: string
+          motivo: string | null
+          quantidade: number
+          responsavel_id: string | null
+          setor_id: string | null
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          documento?: string | null
+          fornecedor?: string | null
+          id?: string
+          item_id: string
+          motivo?: string | null
+          quantidade: number
+          responsavel_id?: string | null
+          setor_id?: string | null
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          documento?: string | null
+          fornecedor?: string | null
+          id?: string
+          item_id?: string
+          motivo?: string | null
+          quantidade?: number
+          responsavel_id?: string | null
+          setor_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_movements_setor_id_fkey"
+            columns: ["setor_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitations: {
         Row: {
           accepted_at: string | null
@@ -2227,6 +2860,75 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "course_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maintenance_requests: {
+        Row: {
+          classroom_id: string | null
+          created_at: string
+          created_by: string | null
+          custo_cents: number
+          data: string
+          id: string
+          local: string | null
+          patrimonio_id: string | null
+          prioridade: string
+          problema: string
+          responsavel_id: string | null
+          solucao: string | null
+          status: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          classroom_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          custo_cents?: number
+          data?: string
+          id?: string
+          local?: string | null
+          patrimonio_id?: string | null
+          prioridade?: string
+          problema: string
+          responsavel_id?: string | null
+          solucao?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          classroom_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          custo_cents?: number
+          data?: string
+          id?: string
+          local?: string | null
+          patrimonio_id?: string | null
+          prioridade?: string
+          problema?: string
+          responsavel_id?: string | null
+          solucao?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_requests_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maintenance_requests_patrimonio_id_fkey"
+            columns: ["patrimonio_id"]
+            isOneToOne: false
+            referencedRelation: "patrimonio"
             referencedColumns: ["id"]
           },
         ]
@@ -2639,6 +3341,50 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          corpo: string | null
+          created_at: string
+          department_id: string | null
+          id: string
+          link: string | null
+          read_at: string | null
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          corpo?: string | null
+          created_at?: string
+          department_id?: string | null
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          tipo?: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          corpo?: string | null
+          created_at?: string
+          department_id?: string | null
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          tipo?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           active: boolean
@@ -2671,6 +3417,118 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      patrimonio: {
+        Row: {
+          categoria: string | null
+          classroom_id: string | null
+          codigo: string | null
+          created_at: string
+          data_aquisicao: string | null
+          estado: string
+          id: string
+          localizacao: string | null
+          nome: string
+          numero_patrimonio: string | null
+          observacoes: string | null
+          responsavel_id: string | null
+          status: string
+          updated_at: string
+          valor_cents: number
+        }
+        Insert: {
+          categoria?: string | null
+          classroom_id?: string | null
+          codigo?: string | null
+          created_at?: string
+          data_aquisicao?: string | null
+          estado?: string
+          id?: string
+          localizacao?: string | null
+          nome: string
+          numero_patrimonio?: string | null
+          observacoes?: string | null
+          responsavel_id?: string | null
+          status?: string
+          updated_at?: string
+          valor_cents?: number
+        }
+        Update: {
+          categoria?: string | null
+          classroom_id?: string | null
+          codigo?: string | null
+          created_at?: string
+          data_aquisicao?: string | null
+          estado?: string
+          id?: string
+          localizacao?: string | null
+          nome?: string
+          numero_patrimonio?: string | null
+          observacoes?: string | null
+          responsavel_id?: string | null
+          status?: string
+          updated_at?: string
+          valor_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patrimonio_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pedagogic_occurrences: {
+        Row: {
+          autor_id: string | null
+          created_at: string
+          descricao: string | null
+          gravidade: string
+          id: string
+          status: string
+          student_user_id: string | null
+          tipo: string
+          titulo: string
+          turma_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          gravidade?: string
+          id?: string
+          status?: string
+          student_user_id?: string | null
+          tipo?: string
+          titulo: string
+          turma_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          autor_id?: string | null
+          created_at?: string
+          descricao?: string | null
+          gravidade?: string
+          id?: string
+          status?: string
+          student_user_id?: string | null
+          tipo?: string
+          titulo?: string
+          turma_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pedagogic_occurrences_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "turmas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       platform_reviews: {
         Row: {
@@ -2724,8 +3582,11 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ativo: boolean
           avatar_url: string | null
+          cargo: string | null
           created_at: string
+          department_id: string | null
           display_name: string | null
           email: string | null
           id: string
@@ -2734,8 +3595,11 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          ativo?: boolean
           avatar_url?: string | null
+          cargo?: string | null
           created_at?: string
+          department_id?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
@@ -2744,8 +3608,11 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          ativo?: boolean
           avatar_url?: string | null
+          cargo?: string | null
           created_at?: string
+          department_id?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
@@ -2753,7 +3620,15 @@ export type Database = {
           user_id?: string
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       role_definitions: {
         Row: {
@@ -2790,6 +3665,70 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      room_reservations: {
+        Row: {
+          classroom_id: string
+          created_at: string
+          department_id: string | null
+          fim: string
+          finalidade: string
+          id: string
+          inicio: string
+          observacoes: string | null
+          responsavel_id: string | null
+          titulo: string
+          turma_id: string | null
+        }
+        Insert: {
+          classroom_id: string
+          created_at?: string
+          department_id?: string | null
+          fim: string
+          finalidade?: string
+          id?: string
+          inicio: string
+          observacoes?: string | null
+          responsavel_id?: string | null
+          titulo: string
+          turma_id?: string | null
+        }
+        Update: {
+          classroom_id?: string
+          created_at?: string
+          department_id?: string | null
+          fim?: string
+          finalidade?: string
+          id?: string
+          inicio?: string
+          observacoes?: string | null
+          responsavel_id?: string | null
+          titulo?: string
+          turma_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_reservations_classroom_id_fkey"
+            columns: ["classroom_id"]
+            isOneToOne: false
+            referencedRelation: "classrooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_reservations_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_reservations_turma_id_fkey"
+            columns: ["turma_id"]
+            isOneToOne: false
+            referencedRelation: "turmas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_documents: {
         Row: {
@@ -3197,6 +4136,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_conv_participant: {
+        Args: { _conv: string; _uid: string }
+        Returns: boolean
+      }
       is_master: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       lead_bank_get_crm_statuses: {
@@ -3253,6 +4196,18 @@ export type Database = {
         | "mod_afiliados"
         | "mod_meu_afiliado"
         | "mod_treinamentos"
+        | "mod_rede_interna"
+        | "mod_solicitacoes"
+        | "mod_almoxarifado"
+        | "mod_escola_fisica"
+        | "mod_patrimonio"
+        | "mod_manutencao"
+        | "mod_pedagogia"
+        | "mod_frequencia"
+        | "mod_agenda"
+        | "mod_documentos_internos"
+        | "mod_auditoria"
+        | "mod_departamentos"
       app_role: "super_admin" | "admin" | "editor" | "viewer" | "certificadora"
       crm_event_type:
         | "anotacao"
@@ -3435,6 +4390,18 @@ export const Constants = {
         "mod_afiliados",
         "mod_meu_afiliado",
         "mod_treinamentos",
+        "mod_rede_interna",
+        "mod_solicitacoes",
+        "mod_almoxarifado",
+        "mod_escola_fisica",
+        "mod_patrimonio",
+        "mod_manutencao",
+        "mod_pedagogia",
+        "mod_frequencia",
+        "mod_agenda",
+        "mod_documentos_internos",
+        "mod_auditoria",
+        "mod_departamentos",
       ],
       app_role: ["super_admin", "admin", "editor", "viewer", "certificadora"],
       crm_event_type: [

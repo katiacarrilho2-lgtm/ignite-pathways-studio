@@ -1,0 +1,12 @@
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_rede_interna';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_solicitacoes';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_almoxarifado';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_escola_fisica';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_patrimonio';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_manutencao';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_pedagogia';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_frequencia';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_agenda';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_documentos_internos';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_auditoria';
+ALTER TYPE public.app_permission ADD VALUE IF NOT EXISTS 'mod_departamentos';

@@ -9,7 +9,10 @@ export type ModulePermission =
   | "mod_imagens" | "mod_promo" | "mod_parceiros" | "mod_cupons" | "mod_marketing"
   | "mod_alunos" | "mod_pre_matriculas" | "mod_turmas" | "mod_usuarios" | "mod_cargos"
   | "mod_leads" | "mod_mensagens" | "mod_suporte" | "mod_financeiro" | "mod_relatorios"
-  | "mod_afiliados" | "mod_meu_afiliado" | "mod_treinamentos";
+  | "mod_afiliados" | "mod_meu_afiliado" | "mod_treinamentos"
+  | "mod_rede_interna" | "mod_solicitacoes" | "mod_almoxarifado" | "mod_escola_fisica"
+  | "mod_patrimonio" | "mod_manutencao" | "mod_pedagogia" | "mod_frequencia"
+  | "mod_agenda" | "mod_documentos_internos" | "mod_auditoria" | "mod_departamentos";
 export type Permission = LegacyPermission | ModulePermission;
 export type Role = "super_admin" | "admin" | "editor" | "viewer" | "certificadora";
 
