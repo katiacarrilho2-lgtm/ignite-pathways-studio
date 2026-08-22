@@ -8,7 +8,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import logo from "@/assets/multplick-logo.png";
 
-const toEmail = (u: string) => `${u.trim().replace(/\D/g, "").padStart(3, "0")}@multplick.local`;
+const toEmail = (u: string) => {
+  const raw = u.trim();
+  if (raw.includes("@")) return raw.toLowerCase();
+  const m = /^([A-Za-z]{1,3})(\d+)$/.exec(raw);
+  if (m) return `${m[1].toLowerCase()}${Number(m[2])}@multplick.local`;
+  return `${raw.replace(/\D/g, "").padStart(3, "0")}@multplick.local`;
+};
 
 const Auth = () => {
   const nav = useNavigate();

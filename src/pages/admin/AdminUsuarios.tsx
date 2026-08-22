@@ -10,24 +10,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, KeyRound, Trash2, RefreshCcw, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
+import { ALL_PERMISSIONS, PERMISSION_GROUPS, permLabel } from "@/lib/permissions";
 
 type Profile = { user_id: string; email: string | null; display_name: string | null; username: string | null };
 type RoleRow = { user_id: string; role: string };
 type PermRow = { user_id: string; permission: string };
 type RoleDef = { key: string; label: string; description: string | null; base_role: string; permissions: string[]; is_system: boolean; sort_order: number };
 
-const ALL_PERMS: { id: string; label: string }[] = [
-  { id: "manage_courses", label: "Gerenciar cursos" },
-  { id: "manage_users", label: "Gerenciar usuários e cargos" },
-  { id: "manage_leads", label: "Gerenciar leads / CRM" },
-  { id: "manage_content", label: "Editar conteúdo do site" },
-  { id: "manage_affiliates", label: "Gerenciar afiliados" },
-  { id: "manage_certification", label: "Certificação / documentos p/ conselhos" },
-  { id: "view_analytics", label: "Ver relatórios e analytics" },
-  { id: "view_commission", label: "Ver comissões" },
-  { id: "issue_boletos", label: "Emitir boletos" },
-  { id: "settle_boletos", label: "Baixar boletos (marcar como pago)" },
-];
+const ALL_PERMS = ALL_PERMISSIONS;
 
 const Inner = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -36,7 +26,7 @@ const Inner = () => {
   const [roleDefs, setRoleDefs] = useState<RoleDef[]>([]);
   const [loading, setLoading] = useState(true);
   const [openNew, setOpenNew] = useState(false);
-  const [form, setForm] = useState({ full_name: "", email: "", password: "", role: "editor" as string });
+  const [form, setForm] = useState({ full_name: "", email: "", password: "", role: "" as string });
   const [saving, setSaving] = useState(false);
 
   const [editUid, setEditUid] = useState<string | null>(null);
@@ -66,6 +56,8 @@ const Inner = () => {
 
   const createUser = async () => {
     if (!form.password || form.password.length < 4) return toast.error("Senha mínima de 4 caracteres");
+    const def = roleDefs.find(r => r.key === form.role);
+    const baseRole = def && ["admin","editor","viewer","certificadora"].includes(def.base_role) ? def.base_role : "viewer";
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke("admin-create-user", {
@@ -73,13 +65,20 @@ const Inner = () => {
           password: form.password,
           full_name: form.full_name,
           email: form.email || undefined,
-          role: form.role,
+          role: baseRole,
+          username_prefix: def?.key === "marketing" ? "M" : undefined,
         },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
+      const uid = (data as any)?.user_id;
+      if (uid && def?.permissions?.length) {
+        await supabase.from("user_permissions").insert(
+          def.permissions.map(p => ({ user_id: uid, permission: p as any })),
+        );
+      }
       toast.success(`Usuário criado (login: ${(data as any)?.username ?? "-"})`);
-      setOpenNew(false); setForm({ full_name: "", email: "", password: "", role: "editor" });
+      setOpenNew(false); setForm({ full_name: "", email: "", password: "", role: form.role });
       load();
     } catch (e: any) { toast.error(e.message); }
     finally { setSaving(false); }
@@ -189,7 +188,7 @@ const Inner = () => {
                 <td className="p-3">
                   <div className="flex flex-wrap gap-1">
                     {(rolesMap[p.user_id] ?? []).map(r => <Badge key={r} variant="secondary" className="text-[10px]">{r}</Badge>)}
-                    {(permsMap[p.user_id] ?? []).map(pm => <Badge key={pm} variant="outline" className="text-[10px]">{ALL_PERMS.find(x => x.id === pm)?.label ?? pm}</Badge>)}
+                    {(permsMap[p.user_id] ?? []).map(pm => <Badge key={pm} variant="outline" className="text-[10px]">{permLabel(pm)}</Badge>)}
                     {(rolesMap[p.user_id] ?? []).length === 0 && (permsMap[p.user_id] ?? []).length === 0 && (
                       <span className="text-xs text-muted-foreground italic">sem acesso</span>
                     )}
@@ -217,15 +216,16 @@ const Inner = () => {
             <div>
               <Label>Cargo inicial</Label>
               <Select value={form.role} onValueChange={(v) => setForm({ ...form, role: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione o cargo" /></SelectTrigger>
                 <SelectContent>
-                  {roleDefs.filter(r => ["super_admin","admin","editor","viewer","certificadora"].includes(r.base_role)).map((r) =>
-                    <SelectItem key={r.key} value={r.base_role}>{r.label}</SelectItem>)}
+                  {roleDefs.map((r) => <SelectItem key={r.key} value={r.key}>{r.label}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <p className="text-[11px] text-muted-foreground mt-1">Após criar, use ✏️ para aplicar cargos personalizados (ex.: vendedor) e permissões finas.</p>
+              <p className="text-[11px] text-muted-foreground mt-1">As permissões do cargo são aplicadas automaticamente; ajuste depois no ✏️.</p>
             </div>
-            <p className="text-xs text-muted-foreground">O login numérico (001, 002, …) é gerado automaticamente.</p>
+            <p className="text-xs text-muted-foreground">
+              Login gerado automaticamente: <strong>M1, M2, M3…</strong> para o cargo Marketing e <strong>001, 002…</strong> para os demais.
+            </p>
             <Button variant="hero" className="w-full" disabled={saving} onClick={createUser}>{saving ? "Criando…" : "Criar usuário"}</Button>
           </div>
         </DialogContent>
@@ -260,16 +260,37 @@ const Inner = () => {
               </div>
             </div>
 
-            <div>
-              <Label className="mb-2 block">Permissões individuais</Label>
-              <div className="grid sm:grid-cols-2 gap-2">
-                {ALL_PERMS.map(p => (
-                  <label key={p.id} className="flex items-center gap-2 p-2 rounded-md border border-border hover:bg-secondary/40 cursor-pointer">
-                    <Checkbox checked={editPerms.includes(p.id)} onCheckedChange={() => setEditPerms(prev => toggle(prev, p.id))} />
-                    <span className="text-sm">{p.label}</span>
-                  </label>
-                ))}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Permissões individuais (pastas e ações)</Label>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setEditPerms(ALL_PERMS.map(p => p.id))}>Marcar tudo</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditPerms([])}>Limpar</Button>
+                </div>
               </div>
+              {PERMISSION_GROUPS.map(g => {
+                const ids = g.items.map(i => i.id);
+                const allOn = ids.every(id => editPerms.includes(id));
+                return (
+                  <div key={g.group} className="rounded-lg border border-border p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-primary">{g.group}</span>
+                      <button type="button" className="text-[11px] text-muted-foreground hover:text-primary"
+                        onClick={() => setEditPerms(prev => allOn ? prev.filter(p => !ids.includes(p)) : Array.from(new Set([...prev, ...ids])))}>
+                        {allOn ? "desmarcar grupo" : "marcar grupo"}
+                      </button>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      {g.items.map(p => (
+                        <label key={p.id} className="flex items-center gap-2 p-2 rounded-md border border-border hover:bg-secondary/40 cursor-pointer">
+                          <Checkbox checked={editPerms.includes(p.id)} onCheckedChange={() => setEditPerms(prev => toggle(prev, p.id))} />
+                          <span className="text-sm">{p.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="flex justify-end gap-2 pt-2">

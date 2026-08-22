@@ -2,7 +2,15 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
 
-export type Permission = "manage_courses" | "manage_users" | "manage_leads" | "view_analytics" | "manage_content" | "view_commission" | "issue_boletos" | "settle_boletos" | "manage_affiliates" | "manage_certification";
+export type LegacyPermission = "manage_courses" | "manage_users" | "manage_leads" | "view_analytics" | "manage_content" | "view_commission" | "issue_boletos" | "settle_boletos" | "manage_affiliates" | "manage_certification";
+export type ModulePermission =
+  | "mod_dashboard" | "mod_certificacao" | "mod_documentos_links" | "mod_crm" | "mod_connect"
+  | "mod_cursos" | "mod_cursos_ia" | "mod_corporativo" | "mod_categorias" | "mod_andamento"
+  | "mod_imagens" | "mod_promo" | "mod_parceiros" | "mod_cupons" | "mod_marketing"
+  | "mod_alunos" | "mod_pre_matriculas" | "mod_turmas" | "mod_usuarios" | "mod_cargos"
+  | "mod_leads" | "mod_mensagens" | "mod_suporte" | "mod_financeiro" | "mod_relatorios"
+  | "mod_afiliados" | "mod_meu_afiliado" | "mod_treinamentos";
+export type Permission = LegacyPermission | ModulePermission;
 export type Role = "super_admin" | "admin" | "editor" | "viewer" | "certificadora";
 
 type AuthCtx = {

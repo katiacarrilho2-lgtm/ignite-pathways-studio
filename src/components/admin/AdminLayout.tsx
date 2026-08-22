@@ -8,35 +8,35 @@ import { AdminBadgesProvider, useAdminBadges, BadgeChannel } from "@/hooks/useAd
 import { useEffect, useState } from "react";
 import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
 
-const navItems: { to: string; label: string; icon: any; perm?: Permission; badge?: BadgeChannel }[] = [
+const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?: Permission; badge?: BadgeChannel }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/certificacao", label: "Certificação e Documentação para Conselhos", icon: FileCheck2, perm: "manage_certification" },
-  { to: "/admin/documentos-links", label: "Links de Documentos", icon: LinkIcon, perm: "manage_courses" },
-  { to: "/admin/crm", label: "CRM", icon: Kanban, perm: "manage_leads" },
-  { to: "/admin/connect", label: "Multplick Connect", icon: MessagesSquare, perm: "manage_leads" },
-  { to: "/admin/cursos", label: "Cursos", icon: GraduationCap, perm: "manage_courses" },
-  { to: "/admin/cursos/ia", label: "Gerar Curso IA", icon: Sparkles, perm: "manage_courses" },
-  { to: "/admin/corporativo", label: "Corporativo", icon: Briefcase, perm: "manage_courses" },
-  { to: "/admin/categorias", label: "Categorias", icon: FolderTree, perm: "manage_courses" },
-  { to: "/admin/andamento", label: "Andamento", icon: Activity, perm: "manage_courses" },
-  { to: "/admin/imagens", label: "Imagens", icon: ImageIcon, perm: "manage_courses" },
-  { to: "/admin/promo", label: "Carrossel Home", icon: Megaphone, perm: "manage_courses" },
-  { to: "/admin/parceiros", label: "Parceiros", icon: Handshake, perm: "manage_courses" },
-  { to: "/admin/cupons", label: "Cupons", icon: Tag, perm: "manage_courses" },
-  { to: "/admin/marketing", label: "Central de Marketing", icon: Rocket, perm: "manage_courses" },
-  { to: "/admin/alunos", label: "Alunos", icon: UserCheck, perm: "manage_courses" },
-  { to: "/admin/pre-matriculas", label: "Pré-matrículas", icon: ClipboardList, perm: "manage_courses" },
-  { to: "/admin/turmas", label: "Turmas", icon: Users2, perm: "manage_courses" },
-  { to: "/admin/usuarios", label: "Usuários", icon: Users, perm: "manage_users" },
-  { to: "/admin/cargos", label: "Cargos", icon: Shield, perm: "manage_users" },
-  { to: "/admin/leads", label: "Leads", icon: Inbox, perm: "manage_leads", badge: "leads" },
-  { to: "/admin/mensagens", label: "Mensagens", icon: MessageSquare, perm: "manage_courses", badge: "course_messages" },
-  { to: "/admin/suporte", label: "Suporte", icon: LifeBuoy, perm: "manage_courses", badge: "support_tickets" },
-  { to: "/admin/financeiro", label: "Financeiro", icon: DollarSign, perm: "manage_courses" },
-  { to: "/admin/relatorios/pagamentos", label: "Relatórios", icon: FileBarChart, perm: "manage_courses" },
-  { to: "/admin/afiliados", label: "Afiliados", icon: Share2, perm: "manage_affiliates" },
+  { to: "/admin/certificacao", label: "Certificação e Documentação para Conselhos", icon: FileCheck2, perm: "manage_certification", mod: "mod_certificacao" },
+  { to: "/admin/documentos-links", label: "Links de Documentos", icon: LinkIcon, perm: "manage_courses", mod: "mod_documentos_links" },
+  { to: "/admin/crm", label: "CRM", icon: Kanban, perm: "manage_leads", mod: "mod_crm" },
+  { to: "/admin/connect", label: "Multplick Connect", icon: MessagesSquare, perm: "manage_leads", mod: "mod_connect" },
+  { to: "/admin/cursos", label: "Cursos", icon: GraduationCap, perm: "manage_courses", mod: "mod_cursos" },
+  { to: "/admin/cursos/ia", label: "Gerar Curso IA", icon: Sparkles, perm: "manage_courses", mod: "mod_cursos_ia" },
+  { to: "/admin/corporativo", label: "Corporativo", icon: Briefcase, perm: "manage_courses", mod: "mod_corporativo" },
+  { to: "/admin/categorias", label: "Categorias", icon: FolderTree, perm: "manage_courses", mod: "mod_categorias" },
+  { to: "/admin/andamento", label: "Andamento", icon: Activity, perm: "manage_courses", mod: "mod_andamento" },
+  { to: "/admin/imagens", label: "Imagens", icon: ImageIcon, perm: "manage_courses", mod: "mod_imagens" },
+  { to: "/admin/promo", label: "Carrossel Home", icon: Megaphone, perm: "manage_courses", mod: "mod_promo" },
+  { to: "/admin/parceiros", label: "Parceiros", icon: Handshake, perm: "manage_courses", mod: "mod_parceiros" },
+  { to: "/admin/cupons", label: "Cupons", icon: Tag, perm: "manage_courses", mod: "mod_cupons" },
+  { to: "/admin/marketing", label: "Central de Marketing", icon: Rocket, perm: "manage_courses", mod: "mod_marketing" },
+  { to: "/admin/alunos", label: "Alunos", icon: UserCheck, perm: "manage_courses", mod: "mod_alunos" },
+  { to: "/admin/pre-matriculas", label: "Pré-matrículas", icon: ClipboardList, perm: "manage_courses", mod: "mod_pre_matriculas" },
+  { to: "/admin/turmas", label: "Turmas", icon: Users2, perm: "manage_courses", mod: "mod_turmas" },
+  { to: "/admin/usuarios", label: "Usuários", icon: Users, perm: "manage_users", mod: "mod_usuarios" },
+  { to: "/admin/cargos", label: "Cargos", icon: Shield, perm: "manage_users", mod: "mod_cargos" },
+  { to: "/admin/leads", label: "Leads", icon: Inbox, perm: "manage_leads", mod: "mod_leads", badge: "leads" },
+  { to: "/admin/mensagens", label: "Mensagens", icon: MessageSquare, perm: "manage_courses", mod: "mod_mensagens", badge: "course_messages" },
+  { to: "/admin/suporte", label: "Suporte", icon: LifeBuoy, perm: "manage_courses", mod: "mod_suporte", badge: "support_tickets" },
+  { to: "/admin/financeiro", label: "Financeiro", icon: DollarSign, perm: "manage_courses", mod: "mod_financeiro" },
+  { to: "/admin/relatorios/pagamentos", label: "Relatórios", icon: FileBarChart, perm: "manage_courses", mod: "mod_relatorios" },
+  { to: "/admin/afiliados", label: "Afiliados", icon: Share2, perm: "manage_affiliates", mod: "mod_afiliados" },
   { to: "/admin/meu-afiliado", label: "Meu Afiliado", icon: Share2 },
-  { to: "/admin/treinamentos", label: "Treinamentos", icon: Trophy, perm: "manage_users" },
+  { to: "/admin/treinamentos", label: "Treinamentos", icon: Trophy, perm: "manage_users", mod: "mod_treinamentos" },
 ];
 
 const AdminLayoutInner = () => {
@@ -83,6 +83,7 @@ const AdminLayoutInner = () => {
           // Itens restritos ao master (não aparecem nem para quem tem permissões amplas)
           const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios"];
           if (masterOnly.includes(i.to) && !isMaster) return false;
+          if (i.mod && hasPermission(i.mod)) return true;
           return !i.perm || hasPermission(i.perm);
         }).map(i => {
           const count = i.badge ? counts[i.badge] : 0;
@@ -137,7 +138,13 @@ export const AdminLayout = () => (
 
 export const RequirePermission = ({ perm, children }: { perm: Permission; children: React.ReactNode }) => {
   const { hasPermission } = useAuth();
-  if (!hasPermission(perm)) return (
+  const { pathname } = useLocation();
+  // Permissão por pasta: se o usuário tem o "mod_" da rota atual, o acesso é liberado.
+  const match = navItems
+    .filter(i => i.mod && (pathname === i.to || pathname.startsWith(i.to + "/")))
+    .sort((a, b) => b.to.length - a.to.length)[0];
+  const allowed = hasPermission(perm) || (match?.mod ? hasPermission(match.mod) : false);
+  if (!allowed) return (
     <div className="p-10 text-center text-muted-foreground">Você não tem permissão para acessar esta área.</div>
   );
   return <>{children}</>;
