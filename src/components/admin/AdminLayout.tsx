@@ -13,6 +13,9 @@ import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
 
 const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?: Permission; badge?: BadgeChannel }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/rede-interna", label: "Rede Interna", icon: Network, mod: "mod_rede_interna" },
+  { to: "/admin/agenda", label: "Agenda Geral", icon: CalendarDays, mod: "mod_agenda" },
+
   { to: "/admin/certificacao", label: "Certificação e Documentação para Conselhos", icon: FileCheck2, perm: "manage_certification", mod: "mod_certificacao" },
   { to: "/admin/documentos-links", label: "Links de Documentos", icon: LinkIcon, perm: "manage_courses", mod: "mod_documentos_links" },
   { to: "/admin/crm", label: "CRM", icon: Kanban, perm: "manage_leads", mod: "mod_crm" },
