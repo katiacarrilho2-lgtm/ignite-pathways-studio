@@ -3253,6 +3253,18 @@ export type Database = {
         | "mod_afiliados"
         | "mod_meu_afiliado"
         | "mod_treinamentos"
+        | "mod_rede_interna"
+        | "mod_solicitacoes"
+        | "mod_almoxarifado"
+        | "mod_escola_fisica"
+        | "mod_patrimonio"
+        | "mod_manutencao"
+        | "mod_pedagogia"
+        | "mod_frequencia"
+        | "mod_agenda"
+        | "mod_documentos_internos"
+        | "mod_auditoria"
+        | "mod_departamentos"
       app_role: "super_admin" | "admin" | "editor" | "viewer" | "certificadora"
       crm_event_type:
         | "anotacao"
@@ -3435,6 +3447,18 @@ export const Constants = {
         "mod_afiliados",
         "mod_meu_afiliado",
         "mod_treinamentos",
+        "mod_rede_interna",
+        "mod_solicitacoes",
+        "mod_almoxarifado",
+        "mod_escola_fisica",
+        "mod_patrimonio",
+        "mod_manutencao",
+        "mod_pedagogia",
+        "mod_frequencia",
+        "mod_agenda",
+        "mod_documentos_internos",
+        "mod_auditoria",
+        "mod_departamentos",
       ],
       app_role: ["super_admin", "admin", "editor", "viewer", "certificadora"],
       crm_event_type: [
