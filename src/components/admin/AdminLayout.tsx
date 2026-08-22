@@ -138,7 +138,13 @@ export const AdminLayout = () => (
 
 export const RequirePermission = ({ perm, children }: { perm: Permission; children: React.ReactNode }) => {
   const { hasPermission } = useAuth();
-  if (!hasPermission(perm)) return (
+  const { pathname } = useLocation();
+  // Permissão por pasta: se o usuário tem o "mod_" da rota atual, o acesso é liberado.
+  const match = navItems
+    .filter(i => i.mod && (pathname === i.to || pathname.startsWith(i.to + "/")))
+    .sort((a, b) => b.to.length - a.to.length)[0];
+  const allowed = hasPermission(perm) || (match?.mod ? hasPermission(match.mod) : false);
+  if (!allowed) return (
     <div className="p-10 text-center text-muted-foreground">Você não tem permissão para acessar esta área.</div>
   );
   return <>{children}</>;
