@@ -56,6 +56,8 @@ const Inner = () => {
 
   const createUser = async () => {
     if (!form.password || form.password.length < 4) return toast.error("Senha mínima de 4 caracteres");
+    const def = roleDefs.find(r => r.key === form.role);
+    const baseRole = def && ["admin","editor","viewer","certificadora"].includes(def.base_role) ? def.base_role : "viewer";
     setSaving(true);
     try {
       const { data, error } = await supabase.functions.invoke("admin-create-user", {
@@ -63,13 +65,20 @@ const Inner = () => {
           password: form.password,
           full_name: form.full_name,
           email: form.email || undefined,
-          role: form.role,
+          role: baseRole,
+          username_prefix: def?.key === "marketing" ? "M" : undefined,
         },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
+      const uid = (data as any)?.user_id;
+      if (uid && def?.permissions?.length) {
+        await supabase.from("user_permissions").insert(
+          def.permissions.map(p => ({ user_id: uid, permission: p as any })),
+        );
+      }
       toast.success(`Usuário criado (login: ${(data as any)?.username ?? "-"})`);
-      setOpenNew(false); setForm({ full_name: "", email: "", password: "", role: "editor" });
+      setOpenNew(false); setForm({ full_name: "", email: "", password: "", role: form.role });
       load();
     } catch (e: any) { toast.error(e.message); }
     finally { setSaving(false); }
