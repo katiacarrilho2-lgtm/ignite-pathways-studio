@@ -124,7 +124,7 @@ const Inner = () => {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[88vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{isNew ? "Novo cargo" : `Editar: ${editing.label}`}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="grid md:grid-cols-2 gap-3">
