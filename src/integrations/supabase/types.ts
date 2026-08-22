@@ -4154,6 +4154,18 @@ export type Database = {
           status_atendimento: string
         }[]
       }
+      lead_bank_import_batch: {
+        Args: {
+          _curso_interesse?: string
+          _grupo_nome?: string
+          _interesse_tipo?: string
+          _items: Json
+          _origem: string
+          _origem_tipo?: string
+          _situacao?: string
+        }
+        Returns: Json
+      }
       next_username: { Args: never; Returns: string }
     }
     Enums: {
