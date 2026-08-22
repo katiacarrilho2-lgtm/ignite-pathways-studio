@@ -12,18 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, Plus, Pencil, Trash2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
+import { PERMISSION_GROUPS, ALL_PERMISSIONS, permLabel } from "@/lib/permissions";
 
-const PERMS = [
-  { id: "manage_courses", label: "Gerenciar cursos" },
-  { id: "manage_users", label: "Gerenciar usuários" },
-  { id: "manage_leads", label: "Gerenciar leads" },
-  { id: "manage_affiliates", label: "Gerenciar afiliados" },
-  { id: "manage_content", label: "Editar conteúdo" },
-  { id: "view_analytics", label: "Ver relatórios" },
-  { id: "issue_boletos", label: "Emitir boletos" },
-  { id: "settle_boletos", label: "Baixar boletos (marcar como pago)" },
-  { id: "manage_certification", label: "Certificação e Documentação para Conselhos" },
-];
+const PERMS = ALL_PERMISSIONS;
 const BASE_ROLES = [
   { id: "viewer", label: "Visualizador (base)" },
   { id: "certificadora", label: "Certificadora (base)" },
