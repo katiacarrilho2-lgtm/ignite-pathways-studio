@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, KeyRound, Trash2, RefreshCcw, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
+import { ALL_PERMISSIONS, PERMISSION_GROUPS, permLabel } from "@/lib/permissions";
 
 type Profile = { user_id: string; email: string | null; display_name: string | null; username: string | null };
 type RoleRow = { user_id: string; role: string };
