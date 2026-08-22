@@ -95,11 +95,14 @@ const AdminLayoutInner = () => {
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {navItems.filter(i => {
           // Itens restritos ao master (não aparecem nem para quem tem permissões amplas)
-          const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios"];
+          const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios", "/admin/auditoria"];
           if (masterOnly.includes(i.to) && !isMaster) return false;
           if (i.mod && hasPermission(i.mod)) return true;
+          // Item exclusivo de módulo (sem permissão legada) exige o mod_ correspondente
+          if (i.mod && !i.perm) return false;
           return !i.perm || hasPermission(i.perm);
         }).map(i => {
+
           const count = i.badge ? counts[i.badge] : 0;
           return (
             <NavLink key={i.to} to={i.to} end={i.to === "/admin"}
