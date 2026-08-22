@@ -412,11 +412,11 @@ export default function MarketingArquivos() {
           {/* Pastas */}
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-foreground">Pastas</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
               {folders.map((f) => (
                 <Card key={f.id} className="p-3 flex items-center gap-3 hover:border-primary/50 hover:shadow-sm transition cursor-pointer"
                   onClick={() => setOpenFolder(f)}>
-                  <div className="size-10 rounded-lg bg-primary/10 text-primary grid place-items-center shrink-0"><Folder className="size-5" /></div>
+                  <div className="size-9 rounded-lg bg-primary/10 text-primary grid place-items-center shrink-0"><Folder className="size-5" /></div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium truncate" title={f.name}>{f.name}</p>
                     <p className="text-[11px] text-muted-foreground">{countByFolder[f.id] ?? 0} arquivo(s)</p>
