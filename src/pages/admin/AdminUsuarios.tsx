@@ -179,7 +179,7 @@ const Inner = () => {
                 <td className="p-3">
                   <div className="flex flex-wrap gap-1">
                     {(rolesMap[p.user_id] ?? []).map(r => <Badge key={r} variant="secondary" className="text-[10px]">{r}</Badge>)}
-                    {(permsMap[p.user_id] ?? []).map(pm => <Badge key={pm} variant="outline" className="text-[10px]">{ALL_PERMS.find(x => x.id === pm)?.label ?? pm}</Badge>)}
+                    {(permsMap[p.user_id] ?? []).map(pm => <Badge key={pm} variant="outline" className="text-[10px]">{permLabel(pm)}</Badge>)}
                     {(rolesMap[p.user_id] ?? []).length === 0 && (permsMap[p.user_id] ?? []).length === 0 && (
                       <span className="text-xs text-muted-foreground italic">sem acesso</span>
                     )}
