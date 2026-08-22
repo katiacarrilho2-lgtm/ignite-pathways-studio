@@ -154,8 +154,9 @@ const AdminLayoutInner = () => {
 };
 
 export const AdminLayout = () => (
-  <AdminBadgesProvider><AdminLayoutInner /></AdminBadgesProvider>
+  <NotificationsProvider><AdminBadgesProvider><AdminLayoutInner /></AdminBadgesProvider></NotificationsProvider>
 );
+
 
 export const RequirePermission = ({ perm, children }: { perm: Permission; children: React.ReactNode }) => {
   const { hasPermission } = useAuth();
