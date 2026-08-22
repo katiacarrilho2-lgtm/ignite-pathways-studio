@@ -216,15 +216,16 @@ const Inner = () => {
             <div>
               <Label>Cargo inicial</Label>
               <Select value={form.role} onValueChange={(v) => setForm({ ...form, role: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione o cargo" /></SelectTrigger>
                 <SelectContent>
-                  {roleDefs.filter(r => ["super_admin","admin","editor","viewer","certificadora"].includes(r.base_role)).map((r) =>
-                    <SelectItem key={r.key} value={r.base_role}>{r.label}</SelectItem>)}
+                  {roleDefs.map((r) => <SelectItem key={r.key} value={r.key}>{r.label}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <p className="text-[11px] text-muted-foreground mt-1">Após criar, use ✏️ para aplicar cargos personalizados (ex.: vendedor) e permissões finas.</p>
+              <p className="text-[11px] text-muted-foreground mt-1">As permissões do cargo são aplicadas automaticamente; ajuste depois no ✏️.</p>
             </div>
-            <p className="text-xs text-muted-foreground">O login numérico (001, 002, …) é gerado automaticamente.</p>
+            <p className="text-xs text-muted-foreground">
+              Login gerado automaticamente: <strong>M1, M2, M3…</strong> para o cargo Marketing e <strong>001, 002…</strong> para os demais.
+            </p>
             <Button variant="hero" className="w-full" disabled={saving} onClick={createUser}>{saving ? "Criando…" : "Criar usuário"}</Button>
           </div>
         </DialogContent>
