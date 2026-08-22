@@ -1475,6 +1475,42 @@ export type Database = {
         }
         Relationships: []
       }
+      departments: {
+        Row: {
+          ativo: boolean
+          cor: string
+          created_at: string
+          icone: string | null
+          id: string
+          nome: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cor?: string
+          created_at?: string
+          icone?: string | null
+          id?: string
+          nome: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cor?: string
+          created_at?: string
+          icone?: string | null
+          id?: string
+          nome?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       doc_links: {
         Row: {
           active: boolean
@@ -1955,6 +1991,133 @@ export type Database = {
             columns: ["enrollment_id"]
             isOneToOne: false
             referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_conversations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          department_id: string | null
+          id: string
+          last_message_at: string
+          last_message_preview: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          tipo: string
+          titulo: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          tipo?: string
+          titulo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string | null
+          id?: string
+          last_message_at?: string
+          last_message_preview?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          tipo?: string
+          titulo?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_conversations_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_messages: {
+        Row: {
+          attachment_path: string | null
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          reply_to: string | null
+          sender_id: string
+        }
+        Insert: {
+          attachment_path?: string | null
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          reply_to?: string | null
+          sender_id: string
+        }
+        Update: {
+          attachment_path?: string | null
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          reply_to?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "internal_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "internal_messages_reply_to_fkey"
+            columns: ["reply_to"]
+            isOneToOne: false
+            referencedRelation: "internal_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_participants: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          last_read_at: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          last_read_at?: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          last_read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "internal_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "internal_conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -2639,6 +2802,50 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          corpo: string | null
+          created_at: string
+          department_id: string | null
+          id: string
+          link: string | null
+          read_at: string | null
+          tipo: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          corpo?: string | null
+          created_at?: string
+          department_id?: string | null
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          tipo?: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          corpo?: string | null
+          created_at?: string
+          department_id?: string | null
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          tipo?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partners: {
         Row: {
           active: boolean
@@ -2724,8 +2931,11 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ativo: boolean
           avatar_url: string | null
+          cargo: string | null
           created_at: string
+          department_id: string | null
           display_name: string | null
           email: string | null
           id: string
@@ -2734,8 +2944,11 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          ativo?: boolean
           avatar_url?: string | null
+          cargo?: string | null
           created_at?: string
+          department_id?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
@@ -2744,8 +2957,11 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          ativo?: boolean
           avatar_url?: string | null
+          cargo?: string | null
           created_at?: string
+          department_id?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
@@ -2753,7 +2969,15 @@ export type Database = {
           user_id?: string
           username?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       role_definitions: {
         Row: {
@@ -3195,6 +3419,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_conv_participant: {
+        Args: { _conv: string; _uid: string }
         Returns: boolean
       }
       is_master: { Args: { _user_id: string }; Returns: boolean }
