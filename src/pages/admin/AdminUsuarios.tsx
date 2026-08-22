@@ -26,7 +26,7 @@ const Inner = () => {
   const [roleDefs, setRoleDefs] = useState<RoleDef[]>([]);
   const [loading, setLoading] = useState(true);
   const [openNew, setOpenNew] = useState(false);
-  const [form, setForm] = useState({ full_name: "", email: "", password: "", role: "editor" as string });
+  const [form, setForm] = useState({ full_name: "", email: "", password: "", role: "" as string });
   const [saving, setSaving] = useState(false);
 
   const [editUid, setEditUid] = useState<string | null>(null);
