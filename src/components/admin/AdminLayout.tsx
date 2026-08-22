@@ -43,6 +43,14 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/afiliados", label: "Afiliados", icon: Share2, perm: "manage_affiliates", mod: "mod_afiliados" },
   { to: "/admin/meu-afiliado", label: "Meu Afiliado", icon: Share2 },
   { to: "/admin/treinamentos", label: "Treinamentos", icon: Trophy, perm: "manage_users", mod: "mod_treinamentos" },
+  { to: "/admin/chamada", label: "Lista de Chamada", icon: CalendarCheck, mod: "mod_frequencia" },
+  { to: "/admin/pedagogico/ocorrencias", label: "Pedagogia", icon: AlertTriangle, mod: "mod_pedagogia" },
+  { to: "/admin/escola-fisica", label: "Escola Física", icon: Building2, mod: "mod_escola_fisica" },
+  { to: "/admin/almoxarifado", label: "Almoxarifado", icon: Boxes, mod: "mod_almoxarifado" },
+  { to: "/admin/solicitacoes", label: "Solicitações Internas", icon: InboxIcon, mod: "mod_solicitacoes" },
+  { to: "/admin/documentos-internos", label: "Documentos Internos", icon: FolderLock, mod: "mod_documentos_internos" },
+  { to: "/admin/auditoria", label: "Auditoria", icon: ShieldCheck, mod: "mod_auditoria" },
+
 ];
 
 const AdminLayoutInner = () => {
