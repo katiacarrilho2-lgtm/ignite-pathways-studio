@@ -115,7 +115,7 @@ const Inner = () => {
               <div className="flex flex-wrap gap-1">
                 {r.permissions.length === 0 && <span className="text-[11px] text-muted-foreground italic">sem permissões</span>}
                 {r.permissions.map(p => (
-                  <Badge key={p} variant="outline" className="text-[10px]">{PERMS.find(x => x.id === p)?.label || p}</Badge>
+                  <Badge key={p} variant="outline" className="text-[10px]">{permLabel(p)}</Badge>
                 ))}
               </div>
             </CardContent>
