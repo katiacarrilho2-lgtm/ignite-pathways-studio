@@ -2308,10 +2308,13 @@ export type Database = {
           created_at: string
           created_by: string | null
           file_path: string | null
+          folder_id: string | null
           id: string
+          is_favorite: boolean
           mime: string | null
           nome: string
           observacoes: string | null
+          original_name: string | null
           pasta: string
           size_bytes: number | null
           tags: string[]
@@ -2324,10 +2327,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           file_path?: string | null
+          folder_id?: string | null
           id?: string
+          is_favorite?: boolean
           mime?: string | null
           nome: string
           observacoes?: string | null
+          original_name?: string | null
           pasta?: string
           size_bytes?: number | null
           tags?: string[]
@@ -2340,10 +2346,13 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           file_path?: string | null
+          folder_id?: string | null
           id?: string
+          is_favorite?: boolean
           mime?: string | null
           nome?: string
           observacoes?: string | null
+          original_name?: string | null
           pasta?: string
           size_bytes?: number | null
           tags?: string[]
@@ -2357,6 +2366,13 @@ export type Database = {
             columns: ["campaign_id"]
             isOneToOne: false
             referencedRelation: "mkt_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mkt_assets_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_folders"
             referencedColumns: ["id"]
           },
         ]
@@ -2420,6 +2436,47 @@ export type Database = {
           vendas?: number
         }
         Relationships: []
+      }
+      mkt_folders: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          icon: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_folders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mkt_social_posts: {
         Row: {
