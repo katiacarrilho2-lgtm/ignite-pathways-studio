@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const {
-      password, full_name, role, username: requestedUsername,
+      password, full_name, role, username: requestedUsername, username_prefix,
       email: emailInput, phone1, phone2, cpf, rg, cep, street, address_number,
       neighborhood, city, state, birth_date, responsible_name, responsible_rg,
       responsible_cpf, sex, polo, notes, avatar_url,
@@ -46,8 +46,30 @@ Deno.serve(async (req) => {
       if (!hasPerm) return json({ error: "Sem permissão" }, 403);
     }
 
-    const normalizeUsername = (value: unknown) => String(value ?? "").replace(/\D/g, "");
+    const prefix = String(username_prefix ?? "").replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 3);
+
+    const normalizeUsername = (value: unknown) => {
+      const raw = String(value ?? "").trim().toUpperCase();
+      return prefix ? raw.replace(new RegExp(`^${prefix}`), "").replace(/\D/g, "") : raw.replace(/\D/g, "");
+    };
+    const compose = (num: string) => prefix ? `${prefix}${Number(num)}` : String(num).padStart(3, "0");
+
+    const nextForPrefix = async () => {
+      const { data: rows } = await admin.from("profiles").select("username").not("username", "is", null);
+      const re = new RegExp(`^${prefix}(\\d+)$`, "i");
+      const max = (rows ?? []).reduce((acc: number, r: any) => {
+        const m = re.exec(String(r.username ?? "").trim());
+        const n = m ? parseInt(m[1], 10) : NaN;
+        return Number.isFinite(n) && n > acc ? n : acc;
+      }, 0);
+      return String(max + 1);
+    };
+
     const getNextUsername = async (after?: string) => {
+      if (prefix) {
+        if (after) return String(Number(after) + 1);
+        return await nextForPrefix();
+      }
       if (after) return String(Number(after) + 1).padStart(3, "0");
 
       const { data: next, error: nextErr } = await admin.rpc("next_username");
@@ -58,22 +80,25 @@ Deno.serve(async (req) => {
         .select("username")
         .not("username", "is", null);
       const max = (rows ?? []).reduce((acc: number, r: any) => {
-        const n = parseInt(normalizeUsername(r.username), 10);
+        const n = parseInt(String(r.username ?? "").replace(/\D/g, ""), 10);
         return Number.isFinite(n) && n > acc ? n : acc;
       }, 0);
       return String(max + 1).padStart(3, "0");
     };
 
-    let username = normalizeUsername(requestedUsername);
-    if (requestedUsername && !/^\d{1,6}$/.test(username)) return json({ error: "Usuário deve ser numérico" }, 400);
+    let seq = normalizeUsername(requestedUsername);
+    if (requestedUsername && !/^\d{1,6}$/.test(seq)) return json({ error: "Usuário deve ser numérico" }, 400);
+    let username = seq ? compose(seq) : "";
 
     let created: any = null;
     let lastError = "";
     for (let attempt = 0; attempt < 50; attempt++) {
-      username = username || await getNextUsername(attempt === 0 ? undefined : username);
-      if (!/^\d{1,6}$/.test(username)) return json({ error: "Usuário deve ser numérico" }, 400);
+      if (!username) {
+        seq = await getNextUsername(attempt === 0 ? undefined : seq);
+        username = compose(seq);
+      }
 
-      const loginEmail = `${username}@multplick.local`;
+      const loginEmail = `${username.toLowerCase()}@multplick.local`;
       const result = await admin.auth.admin.createUser({
         email: loginEmail,
         password,
@@ -89,14 +114,13 @@ Deno.serve(async (req) => {
       lastError = result.error.message;
       const alreadyExists = lastError.toLowerCase().includes("already") || lastError.toLowerCase().includes("registered");
       if (requestedUsername || !alreadyExists) return json({ error: lastError }, 400);
-      username = "";
-      const numeric = Number(loginEmail.split("@")[0]);
-      username = String(numeric + 1).padStart(3, "0");
+      seq = String(Number(seq || 0) + 1);
+      username = compose(seq);
     }
 
     if (!created?.user?.id) return json({ error: lastError || "Não foi possível criar o usuário" }, 400);
 
-    const loginEmail = `${username}@multplick.local`;
+    const loginEmail = `${username.toLowerCase()}@multplick.local`;
 
     // Assign role for non-bootstrap (bootstrap user already becomes super_admin via trigger)
     if (!isBootstrap && role && ["admin", "editor", "viewer", "certificadora"].includes(role)) {
