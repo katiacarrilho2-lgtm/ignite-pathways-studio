@@ -145,16 +145,40 @@ const Inner = () => {
               </div>
               <div><Label>Ordem</Label><Input type="number" value={editing.sort_order} onChange={e => setEditing(s => ({ ...s, sort_order: parseInt(e.target.value) || 100 }))} /></div>
             </div>
-            <div>
-              <Label className="mb-2 block">Permissões</Label>
-              <div className="grid sm:grid-cols-2 gap-2">
-                {PERMS.map(p => (
-                  <label key={p.id} className="flex items-center gap-2 p-2 rounded-md border border-border hover:bg-secondary/40 cursor-pointer">
-                    <Checkbox checked={editing.permissions.includes(p.id)} onCheckedChange={() => togglePerm(p.id)} />
-                    <span className="text-sm">{p.label}</span>
-                  </label>
-                ))}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Permissões (pastas do painel e ações)</Label>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setEditing(s => ({ ...s, permissions: PERMS.map(p => p.id) }))}>Marcar tudo</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditing(s => ({ ...s, permissions: [] }))}>Limpar</Button>
+                </div>
               </div>
+              {PERMISSION_GROUPS.map(g => {
+                const ids = g.items.map(i => i.id);
+                const allOn = ids.every(id => editing.permissions.includes(id));
+                return (
+                  <div key={g.group} className="rounded-lg border border-border p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-primary">{g.group}</span>
+                      <button type="button" className="text-[11px] text-muted-foreground hover:text-primary"
+                        onClick={() => setEditing(s => ({
+                          ...s,
+                          permissions: allOn ? s.permissions.filter(p => !ids.includes(p)) : Array.from(new Set([...s.permissions, ...ids])),
+                        }))}>
+                        {allOn ? "desmarcar grupo" : "marcar grupo"}
+                      </button>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      {g.items.map(p => (
+                        <label key={p.id} className="flex items-center gap-2 p-2 rounded-md border border-border hover:bg-secondary/40 cursor-pointer">
+                          <Checkbox checked={editing.permissions.includes(p.id)} onCheckedChange={() => togglePerm(p.id)} />
+                          <span className="text-sm">{p.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
