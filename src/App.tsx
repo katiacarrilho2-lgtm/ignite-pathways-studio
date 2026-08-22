@@ -68,6 +68,15 @@ import MarketingCofre from "./pages/admin/marketing/MarketingCofre.tsx";
 import AdminPreMatriculas from "./pages/admin/AdminPreMatriculas.tsx";
 import AdminCategorias from "./pages/admin/AdminCategorias.tsx";
 import AdminParceiros from "./pages/admin/AdminParceiros.tsx";
+import RedeInterna from "./pages/admin/rede/RedeInterna.tsx";
+import AdminSolicitacoes from "./pages/admin/AdminSolicitacoes.tsx";
+import AdminAlmoxarifado from "./pages/admin/AdminAlmoxarifado.tsx";
+import AdminEscolaFisica from "./pages/admin/AdminEscolaFisica.tsx";
+import AdminChamada from "./pages/admin/pedagogico/AdminChamada.tsx";
+import AdminOcorrencias from "./pages/admin/pedagogico/AdminOcorrencias.tsx";
+import AdminAgenda from "./pages/admin/AdminAgenda.tsx";
+import AdminDocumentosInternos from "./pages/admin/AdminDocumentosInternos.tsx";
+import AdminAuditoria from "./pages/admin/AdminAuditoria.tsx";
 import AdminTreinamentos from "./pages/admin/AdminTreinamentos.tsx";
 import AdminCertificacao from "./pages/admin/AdminCertificacao.tsx";
 import AdminDocumentosLinks from "./pages/admin/AdminDocumentosLinks.tsx";
@@ -160,6 +169,15 @@ const App = () => (
               <Route path="cursos/ia" element={<AdminCursoIA />} />
               <Route path="categorias" element={<AdminCategorias />} />
               <Route path="parceiros" element={<AdminParceiros />} />
+              <Route path="rede-interna" element={<RedeInterna />} />
+              <Route path="solicitacoes" element={<AdminSolicitacoes />} />
+              <Route path="almoxarifado" element={<AdminAlmoxarifado />} />
+              <Route path="escola-fisica" element={<AdminEscolaFisica />} />
+              <Route path="chamada" element={<AdminChamada />} />
+              <Route path="pedagogico/ocorrencias" element={<AdminOcorrencias />} />
+              <Route path="agenda" element={<AdminAgenda />} />
+              <Route path="documentos-internos" element={<AdminDocumentosInternos />} />
+              <Route path="auditoria" element={<AdminAuditoria />} />
               <Route path="treinamentos" element={<AdminTreinamentos />} />
               <Route path="certificacao" element={<AdminCertificacao />} />
               <Route path="certificacao/:userId" element={<AdminCertificacao />} />
