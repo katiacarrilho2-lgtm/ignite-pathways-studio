@@ -262,7 +262,7 @@ export default function RepasseSection({ enrollments, installmentsCount }: Props
     <div className="space-y-6">
       {parceiros.length === 0 && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 text-amber-900 p-4 text-sm">
-          Nenhuma faculdade/parceiro cadastrada ainda. Cadastre em <strong>Financeiro › Repasses › Parceiros</strong>.
+          Nenhuma faculdade/parceiro cadastrada ainda — clique em <strong>SIM</strong> abaixo para cadastrar na hora, ou use <strong>Financeiro › Repasses › Parceiros</strong>.
         </div>
       )}
 
