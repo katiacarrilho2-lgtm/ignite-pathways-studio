@@ -199,7 +199,22 @@ const Inner = () => {
             {list.map((a) => (
               <tr key={a.id} className="border-t border-border">
                 <td className="p-3">{a.profile ? `${a.profile.username ?? ""} · ${a.profile.display_name ?? a.profile.email ?? ""}` : a.user_id.slice(0, 8)}</td>
-                <td className="p-3 font-mono">{a.code}</td>
+                <td className="p-3 font-mono">
+                  <div className="flex items-center gap-2">
+                    {a.code}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      title="Copiar link com o código deste afiliado"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(`${window.location.origin}/?ref=${a.code}`);
+                        toast.success("Link do afiliado copiado");
+                      }}
+                    >
+                      Copiar link
+                    </Button>
+                  </div>
+                </td>
                 <td className="p-3">{a.commission_pct}%</td>
                 <td className="p-3 text-muted-foreground">{a.pix_key ?? "—"}</td>
                 <td className="p-3">
