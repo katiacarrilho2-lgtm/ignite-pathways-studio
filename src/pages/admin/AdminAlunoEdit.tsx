@@ -13,6 +13,7 @@ import { ArrowLeft, Save, KeyRound, Trash2, Plus, Send, Mail, CheckCircle2, Penc
 import { Barcode } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import RepasseSection from "@/components/admin/RepasseSection";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
@@ -875,7 +876,7 @@ const Inner = () => {
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid grid-cols-9 w-full max-w-6xl">
+        <TabsList className="grid grid-cols-10 w-full max-w-6xl">
           <TabsTrigger value="dados">Dados</TabsTrigger>
           <TabsTrigger value="pre-matricula">Pré-matrícula</TabsTrigger>
           <TabsTrigger value="cursos">Cursos</TabsTrigger>
@@ -883,6 +884,7 @@ const Inner = () => {
           <TabsTrigger value="provas">Provas</TabsTrigger>
           <TabsTrigger value="turmas">Turmas</TabsTrigger>
           <TabsTrigger value="parcelas">Parcelas</TabsTrigger>
+          <TabsTrigger value="repasse">Repasse</TabsTrigger>
           <TabsTrigger value="anexos">Anexos</TabsTrigger>
           <TabsTrigger value="login">Enviar Login</TabsTrigger>
         </TabsList>
@@ -1339,6 +1341,14 @@ const Inner = () => {
               })}
             </div>
           )}
+        </TabsContent>
+
+        {/* REPASSE */}
+        <TabsContent value="repasse" className="space-y-4 mt-6">
+          <RepasseSection
+            enrollments={enrollments.map(e => ({ id: e.id, courses: e.courses }))}
+            installmentsCount={(id) => installments.filter(i => i.enrollment_id === id).length}
+          />
         </TabsContent>
 
         {/* PARCELAS */}
