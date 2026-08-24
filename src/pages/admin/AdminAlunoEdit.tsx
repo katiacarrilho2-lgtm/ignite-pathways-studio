@@ -384,7 +384,8 @@ const Inner = () => {
 
   const addCourse = async () => {
     if (!newCourseId || !userId) return;
-    const { error } = await supabase.from("enrollments").insert(withAccount({ user_id: userId, course_id: newCourseId }, activeAccountId));
+    const affiliateId = affiliateSellers.find((affiliate) => affiliate.user_id === sp.vendedor)?.id ?? null;
+    const { error } = await supabase.from("enrollments").insert(withAccount({ user_id: userId, course_id: newCourseId, affiliate_id: affiliateId }, activeAccountId));
     if (error) {
       if ((error as any).code === "23505" || /duplicate key/i.test(error.message)) {
         toast.info("Aluno já está matriculado nesse curso.");

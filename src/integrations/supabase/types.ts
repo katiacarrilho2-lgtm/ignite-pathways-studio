@@ -59,6 +59,141 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_goals: {
+        Row: {
+          active: boolean
+          affiliate_id: string
+          created_at: string
+          id: string
+          period: string
+          reward_label: string | null
+          target_enrollments: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          affiliate_id: string
+          created_at?: string
+          id?: string
+          period: string
+          reward_label?: string | null
+          target_enrollments?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          affiliate_id?: string
+          created_at?: string
+          id?: string
+          period?: string
+          reward_label?: string | null
+          target_enrollments?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_goals_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_messages: {
+        Row: {
+          affiliate_id: string | null
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sent_by: string
+          title: string
+        }
+        Insert: {
+          affiliate_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sent_by: string
+          title: string
+        }
+        Update: {
+          affiliate_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sent_by?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_messages_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_program_settings: {
+        Row: {
+          milestone_enrollments: number
+          milestone_reward: string | null
+          singleton: boolean
+          star_every: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          milestone_enrollments?: number
+          milestone_reward?: string | null
+          singleton?: boolean
+          star_every?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          milestone_enrollments?: number
+          milestone_reward?: string | null
+          singleton?: boolean
+          star_every?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      affiliate_public_stats: {
+        Row: {
+          affiliate_id: string
+          display_name: string
+          paid_enrollments: number
+          updated_at: string
+        }
+        Insert: {
+          affiliate_id: string
+          display_name: string
+          paid_enrollments?: number
+          updated_at?: string
+        }
+        Update: {
+          affiliate_id?: string
+          display_name?: string
+          paid_enrollments?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_public_stats_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: true
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       affiliate_referrals: {
         Row: {
           affiliate_id: string

@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
-import { useCrmSellers } from "@/hooks/useCrmSellers";
 import { withAccount } from "@/lib/multiAccount";
 import { buildStudentContractPdf } from "@/lib/contracts/studentContractPdf";
 
@@ -54,7 +53,6 @@ const payLabel = (v: string | null) => v ? ({
 
 const Inner = () => {
   const { activeAccountId } = useCommercialAccounts();
-  const { sellers } = useCrmSellers();
   const navigate = useNavigate();
   const [list, setList] = useState<App[]>([]);
   const [courses, setCourses] = useState<{ id: string; slug: string; title: string }[]>([]);
@@ -74,6 +72,7 @@ const Inner = () => {
   const [matPassword, setMatPassword] = useState("");
   const [matSaving, setMatSaving] = useState(false);
   const [matResult, setMatResult] = useState<{ username: string; password: string; name: string } | null>(null);
+  const [affiliateSellers, setAffiliateSellers] = useState<{ id: string; user_id: string; label: string }[]>([]);
   const randomPassword = () => Math.random().toString(36).slice(-6);
 
   // Contrato
@@ -145,8 +144,27 @@ const Inner = () => {
   };
 
   const load = async () => {
-    const { data } = await supabase.from("enrollment_applications").select("*").order("created_at", { ascending: false });
+    const [{ data }, { data: affiliates, error: affiliatesError }] = await Promise.all([
+      supabase.from("enrollment_applications").select("*").order("created_at", { ascending: false }),
+      supabase.from("affiliates").select("id,user_id,code").eq("status", "ativo").order("code"),
+    ]);
     setList((data ?? []) as App[]);
+    if (affiliatesError) {
+      toast.error(`Não foi possível carregar afiliados: ${affiliatesError.message}`);
+      setAffiliateSellers([]);
+    } else {
+      const userIds = (affiliates ?? []).map((affiliate) => affiliate.user_id);
+      const { data: profiles, error: profilesError } = userIds.length
+        ? await supabase.from("profiles").select("user_id,username,display_name,email").in("user_id", userIds)
+        : { data: [], error: null };
+      if (profilesError) toast.error(`Não foi possível carregar nomes dos afiliados: ${profilesError.message}`);
+      const profileMap = new Map((profiles ?? []).map((profile) => [profile.user_id, profile]));
+      setAffiliateSellers((affiliates ?? []).map((affiliate) => {
+        const profile = profileMap.get(affiliate.user_id);
+        const name = profile?.display_name ?? profile?.email ?? affiliate.user_id.slice(0, 8);
+        return { ...affiliate, label: `${name}${profile?.username ? ` · ${profile.username}` : ""} · ${affiliate.code}` };
+      }));
+    }
     // Lista TODOS os cursos (ativos, inativos, rascunhos) para que o admin possa
     // gerar o link de pré-matrícula mesmo antes de publicar/concluir o conteúdo.
     const { data: cs } = await supabase.from("courses").select("id,slug,title").order("title");
@@ -298,9 +316,10 @@ const Inner = () => {
       const out = await res.json();
       if (!res.ok) { setMatSaving(false); return toast.error(out.error || "Erro ao criar aluno"); }
 
+      const affiliateId = affiliateSellers.find((affiliate) => affiliate.user_id === matApp.seller_id)?.id ?? null;
       const { error: enrErr } = await supabase
         .from("enrollments")
-        .insert(withAccount({ user_id: out.user_id, course_id: matApp.course_id, seller_id: matApp.seller_id }, activeAccountId));
+        .insert(withAccount({ user_id: out.user_id, course_id: matApp.course_id, seller_id: matApp.seller_id, affiliate_id: affiliateId }, activeAccountId));
       if (enrErr) { setMatSaving(false); return toast.error(enrErr.message); }
 
       // Copia dados pessoais para student_profiles (perfil de aluno usado no portal)
@@ -629,7 +648,7 @@ const Inner = () => {
                     <SelectTrigger className="h-7 text-xs w-40"><SelectValue placeholder="—" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__none__">— sem vendedor —</SelectItem>
-                      {sellers.map(s => <SelectItem key={s.user_id} value={s.user_id}>{s.display_name}</SelectItem>)}
+                      {affiliateSellers.map((affiliate) => <SelectItem key={affiliate.id} value={affiliate.user_id}>{affiliate.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </td>

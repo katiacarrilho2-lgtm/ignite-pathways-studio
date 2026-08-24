@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertTriangle, CheckCircle2, Copy, FileText, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { getReferralCode } from "@/hooks/useReferralCapture";
 
 type Course = { id: string | null; slug: string; title: string; description: string | null; price_cents: number | null; image_url: string | null };
 
@@ -64,6 +65,11 @@ const Matricula = () => {
     } catch { /* ignore */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftKey]);
+
+  useEffect(() => {
+    const referralCode = getReferralCode();
+    if (referralCode) setForm((current) => current.promo_code ? current : { ...current, promo_code: referralCode });
+  }, []);
 
   // Salva rascunho a cada alteração (debounce curto)
   useEffect(() => {
