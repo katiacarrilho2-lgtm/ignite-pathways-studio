@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -302,8 +302,8 @@ const Inner = () => {
                   const st = pendentes.length === 0 ? "recebido" : vs.some(p => p.status === "divergencia") ? "divergencia" : "a_receber";
                   const open = aberto === l.contratoId;
                   return (
-                    <>
-                      <tr key={l.contratoId} className="border-t border-border hover:bg-secondary/30 cursor-pointer" onClick={() => setAberto(open ? null : l.contratoId)}>
+                    <Fragment key={l.contratoId}>
+                      <tr className="border-t border-border hover:bg-secondary/30 cursor-pointer" onClick={() => setAberto(open ? null : l.contratoId)}>
                         <td className="p-3 font-medium text-primary flex items-center gap-1">
                           {open ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />} {l.aluno}
                         </td>
@@ -320,7 +320,7 @@ const Inner = () => {
                         <td className="p-3"><span className={`px-2 py-1 rounded text-xs ${statusClass(st)}`}>{STATUS_LABEL[st]}</span></td>
                       </tr>
                       {open && (
-                        <tr key={`${l.contratoId}-d`} className="border-t border-border bg-secondary/20">
+                        <tr className="border-t border-border bg-secondary/20">
                           <td colSpan={12} className="p-4">
                             <div className="flex justify-between items-center mb-2">
                               <p className="font-semibold text-sm">Parcelas do repasse</p>
@@ -366,7 +366,7 @@ const Inner = () => {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   );
                 })}
                 {!loading && linhasFiltradas.length === 0 && (
