@@ -181,7 +181,26 @@ export default function CrmPromoBanner() {
                 </Select>
               </div>
             </div>
-            <div><Label>URL da imagem (opcional)</Label><Input value={editing.image_url ?? ""} onChange={e => setEditing({ ...editing, image_url: e.target.value })} placeholder="https://..." /></div>
+            <div className="space-y-2">
+              <Label>Imagem do banner (opcional)</Label>
+              <ImageDropZone maxMB={5} onFiles={(files) => uploadImage(files[0])}>
+                <div className="flex items-center gap-3">
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm hover:bg-accent">
+                    <Upload className="size-4" /> {uploading ? "Enviando…" : "Escolher do computador"}
+                    <input type="file" accept="image/*" className="hidden" disabled={uploading}
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.currentTarget.value = ""; }} />
+                  </label>
+                  {editing.image_url && (
+                    <div className="flex items-center gap-2">
+                      <img src={editing.image_url} alt="Prévia do banner" className="h-12 w-20 rounded object-cover border" />
+                      <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setEditing({ ...editing, image_url: null })}>Remover</Button>
+                    </div>
+                  )}
+                </div>
+              </ImageDropZone>
+              <Input value={editing.image_url ?? ""} onChange={e => setEditing({ ...editing, image_url: e.target.value })} placeholder="ou cole uma URL https://..." />
+              <p className="text-[11px] text-muted-foreground">Recomendado: 1920×720 px (JPG/PNG, até 5 MB).</p>
+            </div>
             <div><Label>Link do botão (opcional)</Label><Input value={editing.cta_url ?? ""} onChange={e => setEditing({ ...editing, cta_url: e.target.value })} placeholder="https://... (WhatsApp, checkout, etc.)" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Ordem</Label><Input type="number" value={editing.sort_order ?? 100} onChange={e => setEditing({ ...editing, sort_order: Number(e.target.value) })} /></div>
