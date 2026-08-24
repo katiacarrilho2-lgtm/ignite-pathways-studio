@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -109,6 +108,90 @@ export function BaixaRepasseDialog({
               >Desfazer</Button>
             )}
           </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** Escolha (ou cadastro rápido) da faculdade parceira ao marcar SIM */
+function EscolherParceiroDialog({
+  open, parceiros, onClose, onPick, onCreated,
+}: {
+  open: boolean;
+  parceiros: RepasseParceiro[];
+  onClose: () => void;
+  onPick: (parceiroId: string) => void;
+  onCreated: () => Promise<void>;
+}) {
+  const ativos = parceiros.filter(p => p.ativo);
+  const [sel, setSel] = useState("");
+  const [novo, setNovo] = useState(false);
+  const [nome, setNome] = useState("");
+  const [pct, setPct] = useState("50");
+  const [fech, setFech] = useState("27");
+  const [pag, setPag] = useState("15");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setSel(ativos[0]?.id ?? "");
+    setNovo(ativos.length === 0);
+  }, [open, ativos.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!open) return null;
+
+  const criar = async () => {
+    if (!nome.trim()) return toast.error("Informe o nome da faculdade/parceiro");
+    setSaving(true);
+    const { data, error } = await supabase.from("repasse_parceiros" as any).insert({
+      nome: nome.trim(),
+      percentual: Number(pct) || 0,
+      dia_fechamento: Number(fech) || 27,
+      dia_pagamento: Number(pag) || 15,
+      ativo: true,
+    }).select("id").single();
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    await onCreated();
+    onPick((data as any).id);
+  };
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader><DialogTitle>Faculdade/parceiro do repasse</DialogTitle></DialogHeader>
+        <div className="space-y-4">
+          {!novo ? (
+            <>
+              <div>
+                <Label>Faculdade/parceiro</Label>
+                <Select value={sel} onValueChange={setSel}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    {ativos.map(p => <SelectItem key={p.id} value={p.id}>{p.nome} · {p.percentual}%</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="hero" className="flex-1" disabled={!sel} onClick={() => onPick(sel)}>Ativar repasse</Button>
+                <Button variant="outline" onClick={() => setNovo(true)}>Nova faculdade</Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div><Label>Nome da faculdade/parceiro</Label><Input value={nome} onChange={e => setNome(e.target.value)} placeholder="Ex: Faculdade XYZ" /></div>
+              <div className="grid grid-cols-3 gap-2">
+                <div><Label>% repasse</Label><Input value={pct} onChange={e => setPct(e.target.value)} inputMode="decimal" /></div>
+                <div><Label>Dia fechamento</Label><Input value={fech} onChange={e => setFech(e.target.value)} inputMode="numeric" /></div>
+                <div><Label>Dia pagamento</Label><Input value={pag} onChange={e => setPag(e.target.value)} inputMode="numeric" /></div>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="hero" className="flex-1" onClick={criar} disabled={saving}>{saving ? "Salvando…" : "Cadastrar e ativar"}</Button>
+                {ativos.length > 0 && <Button variant="outline" onClick={() => setNovo(false)}>Voltar</Button>}
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
@@ -311,6 +394,13 @@ export default function RepasseSection({ enrollments, installmentsCount }: Props
       })}
 
       <BaixaRepasseDialog parcela={baixa} onClose={() => setBaixa(null)} onSaved={load} />
+      <EscolherParceiroDialog
+        open={!!escolher}
+        parceiros={parceiros}
+        onClose={() => setEscolher(null)}
+        onPick={async (id) => { const e = escolher; setEscolher(null); if (e) await ativar(e, id); }}
+        onCreated={async () => { setParceiros(await loadParceiros()); }}
+      />
     </div>
   );
 }
