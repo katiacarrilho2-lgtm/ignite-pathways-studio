@@ -4301,6 +4301,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_affiliate_of_application: {
+        Args: { _promo_code: string; _seller_id: string; _uid: string }
+        Returns: boolean
+      }
       is_conv_participant: {
         Args: { _conv: string; _uid: string }
         Returns: boolean
