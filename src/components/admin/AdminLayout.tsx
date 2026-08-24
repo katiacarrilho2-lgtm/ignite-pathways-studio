@@ -39,6 +39,7 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/mensagens", label: "Mensagens", icon: MessageSquare, perm: "manage_courses", mod: "mod_mensagens", badge: "course_messages" },
   { to: "/admin/suporte", label: "Suporte", icon: LifeBuoy, perm: "manage_courses", mod: "mod_suporte", badge: "support_tickets" },
   { to: "/admin/financeiro", label: "Financeiro", icon: DollarSign, perm: "manage_courses", mod: "mod_financeiro" },
+  { to: "/admin/financeiro/repasses", label: "Repasses de Faculdades", icon: Handshake, perm: "manage_courses", mod: "mod_financeiro" },
   { to: "/admin/relatorios/pagamentos", label: "Relatórios", icon: FileBarChart, perm: "manage_courses", mod: "mod_relatorios" },
   { to: "/admin/afiliados", label: "Afiliados", icon: Share2, perm: "manage_affiliates", mod: "mod_afiliados" },
   { to: "/admin/meu-afiliado", label: "Meu Afiliado", icon: Share2 },
