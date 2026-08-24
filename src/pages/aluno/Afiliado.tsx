@@ -8,7 +8,7 @@ import { Copy, Users, DollarSign, Share2, Star, Trophy, Medal } from "lucide-rea
 
 type Aff = { id: string; code: string; commission_pct: number; status: string; pix_key: string | null };
 type Ref = {
-  id: string; valor_cents: number; commission_cents: number; status: string; created_at: string; paid_at: string | null;
+  id: string; enrollment_id: string; valor_cents: number; commission_cents: number; status: string; created_at: string; paid_at: string | null;
   student_name?: string | null; course_title?: string | null; parcela_label?: string | null; comprovante_path?: string | null;
 };
 type ProgramSettings = { star_every: number; milestone_enrollments: number; milestone_reward: string | null };
@@ -64,7 +64,7 @@ export default function AlunoAfiliado() {
   const link = `${window.location.origin}/?ref=${aff.code}`;
   const totalPend = refs.filter((r) => r.status === "pendente").reduce((s, r) => s + (r.commission_cents ?? 0), 0);
   const totalPago = refs.filter((r) => r.status === "pago").reduce((s, r) => s + (r.commission_cents ?? 0), 0);
-  const paidEnrollments = new Set(refs.filter((r) => r.valor_cents > 0).map((r) => r.id && `${r.student_name ?? ""}|${r.course_title ?? ""}`)).size;
+  const paidEnrollments = new Set(refs.filter((r) => r.valor_cents > 0).map((r) => r.enrollment_id)).size;
   const stars = Math.floor(paidEnrollments / Math.max(settings.star_every, 1));
   const milestoneProgress = Math.min(100, Math.round((paidEnrollments / Math.max(settings.milestone_enrollments, 1)) * 100));
 
