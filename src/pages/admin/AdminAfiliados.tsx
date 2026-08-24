@@ -77,7 +77,10 @@ const Inner = () => {
 
   const affLabel = (id: string) => {
     const a = list.find((x) => x.id === id);
-    return a ? `${a.code} · ${a.profile?.display_name ?? a.profile?.email ?? ""}` : id.slice(0, 8);
+    if (!a) return id.slice(0, 8);
+    const name = a.profile?.display_name ?? a.profile?.email ?? a.user_id.slice(0, 8);
+    const login = a.profile?.username ? ` · ${a.profile.username}` : "";
+    return `${name}${login} · ${a.code}`;
   };
 
   const vincular = async (enrollmentId: string, affiliateId: string) => {
@@ -198,7 +201,7 @@ const Inner = () => {
                       <SelectTrigger className="w-64 h-8 text-xs"><SelectValue placeholder="Sem afiliado" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">Sem afiliado</SelectItem>
-                        {list.map((a) => <SelectItem key={a.id} value={a.id}>{affLabel(a.id)}</SelectItem>)}
+                        {list.filter((a) => a.status === "ativo").map((a) => <SelectItem key={a.id} value={a.id}>{affLabel(a.id)}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </td>
