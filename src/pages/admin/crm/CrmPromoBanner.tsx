@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Plus, Pencil, Trash2, Tag, ExternalLink } from "lucide-react";
+import { Settings, Plus, Pencil, Trash2, Tag, ExternalLink, Upload } from "lucide-react";
 import { toast } from "sonner";
+import ImageDropZone from "@/components/admin/ImageDropZone";
 
 type Banner = {
   id: string;
@@ -41,6 +42,26 @@ export default function CrmPromoBanner() {
   const [manageOpen, setManageOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<Banner>>(empty);
+  const [uploading, setUploading] = useState(false);
+
+  const uploadImage = async (file?: File) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const path = `banners/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage.from("promo-images").upload(path, file, { upsert: false, contentType: file.type });
+      if (error) throw error;
+      const url = supabase.storage.from("promo-images").getPublicUrl(path).data.publicUrl;
+      setEditing((prev) => ({ ...prev, image_url: url }));
+      toast.success("Imagem enviada!");
+    } catch (e: any) {
+      toast.error(e.message ?? "Falha ao enviar imagem");
+    } finally {
+      setUploading(false);
+    }
+  };
+
 
   const load = async () => {
     const { data } = await supabase.from("crm_promo_banners" as any).select("*").order("sort_order");
@@ -181,7 +202,26 @@ export default function CrmPromoBanner() {
                 </Select>
               </div>
             </div>
-            <div><Label>URL da imagem (opcional)</Label><Input value={editing.image_url ?? ""} onChange={e => setEditing({ ...editing, image_url: e.target.value })} placeholder="https://..." /></div>
+            <div className="space-y-2">
+              <Label>Imagem do banner (opcional)</Label>
+              <ImageDropZone maxMB={5} onFiles={(files) => uploadImage(files[0])}>
+                <div className="flex items-center gap-3">
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm hover:bg-accent">
+                    <Upload className="size-4" /> {uploading ? "Enviando…" : "Escolher do computador"}
+                    <input type="file" accept="image/*" className="hidden" disabled={uploading}
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); e.currentTarget.value = ""; }} />
+                  </label>
+                  {editing.image_url && (
+                    <div className="flex items-center gap-2">
+                      <img src={editing.image_url} alt="Prévia do banner" className="h-12 w-20 rounded object-cover border" />
+                      <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setEditing({ ...editing, image_url: null })}>Remover</Button>
+                    </div>
+                  )}
+                </div>
+              </ImageDropZone>
+              <Input value={editing.image_url ?? ""} onChange={e => setEditing({ ...editing, image_url: e.target.value })} placeholder="ou cole uma URL https://..." />
+              <p className="text-[11px] text-muted-foreground">Recomendado: 1920×720 px (JPG/PNG, até 5 MB).</p>
+            </div>
             <div><Label>Link do botão (opcional)</Label><Input value={editing.cta_url ?? ""} onChange={e => setEditing({ ...editing, cta_url: e.target.value })} placeholder="https://... (WhatsApp, checkout, etc.)" /></div>
             <div className="grid grid-cols-2 gap-3">
               <div><Label>Ordem</Label><Input type="number" value={editing.sort_order ?? 100} onChange={e => setEditing({ ...editing, sort_order: Number(e.target.value) })} /></div>
