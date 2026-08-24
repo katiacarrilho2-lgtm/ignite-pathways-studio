@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, RefreshCcw, Users, Download, Upload, Eye, Link2 } from "lucide-react";
+import { Plus, Trash2, RefreshCcw, Users, Download, Upload, Eye, Link2, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { downloadCsv, brlCsv, dateCsv } from "@/lib/exportCsv";
@@ -20,6 +20,7 @@ type Ref = {
   comprovante_path: string | null; comprovante_nome: string | null;
 };
 type Enr = { id: string; user_id: string; affiliate_id: string | null; course_title: string; student_name: string };
+type ProgramSettings = { star_every: number; milestone_enrollments: number; milestone_reward: string | null };
 
 const Inner = () => {
   const [list, setList] = useState<Aff[]>([]);
@@ -29,16 +30,24 @@ const Inner = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ user_id: "", code: "", commission_pct: 10, pix_key: "" });
   const [busy, setBusy] = useState<string | null>(null);
+  const [settings, setSettings] = useState<ProgramSettings>({ star_every: 5, milestone_enrollments: 30, milestone_reward: "" });
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const load = async () => {
-    const [{ data: a }, { data: r }, { data: p }] = await Promise.all([
-      supabase.from("affiliates").select("*, profile:profiles!affiliates_user_id_fkey(username,display_name,email)").order("created_at", { ascending: false }),
+    const [{ data: a, error: aError }, { data: r, error: rError }, { data: p, error: pError }, { data: program }] = await Promise.all([
+      supabase.from("affiliates").select("*").order("created_at", { ascending: false }),
       supabase.from("affiliate_referrals").select("*").order("created_at", { ascending: false }).limit(200),
       supabase.from("profiles").select("user_id,username,display_name,email").order("username"),
+      supabase.from("affiliate_program_settings").select("star_every,milestone_enrollments,milestone_reward").eq("singleton", true).maybeSingle(),
     ]);
-    setList((a ?? []) as any);
+    if (aError || rError || pError) {
+      toast.error(aError?.message ?? rError?.message ?? pError?.message ?? "Falha ao carregar afiliados");
+    }
+    const profileMap = new Map((p ?? []).map((profile) => [profile.user_id, profile]));
+    setList((a ?? []).map((affiliate) => ({ ...affiliate, profile: profileMap.get(affiliate.user_id) ?? null })) as Aff[]);
     setRefs((r ?? []) as any);
     setStudents((p ?? []).map((x: any) => ({ user_id: x.user_id, label: `${x.username ?? ""} · ${x.display_name ?? x.email ?? ""}` })));
+    if (program) setSettings(program);
     const { data: e } = await supabase
       .from("enrollments")
       .select("id,user_id,affiliate_id, course:courses(title)")
@@ -51,6 +60,19 @@ const Inner = () => {
     })));
   };
   useEffect(() => { load(); }, []);
+
+  const saveSettings = async () => {
+    if (settings.star_every < 1 || settings.milestone_enrollments < 1) return toast.error("Informe metas maiores que zero");
+    setSavingSettings(true);
+    const { error } = await supabase.from("affiliate_program_settings").update({
+      star_every: settings.star_every,
+      milestone_enrollments: settings.milestone_enrollments,
+      milestone_reward: settings.milestone_reward?.trim() || null,
+    }).eq("singleton", true);
+    setSavingSettings(false);
+    if (error) return toast.error(error.message);
+    toast.success("Regras de premiação atualizadas");
+  };
 
   const create = async () => {
     if (!form.user_id || !form.code.trim()) return toast.error("Usuário e código obrigatórios");
@@ -147,6 +169,19 @@ const Inner = () => {
         <div className="rounded-xl border p-4"><div className="text-xs text-muted-foreground">Comissões pendentes</div><div className="text-2xl font-bold text-amber-600">R$ {(totalPend / 100).toFixed(2)}</div></div>
         <div className="rounded-xl border p-4"><div className="text-xs text-muted-foreground">Comissões pagas</div><div className="text-2xl font-bold text-emerald-600">R$ {(totalPago / 100).toFixed(2)}</div></div>
       </div>
+
+      <section className="border border-border bg-card p-5 space-y-4">
+        <div>
+          <h2 className="text-xl font-bold text-primary flex items-center gap-2"><Trophy className="size-5" /> Metas e premiação</h2>
+          <p className="text-sm text-muted-foreground">As estrelas contam matrículas com recebimento registrado, sem duplicar o mesmo aluno/curso.</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-3">
+          <div><Label>Uma estrela a cada</Label><Input type="number" min={1} value={settings.star_every} onChange={(e) => setSettings({ ...settings, star_every: Number(e.target.value) })} /><p className="text-xs text-muted-foreground mt-1">matrículas pagas</p></div>
+          <div><Label>Marco do prêmio</Label><Input type="number" min={1} value={settings.milestone_enrollments} onChange={(e) => setSettings({ ...settings, milestone_enrollments: Number(e.target.value) })} /><p className="text-xs text-muted-foreground mt-1">matrículas pagas</p></div>
+          <div><Label>Prêmio do marco</Label><Input value={settings.milestone_reward ?? ""} onChange={(e) => setSettings({ ...settings, milestone_reward: e.target.value })} placeholder="Ex.: bônus de R$ 500" /></div>
+        </div>
+        <Button variant="hero" onClick={saveSettings} disabled={savingSettings}>{savingSettings ? "Salvando..." : "Salvar regras"}</Button>
+      </section>
 
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <table className="w-full text-sm">
