@@ -345,14 +345,20 @@ const Matricula = () => {
               <Textarea rows={3} value={form.notes} onChange={e=>set("notes", e.target.value)} placeholder="Parcelamento desejado, dúvidas, etc." />
             </div>
             <div>
-              <Label>Cupom do vendedor (opcional)</Label>
+              <Label>Vendedor afiliado {lockedReferral ? "" : "(opcional)"}</Label>
               <Input
                 value={form.promo_code}
                 onChange={e=>set("promo_code", e.target.value.toUpperCase())}
                 placeholder="Ex.: VEND-001"
                 maxLength={40}
+                readOnly={!!lockedReferral}
+                className={lockedReferral ? "bg-secondary/60 font-mono font-semibold" : ""}
               />
-              <p className="text-[11px] text-muted-foreground mt-1">Informe o código do vendedor/afiliado que indicou este curso.</p>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                {lockedReferral
+                  ? "Indicação identificada automaticamente pelo link do vendedor afiliado."
+                  : "Informe o código do vendedor/afiliado que indicou este curso."}
+              </p>
             </div>
           </Card>
 
