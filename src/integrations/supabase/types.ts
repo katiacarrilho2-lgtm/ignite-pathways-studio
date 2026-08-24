@@ -3768,6 +3768,153 @@ export type Database = {
           },
         ]
       }
+      repasse_contratos: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          enrollment_id: string
+          id: string
+          observacoes: string | null
+          parceiro_id: string
+          percentual: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          enrollment_id: string
+          id?: string
+          observacoes?: string | null
+          parceiro_id: string
+          percentual?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          enrollment_id?: string
+          id?: string
+          observacoes?: string | null
+          parceiro_id?: string
+          percentual?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repasse_contratos_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: true
+            referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repasse_contratos_parceiro_id_fkey"
+            columns: ["parceiro_id"]
+            isOneToOne: false
+            referencedRelation: "repasse_parceiros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repasse_parceiros: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          dia_fechamento: number
+          dia_pagamento: number
+          id: string
+          nome: string
+          observacoes: string | null
+          percentual: number
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          dia_fechamento?: number
+          dia_pagamento?: number
+          id?: string
+          nome: string
+          observacoes?: string | null
+          percentual?: number
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          dia_fechamento?: number
+          dia_pagamento?: number
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          percentual?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      repasse_parcelas: {
+        Row: {
+          contrato_id: string
+          created_at: string
+          id: string
+          installment_id: string
+          numero: number
+          observacoes: string | null
+          previsao: string | null
+          recebido_em: string | null
+          status: string
+          updated_at: string
+          valor_aluno_cents: number
+          valor_recebido_cents: number | null
+          valor_repasse_cents: number
+        }
+        Insert: {
+          contrato_id: string
+          created_at?: string
+          id?: string
+          installment_id: string
+          numero?: number
+          observacoes?: string | null
+          previsao?: string | null
+          recebido_em?: string | null
+          status?: string
+          updated_at?: string
+          valor_aluno_cents?: number
+          valor_recebido_cents?: number | null
+          valor_repasse_cents?: number
+        }
+        Update: {
+          contrato_id?: string
+          created_at?: string
+          id?: string
+          installment_id?: string
+          numero?: number
+          observacoes?: string | null
+          previsao?: string | null
+          recebido_em?: string | null
+          status?: string
+          updated_at?: string
+          valor_aluno_cents?: number
+          valor_recebido_cents?: number | null
+          valor_repasse_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repasse_parcelas_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "repasse_contratos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repasse_parcelas_installment_id_fkey"
+            columns: ["installment_id"]
+            isOneToOne: true
+            referencedRelation: "installments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_definitions: {
         Row: {
           base_role: Database["public"]["Enums"]["app_role"]
@@ -4336,6 +4483,14 @@ export type Database = {
         Returns: Json
       }
       next_username: { Args: never; Returns: string }
+      repasse_previsao: {
+        Args: { _fechamento: number; _pagamento: number; _venc: string }
+        Returns: string
+      }
+      repasse_sync_contrato: {
+        Args: { _contrato_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_permission:
