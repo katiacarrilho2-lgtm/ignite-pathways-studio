@@ -202,19 +202,21 @@ export default function RepasseSection({ enrollments, installmentsCount }: Props
                   {installmentsCount(enr.id)} parcela(s) nesta matrícula
                 </p>
               </div>
-              <label className="flex items-center gap-2 text-sm">
+              <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">Esta matrícula gera repasse para a Multplick?</span>
-                <Switch
-                  checked={!!contrato}
-                  disabled={busy === enr.id || (!contrato && parceiros.length === 0)}
-                  onCheckedChange={(v) => {
-                    if (!v && contrato) return desativar(contrato.id);
-                    const ativos = parceiros.filter(p => p.ativo);
-                    if (v && ativos.length) ativar(enr.id, ativos[0].id);
-                  }}
-                />
-                <strong>{contrato ? "SIM" : "NÃO"}</strong>
-              </label>
+                <Button
+                  type="button" size="sm"
+                  variant={!contrato ? "hero" : "outline"}
+                  disabled={busy === enr.id}
+                  onClick={() => { if (contrato) desativar(contrato.id); }}
+                >NÃO</Button>
+                <Button
+                  type="button" size="sm"
+                  variant={contrato ? "hero" : "outline"}
+                  disabled={busy === enr.id}
+                  onClick={() => { if (!contrato) setEscolher(enr.id); }}
+                >SIM</Button>
+              </div>
             </div>
 
             {contrato && (
