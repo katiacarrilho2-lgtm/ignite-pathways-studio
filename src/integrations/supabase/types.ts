@@ -59,6 +59,112 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_goals: {
+        Row: {
+          active: boolean
+          affiliate_id: string
+          created_at: string
+          id: string
+          period: string
+          reward_label: string | null
+          target_enrollments: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          affiliate_id: string
+          created_at?: string
+          id?: string
+          period: string
+          reward_label?: string | null
+          target_enrollments?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          affiliate_id?: string
+          created_at?: string
+          id?: string
+          period?: string
+          reward_label?: string | null
+          target_enrollments?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_goals_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_messages: {
+        Row: {
+          affiliate_id: string | null
+          body: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sent_by: string
+          title: string
+        }
+        Insert: {
+          affiliate_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sent_by: string
+          title: string
+        }
+        Update: {
+          affiliate_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sent_by?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_messages_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_program_settings: {
+        Row: {
+          milestone_enrollments: number
+          milestone_reward: string | null
+          singleton: boolean
+          star_every: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          milestone_enrollments?: number
+          milestone_reward?: string | null
+          singleton?: boolean
+          star_every?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          milestone_enrollments?: number
+          milestone_reward?: string | null
+          singleton?: boolean
+          star_every?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       affiliate_referrals: {
         Row: {
           affiliate_id: string
@@ -4150,6 +4256,39 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      affiliate_goal_progress: {
+        Args: never
+        Returns: {
+          affiliate_id: string
+          paid_enrollments: number
+          period: string
+          reward_label: string
+          target_enrollments: number
+        }[]
+      }
+      affiliate_ranking: {
+        Args: never
+        Returns: {
+          affiliate_id: string
+          display_name: string
+          paid_enrollments: number
+          stars: number
+        }[]
+      }
+      affiliate_remaining_installments: {
+        Args: never
+        Returns: {
+          course_title: string
+          enrollment_id: string
+          id: string
+          numero: number
+          status: string
+          student_name: string
+          valor_cents: number
+          valor_final_cents: number
+          vencimento: string
+        }[]
       }
       crm_can_manage_all: { Args: { _uid: string }; Returns: boolean }
       has_permission: {
