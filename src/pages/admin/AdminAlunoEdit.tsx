@@ -397,6 +397,15 @@ const Inner = () => {
     }
     toast.success("Curso adicionado!"); setAddCourseOpen(false); setNewCourseId(""); load();
   };
+  const changeCourse = async (enrollmentId: string, courseId: string) => {
+    const { error } = await supabase.from("enrollments").update({ course_id: courseId }).eq("id", enrollmentId);
+    if (error) {
+      if ((error as any).code === "23505" || /duplicate key/i.test(error.message)) return toast.info("Aluno já está matriculado nesse curso.");
+      return toast.error(error.message);
+    }
+    toast.success("Curso alterado!"); load();
+  };
+
   const removeEnr = async (id: string) => {
     if (!confirm("Remover este curso?")) return;
     const { error } = await supabase.from("enrollments").delete().eq("id", id);
@@ -1119,7 +1128,14 @@ const Inner = () => {
               <tbody>
                 {enrollments.map(e => (
                   <tr key={e.id} className="border-t border-border">
-                    <td className="p-3 font-medium">{e.courses?.title}</td>
+                    <td className="p-3 font-medium min-w-[260px]">
+                      <Select value={e.course_id} onValueChange={(v) => { if (v !== e.course_id) changeCourse(e.id, v); }}>
+                        <SelectTrigger><SelectValue placeholder={e.courses?.title ?? "Selecione"} /></SelectTrigger>
+                        <SelectContent>
+                          {allCourses.map(c => <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </td>
                     <td className="p-3">{e.progress}%</td>
                     <td className="p-3"><span className="px-2 py-1 rounded text-xs bg-green-100 text-green-800">{e.status}</span></td>
                     <td className="p-3 text-muted-foreground">{new Date(e.enrolled_at).toLocaleDateString("pt-BR")}</td>
