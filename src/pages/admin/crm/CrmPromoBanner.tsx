@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Plus, Pencil, Trash2, Tag, ExternalLink } from "lucide-react";
+import { Settings, Plus, Pencil, Trash2, Tag, ExternalLink, Upload } from "lucide-react";
 import { toast } from "sonner";
+import ImageDropZone from "@/components/admin/ImageDropZone";
 
 type Banner = {
   id: string;
