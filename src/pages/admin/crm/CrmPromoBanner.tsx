@@ -42,6 +42,26 @@ export default function CrmPromoBanner() {
   const [manageOpen, setManageOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<Banner>>(empty);
+  const [uploading, setUploading] = useState(false);
+
+  const uploadImage = async (file?: File) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+      const path = `banners/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage.from("promo-images").upload(path, file, { upsert: false, contentType: file.type });
+      if (error) throw error;
+      const url = supabase.storage.from("promo-images").getPublicUrl(path).data.publicUrl;
+      setEditing((prev) => ({ ...prev, image_url: url }));
+      toast.success("Imagem enviada!");
+    } catch (e: any) {
+      toast.error(e.message ?? "Falha ao enviar imagem");
+    } finally {
+      setUploading(false);
+    }
+  };
+
 
   const load = async () => {
     const { data } = await supabase.from("crm_promo_banners" as any).select("*").order("sort_order");
