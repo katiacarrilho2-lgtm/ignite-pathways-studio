@@ -20,11 +20,16 @@ import jsPDF from "jspdf";
 import logoUrl from "@/assets/multplick-logo.png";
 import { StudentAnexos } from "@/components/admin/StudentAnexos";
 import { StudentContractDialog } from "@/components/admin/StudentContractDialog";
-import { useCrmSellers } from "@/hooks/useCrmSellers";
 import { useAuth } from "@/hooks/useAuth";
 
 type Course = { id: string; title: string };
 type Enrollment = { id: string; course_id: string; status: string; progress: number; enrolled_at: string; courses: { title: string } | null };
+type AffiliateSeller = {
+  id: string;
+  user_id: string;
+  code: string;
+  profile: { username: string | null; display_name: string | null; email: string | null } | null;
+};
 type Turma = { id: string; nome: string; courses: { title: string } | null };
 type ProgressRow = {
   lesson_id: string; completed: boolean; score: number | null;
@@ -73,7 +78,6 @@ const calcIdade = (d?: string | null) => {
 
 const Inner = () => {
   const { activeAccountId } = useCommercialAccounts();
-  const { sellers } = useCrmSellers();
   const { hasPermission, isSuperAdmin } = useAuth();
   const canIssueBoleto = isSuperAdmin || hasPermission("issue_boletos") || hasPermission("manage_courses");
   const canSettleBoleto = isSuperAdmin || hasPermission("settle_boletos") || hasPermission("manage_courses");
@@ -93,6 +97,7 @@ const Inner = () => {
   const [progressRows, setProgressRows] = useState<ProgressRow[]>([]);
   const [exams, setExams] = useState<ExamRow[]>([]);
   const [preApps, setPreApps] = useState<PreApp[]>([]);
+  const [affiliateSellers, setAffiliateSellers] = useState<AffiliateSeller[]>([]);
   const [savingPreId, setSavingPreId] = useState<string | null>(null);
 
   // dialogs
@@ -164,13 +169,17 @@ const Inner = () => {
   const load = async () => {
     if (!userId) return;
     setLoading(true);
-    const [{ data: prof }, { data: spd }, { data: enrs }, { data: tas }, { data: ats }, { data: cs }] = await Promise.all([
+    const [{ data: prof }, { data: spd }, { data: enrs }, { data: tas }, { data: ats }, { data: cs }, { data: affs }] = await Promise.all([
       supabase.from("profiles").select("username, display_name, email").eq("user_id", userId).maybeSingle(),
       supabase.from("student_profiles").select("*").eq("user_id", userId).maybeSingle(),
       supabase.from("enrollments").select("id,course_id,status,progress,enrolled_at, courses(title)").eq("user_id", userId).order("enrolled_at", { ascending: false }),
       supabase.from("turma_alunos").select("turma_id, turmas(id, nome, courses(title))").eq("user_id", userId),
       supabase.from("turmas").select("id, nome").order("nome"),
       supabase.from("courses").select("id,title").eq("active", true).order("title"),
+      supabase.from("affiliates")
+        .select("id,user_id,code,profile:profiles!affiliates_user_id_fkey(username,display_name,email)")
+        .eq("status", "ativo")
+        .order("code"),
     ]);
     setProfile(prof ?? { username: "", display_name: "", email: "" });
     setSp(spd ?? { user_id: userId });
@@ -178,6 +187,7 @@ const Inner = () => {
     setTurmas(((tas ?? []) as any[]).map((t: any) => ({ id: t.turmas?.id, nome: t.turmas?.nome, courses: t.turmas?.courses })).filter((t: any) => t.id));
     setAllTurmas((ats ?? []) as any);
     setAllCourses((cs ?? []) as any);
+    setAffiliateSellers((affs ?? []) as unknown as AffiliateSeller[]);
     const enrIds = (enrs ?? []).map((e: any) => e.id);
     if (enrIds.length) {
       const { data: ins } = await supabase.from("installments").select("*").in("enrollment_id", enrIds).order("vencimento");
@@ -331,40 +341,18 @@ const Inner = () => {
     }
     setSaving(false);
     if (error) return toast.error(error.message);
-    // Attribute sales to selected vendedor (creates/updates affiliate_referrals)
-    if (sp.vendedor && enrollments.length) {
-      try {
-        let { data: aff } = await supabase.from("affiliates").select("id, commission_pct").eq("user_id", sp.vendedor).maybeSingle();
-        if (!aff) {
-          const code = `V${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
-          const { data: created } = await supabase.from("affiliates").insert({ user_id: sp.vendedor, code, commission_pct: 10, status: "ativo" } as any).select("id, commission_pct").single();
-          aff = created;
-        }
-        if (aff) {
-          const pct = Number(aff.commission_pct) || 10;
-          for (const e of enrollments) {
-            // Vincula a matrícula ao afiliado: a partir daí, toda parcela marcada
-            // como paga gera comissão automaticamente (trigger no banco).
-            await supabase.from("enrollments").update({ affiliate_id: aff.id }).eq("id", e.id);
-            const parcelas = installments.filter(i => i.enrollment_id === e.id);
-            // Só conta parcelas efetivamente pagas
-            const paidCents = parcelas
-              .filter(i => i.status === "pago")
-              .reduce((s, i) => s + (i.valor_final_cents ?? i.valor_cents ?? 0), 0);
-            const commissionCents = Math.round(paidCents * pct / 100);
-            const { data: existing } = await supabase.from("affiliate_referrals").select("id").eq("enrollment_id", e.id).limit(1).maybeSingle();
-            if (existing) {
-              await supabase.from("affiliate_referrals").update({ affiliate_id: aff.id, valor_cents: paidCents, commission_cents: commissionCents }).eq("id", existing.id);
-            } else {
-              await supabase.from("affiliate_referrals").insert({ affiliate_id: aff.id, enrollment_id: e.id, valor_cents: paidCents, commission_cents: commissionCents, status: paidCents > 0 ? "parcial" : "pendente" } as any);
-            }
-          }
-        }
-      } catch (e: any) {
-        console.warn("Falha ao atribuir comissão:", e?.message);
-        toast.error("Cadastro salvo, mas falhou ao vincular a comissão do afiliado.");
+    // O afiliado é vinculado à matrícula. A comissão só nasce quando uma
+    // parcela for efetivamente marcada como paga pelo trigger do banco.
+    if (enrollments.length) {
+      const affiliateId = affiliateSellers.find((affiliate) => affiliate.user_id === sp.vendedor)?.id ?? null;
+      const { error: affiliateError } = await supabase
+        .from("enrollments")
+        .update({ affiliate_id: affiliateId })
+        .in("id", enrollments.map((enrollment) => enrollment.id));
+      if (affiliateError) {
+        toast.error("Cadastro salvo, mas falhou ao vincular o afiliado às matrículas.");
+        return;
       }
-
     }
     toast.success("Cadastro salvo!");
     load();
@@ -988,19 +976,21 @@ const Inner = () => {
                 </Select>
               </div>
               <div>
-                <Label>Vendedor</Label>
+                <Label>Vendedor afiliado</Label>
                 <Select value={sp.vendedor ?? "__none__"} onValueChange={v=>setSpField("vendedor", v === "__none__" ? null : v)}>
-                  <SelectTrigger><SelectValue placeholder="Selecionar vendedor" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Selecionar afiliado" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="__none__">— Sem vendedor —</SelectItem>
-                    {sellers.map(s => (
-                      <SelectItem key={s.user_id} value={s.user_id}>
-                        {s.display_name} {(s.kind as string) !== "staff" ? `· ${s.kind}` : ""}
+                    <SelectItem value="__none__">— Sem afiliado —</SelectItem>
+                    {affiliateSellers.map((affiliate) => (
+                      <SelectItem key={affiliate.id} value={affiliate.user_id}>
+                        {affiliate.profile?.display_name ?? affiliate.profile?.email ?? affiliate.user_id.slice(0, 8)}
+                        {affiliate.profile?.username ? ` · ${affiliate.profile.username}` : ""}
+                        {` · ${affiliate.code}`}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-[11px] text-muted-foreground mt-1">A venda deste aluno será contabilizada como comissão para o vendedor selecionado.</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Somente afiliados ativos aparecem. A comissão será gerada quando a parcela for paga.</p>
               </div>
               <div><Label>Data final do curso</Label><Input type="date" value={sp.data_final ?? ""} onChange={e=>setSpField("data_final", e.target.value)} /></div>
               <div className="flex items-center justify-between border border-border rounded-md px-3"><Label>Liberar apostila</Label><Switch checked={!!sp.liberar_apostila} onCheckedChange={v=>setSpField("liberar_apostila", v)} /></div>
