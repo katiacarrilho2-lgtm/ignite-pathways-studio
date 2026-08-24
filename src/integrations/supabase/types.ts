@@ -1851,6 +1851,7 @@ export type Database = {
           state: string | null
           status: string
           street: string | null
+          submitted_by: string | null
           updated_at: string
         }
         Insert: {
@@ -1888,6 +1889,7 @@ export type Database = {
           state?: string | null
           status?: string
           street?: string | null
+          submitted_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -1925,6 +1927,7 @@ export type Database = {
           state?: string | null
           status?: string
           street?: string | null
+          submitted_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -4247,6 +4250,7 @@ export type Database = {
         | "mod_documentos_internos"
         | "mod_auditoria"
         | "mod_departamentos"
+        | "manage_vault"
       app_role: "super_admin" | "admin" | "editor" | "viewer" | "certificadora"
       crm_event_type:
         | "anotacao"
@@ -4441,6 +4445,7 @@ export const Constants = {
         "mod_documentos_internos",
         "mod_auditoria",
         "mod_departamentos",
+        "manage_vault",
       ],
       app_role: ["super_admin", "admin", "editor", "viewer", "certificadora"],
       crm_event_type: [

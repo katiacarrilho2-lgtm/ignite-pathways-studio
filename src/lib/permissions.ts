@@ -115,6 +115,7 @@ export const PERMISSION_GROUPS: PermGroup[] = [
       { id: "mod_cargos", label: "Cargos e permissões" },
       { id: "mod_auditoria", label: "Auditoria do sistema" },
       { id: "manage_users", label: "Ação: gerenciar usuários e cargos" },
+      { id: "manage_vault", label: "Ação: cofre de acessos (credenciais)" },
     ],
   },
 ];
