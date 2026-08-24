@@ -343,25 +343,28 @@ const Inner = () => {
         if (aff) {
           const pct = Number(aff.commission_pct) || 10;
           for (const e of enrollments) {
+            // Vincula a matrícula ao afiliado: a partir daí, toda parcela marcada
+            // como paga gera comissão automaticamente (trigger no banco).
+            await supabase.from("enrollments").update({ affiliate_id: aff.id }).eq("id", e.id);
             const parcelas = installments.filter(i => i.enrollment_id === e.id);
             // Só conta parcelas efetivamente pagas
             const paidCents = parcelas
               .filter(i => i.status === "pago")
               .reduce((s, i) => s + (i.valor_final_cents ?? i.valor_cents ?? 0), 0);
             const commissionCents = Math.round(paidCents * pct / 100);
-            const { data: existing } = await supabase.from("affiliate_referrals").select("id").eq("enrollment_id", e.id).maybeSingle();
+            const { data: existing } = await supabase.from("affiliate_referrals").select("id").eq("enrollment_id", e.id).limit(1).maybeSingle();
             if (existing) {
               await supabase.from("affiliate_referrals").update({ affiliate_id: aff.id, valor_cents: paidCents, commission_cents: commissionCents }).eq("id", existing.id);
             } else {
               await supabase.from("affiliate_referrals").insert({ affiliate_id: aff.id, enrollment_id: e.id, valor_cents: paidCents, commission_cents: commissionCents, status: paidCents > 0 ? "parcial" : "pendente" } as any);
             }
-            // Recalcula via trigger/função no banco para manter consistência
-            await supabase.rpc("recompute_affiliate_referral" as any, { _enrollment_id: e.id } as any);
           }
         }
       } catch (e: any) {
         console.warn("Falha ao atribuir comissão:", e?.message);
+        toast.error("Cadastro salvo, mas falhou ao vincular a comissão do afiliado.");
       }
+
     }
     toast.success("Cadastro salvo!");
     load();
