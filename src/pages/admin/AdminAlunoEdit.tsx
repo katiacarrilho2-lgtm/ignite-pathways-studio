@@ -169,17 +169,13 @@ const Inner = () => {
   const load = async () => {
     if (!userId) return;
     setLoading(true);
-    const [{ data: prof }, { data: spd }, { data: enrs }, { data: tas }, { data: ats }, { data: cs }, { data: affs }] = await Promise.all([
+    const [{ data: prof }, { data: spd }, { data: enrs }, { data: tas }, { data: ats }, { data: cs }] = await Promise.all([
       supabase.from("profiles").select("username, display_name, email").eq("user_id", userId).maybeSingle(),
       supabase.from("student_profiles").select("*").eq("user_id", userId).maybeSingle(),
       supabase.from("enrollments").select("id,course_id,status,progress,enrolled_at, courses(title)").eq("user_id", userId).order("enrolled_at", { ascending: false }),
       supabase.from("turma_alunos").select("turma_id, turmas(id, nome, courses(title))").eq("user_id", userId),
       supabase.from("turmas").select("id, nome").order("nome"),
       supabase.from("courses").select("id,title").eq("active", true).order("title"),
-      supabase.from("affiliates")
-        .select("id,user_id,code,profile:profiles!affiliates_user_id_fkey(username,display_name,email)")
-        .eq("status", "ativo")
-        .order("code"),
     ]);
     setProfile(prof ?? { username: "", display_name: "", email: "" });
     setSp(spd ?? { user_id: userId });
@@ -187,7 +183,35 @@ const Inner = () => {
     setTurmas(((tas ?? []) as any[]).map((t: any) => ({ id: t.turmas?.id, nome: t.turmas?.nome, courses: t.turmas?.courses })).filter((t: any) => t.id));
     setAllTurmas((ats ?? []) as any);
     setAllCourses((cs ?? []) as any);
-    setAffiliateSellers((affs ?? []) as unknown as AffiliateSeller[]);
+    // Carrega afiliados e perfis separadamente. Assim, uma relação embutida
+    // indisponível no cache da API não deixa o seletor silenciosamente vazio.
+    const { data: activeAffiliates, error: affiliatesError } = await supabase
+      .from("affiliates")
+      .select("id,user_id,code")
+      .eq("status", "ativo")
+      .order("code");
+    if (affiliatesError) {
+      setAffiliateSellers([]);
+      toast.error(`Não foi possível carregar os afiliados: ${affiliatesError.message}`);
+    } else {
+      const affiliateUserIds = (activeAffiliates ?? []).map((affiliate) => affiliate.user_id);
+      const { data: affiliateProfiles, error: profilesError } = affiliateUserIds.length
+        ? await supabase
+            .from("profiles")
+            .select("user_id,username,display_name,email")
+            .in("user_id", affiliateUserIds)
+        : { data: [], error: null };
+      if (profilesError) {
+        toast.error(`Não foi possível carregar os nomes dos afiliados: ${profilesError.message}`);
+      }
+      const profilesByUserId = new Map(
+        (affiliateProfiles ?? []).map((affiliateProfile) => [affiliateProfile.user_id, affiliateProfile]),
+      );
+      setAffiliateSellers((activeAffiliates ?? []).map((affiliate) => ({
+        ...affiliate,
+        profile: profilesByUserId.get(affiliate.user_id) ?? null,
+      })));
+    }
     const enrIds = (enrs ?? []).map((e: any) => e.id);
     if (enrIds.length) {
       const { data: ins } = await supabase.from("installments").select("*").in("enrollment_id", enrIds).order("vencimento");
