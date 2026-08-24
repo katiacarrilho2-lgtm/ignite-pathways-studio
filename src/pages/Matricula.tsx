@@ -66,10 +66,17 @@ const Matricula = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftKey]);
 
+  // Código do vendedor/afiliado: ?ref= na URL tem prioridade e trava o campo
+  const refParam = (searchParams.get("ref") ?? "").trim().toUpperCase();
+  const lockedReferral = /^[A-Z0-9_-]{2,30}$/.test(refParam) ? refParam : null;
+
   useEffect(() => {
-    const referralCode = getReferralCode();
-    if (referralCode) setForm((current) => current.promo_code ? current : { ...current, promo_code: referralCode });
-  }, []);
+    const referralCode = lockedReferral ?? getReferralCode();
+    if (!referralCode) return;
+    setForm((current) =>
+      lockedReferral || !current.promo_code ? { ...current, promo_code: referralCode } : current
+    );
+  }, [lockedReferral, draftRestored]);
 
   // Salva rascunho a cada alteração (debounce curto)
   useEffect(() => {
