@@ -444,5 +444,5 @@ const Inner = () => {
 };
 
 export default function AdminRepasses() {
-  return <RequirePermission perm="manage_courses" mod="mod_financeiro"><Inner /></RequirePermission>;
+  return <RequirePermission perm="manage_courses"><Inner /></RequirePermission>;
 }
