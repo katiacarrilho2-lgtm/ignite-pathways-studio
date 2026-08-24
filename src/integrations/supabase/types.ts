@@ -3791,6 +3791,7 @@ export type Database = {
       }
       student_profiles: {
         Row: {
+          ano_formacao: string | null
           bairro: string | null
           birth_date: string | null
           bolsista: boolean
@@ -3800,14 +3801,21 @@ export type Database = {
           contact_email: string | null
           cpf: string | null
           created_at: string
+          curso_escolhido: string | null
           data_final: string | null
+          escolaridade: string | null
           estado: string | null
           foto_url: string | null
           full_name: string | null
           id: string
+          instituicao_formacao: string | null
           liberar_apostila: boolean
+          mae: string | null
+          naturalidade: string | null
           numero: string | null
           observacoes: string | null
+          orgao_emissor: string | null
+          pai: string | null
           phone: string | null
           phone1: string | null
           phone2: string | null
@@ -3816,6 +3824,7 @@ export type Database = {
           responsavel_nome: string | null
           responsavel_rg: string | null
           rg: string | null
+          rg_emissao: string | null
           rua: string | null
           sexo: string | null
           status: string
@@ -3824,6 +3833,7 @@ export type Database = {
           vendedor: string | null
         }
         Insert: {
+          ano_formacao?: string | null
           bairro?: string | null
           birth_date?: string | null
           bolsista?: boolean
@@ -3833,14 +3843,21 @@ export type Database = {
           contact_email?: string | null
           cpf?: string | null
           created_at?: string
+          curso_escolhido?: string | null
           data_final?: string | null
+          escolaridade?: string | null
           estado?: string | null
           foto_url?: string | null
           full_name?: string | null
           id?: string
+          instituicao_formacao?: string | null
           liberar_apostila?: boolean
+          mae?: string | null
+          naturalidade?: string | null
           numero?: string | null
           observacoes?: string | null
+          orgao_emissor?: string | null
+          pai?: string | null
           phone?: string | null
           phone1?: string | null
           phone2?: string | null
@@ -3849,6 +3866,7 @@ export type Database = {
           responsavel_nome?: string | null
           responsavel_rg?: string | null
           rg?: string | null
+          rg_emissao?: string | null
           rua?: string | null
           sexo?: string | null
           status?: string
@@ -3857,6 +3875,7 @@ export type Database = {
           vendedor?: string | null
         }
         Update: {
+          ano_formacao?: string | null
           bairro?: string | null
           birth_date?: string | null
           bolsista?: boolean
@@ -3866,14 +3885,21 @@ export type Database = {
           contact_email?: string | null
           cpf?: string | null
           created_at?: string
+          curso_escolhido?: string | null
           data_final?: string | null
+          escolaridade?: string | null
           estado?: string | null
           foto_url?: string | null
           full_name?: string | null
           id?: string
+          instituicao_formacao?: string | null
           liberar_apostila?: boolean
+          mae?: string | null
+          naturalidade?: string | null
           numero?: string | null
           observacoes?: string | null
+          orgao_emissor?: string | null
+          pai?: string | null
           phone?: string | null
           phone1?: string | null
           phone2?: string | null
@@ -3882,6 +3908,7 @@ export type Database = {
           responsavel_nome?: string | null
           responsavel_rg?: string | null
           rg?: string | null
+          rg_emissao?: string | null
           rua?: string | null
           sexo?: string | null
           status?: string
