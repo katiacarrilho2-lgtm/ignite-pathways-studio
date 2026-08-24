@@ -165,6 +165,35 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_public_stats: {
+        Row: {
+          affiliate_id: string
+          display_name: string
+          paid_enrollments: number
+          updated_at: string
+        }
+        Insert: {
+          affiliate_id: string
+          display_name: string
+          paid_enrollments?: number
+          updated_at?: string
+        }
+        Update: {
+          affiliate_id?: string
+          display_name?: string
+          paid_enrollments?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_public_stats_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: true
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       affiliate_referrals: {
         Row: {
           affiliate_id: string
