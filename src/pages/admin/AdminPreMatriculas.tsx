@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
-import { useCrmSellers } from "@/hooks/useCrmSellers";
 import { withAccount } from "@/lib/multiAccount";
 import { buildStudentContractPdf } from "@/lib/contracts/studentContractPdf";
 
@@ -54,7 +53,6 @@ const payLabel = (v: string | null) => v ? ({
 
 const Inner = () => {
   const { activeAccountId } = useCommercialAccounts();
-  const { sellers } = useCrmSellers();
   const navigate = useNavigate();
   const [list, setList] = useState<App[]>([]);
   const [courses, setCourses] = useState<{ id: string; slug: string; title: string }[]>([]);
