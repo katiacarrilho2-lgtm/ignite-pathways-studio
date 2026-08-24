@@ -128,6 +128,7 @@ export default function RepasseSection({ enrollments, installmentsCount }: Props
   const [parcelas, setParcelas] = useState<RepasseParcela[]>([]);
   const [baixa, setBaixa] = useState<RepasseParcela | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [escolher, setEscolher] = useState<string | null>(null);
 
   const enrIds = useMemo(() => enrollments.map(e => e.id), [enrollments]);
 
