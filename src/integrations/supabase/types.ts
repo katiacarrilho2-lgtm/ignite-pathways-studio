@@ -4257,39 +4257,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      affiliate_goal_progress: {
-        Args: never
-        Returns: {
-          affiliate_id: string
-          paid_enrollments: number
-          period: string
-          reward_label: string
-          target_enrollments: number
-        }[]
-      }
-      affiliate_ranking: {
-        Args: never
-        Returns: {
-          affiliate_id: string
-          display_name: string
-          paid_enrollments: number
-          stars: number
-        }[]
-      }
-      affiliate_remaining_installments: {
-        Args: never
-        Returns: {
-          course_title: string
-          enrollment_id: string
-          id: string
-          numero: number
-          status: string
-          student_name: string
-          valor_cents: number
-          valor_final_cents: number
-          vencimento: string
-        }[]
-      }
       crm_can_manage_all: { Args: { _uid: string }; Returns: boolean }
       has_permission: {
         Args: {
