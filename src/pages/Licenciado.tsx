@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { Briefcase, CalendarCheck, Coins, Handshake, TrendingUp, Users } from "lucide-react";
 import { z } from "zod";
 import { useState } from "react";
@@ -29,20 +30,32 @@ const Licenciado = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+    const formEl = e.currentTarget;
+    const data = Object.fromEntries(new FormData(formEl).entries());
     const result = schema.safeParse(data);
     if (!result.success) {
       toast({ title: "Verifique os campos", description: result.error.issues[0].message, variant: "destructive" });
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    const { nome, email, telefone, cidade, mensagem } = result.data;
+    const { error } = await supabase.from("leads").insert({
+      name: nome,
+      email,
+      phone: telefone,
+      source: "licenciado",
+      message: [`Cidade/Estado: ${cidade}`, mensagem ? `Mensagem: ${mensagem}` : null].filter(Boolean).join("\n"),
+    });
+    if (error) {
       setLoading(false);
-      toast({ title: "Solicitação enviada!", description: "Vamos agendar uma reunião para apresentar o modelo Licenciado Multplick." });
-      e.currentTarget.reset();
-    }, 800);
+      toast({ title: "Não foi possível enviar", description: error.message, variant: "destructive" });
+      return;
+    }
+    setLoading(false);
+    toast({ title: "Solicitação enviada!", description: "Vamos agendar uma reunião para apresentar o modelo Licenciado Multplick." });
+    formEl.reset();
   };
 
   return (

@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { useState } from "react";
 
@@ -22,9 +23,10 @@ const Contato = () => {
   const curso = params.get("curso") ?? "";
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const form = new FormData(formEl);
     const data = Object.fromEntries(form.entries());
     const result = schema.safeParse(data);
     if (!result.success) {
@@ -32,11 +34,22 @@ const Contato = () => {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    const { nome, email, telefone, mensagem } = result.data;
+    const { error } = await supabase.from("leads").insert({
+      name: nome,
+      email,
+      phone: telefone,
+      message: mensagem,
+      source: curso ? `contato: ${curso}` : "contato",
+    });
+    if (error) {
       setLoading(false);
-      toast({ title: "Mensagem enviada!", description: "Entraremos em contato em breve." });
-      e.currentTarget.reset();
-    }, 800);
+      toast({ title: "Não foi possível enviar", description: error.message, variant: "destructive" });
+      return;
+    }
+    setLoading(false);
+    toast({ title: "Mensagem enviada!", description: "Entraremos em contato em breve." });
+    formEl.reset();
   };
 
   return (

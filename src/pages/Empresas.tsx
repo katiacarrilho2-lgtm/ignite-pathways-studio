@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { useState } from "react";
 import { Briefcase, TrendingUp, Users, ShieldCheck, Quote } from "lucide-react";
@@ -21,9 +22,10 @@ const Empresas = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const form = new FormData(formEl);
     const data = Object.fromEntries(form.entries());
     const result = schema.safeParse(data);
     if (!result.success) {
@@ -31,11 +33,26 @@ const Empresas = () => {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
+    const { empresa, responsavel, telefone, email, funcionarios, treinamento } = result.data;
+    const { error } = await supabase.from("leads").insert({
+      name: responsavel,
+      email,
+      phone: telefone,
+      source: "empresas",
+      message: [
+        `Empresa: ${empresa}`,
+        `Funcionários: ${funcionarios}`,
+        `Treinamento: ${treinamento}`,
+      ].join("\n"),
+    });
+    if (error) {
       setLoading(false);
-      toast({ title: "Solicitação enviada!", description: "Nossa equipe entrará em contato em breve." });
-      e.currentTarget.reset();
-    }, 800);
+      toast({ title: "Não foi possível enviar", description: error.message, variant: "destructive" });
+      return;
+    }
+    setLoading(false);
+    toast({ title: "Solicitação enviada!", description: "Nossa equipe entrará em contato em breve." });
+    formEl.reset();
   };
 
   return (
