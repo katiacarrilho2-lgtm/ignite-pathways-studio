@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminTasksWidget from "@/components/admin/AdminTasksWidget";
+import { useAuth } from "@/hooks/useAuth";
 import FinanceWidget from "@/components/admin/FinanceWidget";
 
 const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -16,6 +17,8 @@ const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency"
 type Kpi = { key: string; label: string; value: string | number; icon: any; to: string; tone: string };
 
 export default function Dashboard() {
+  const { isMaster, roles } = useAuth();
+  const canSee = isMaster || roles.includes("admin");
   const [loading, setLoading] = useState(true);
   const [k, setK] = useState<Record<string, number>>({});
 
@@ -51,7 +54,7 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { if (canSee) load(); }, [canSee]);
 
   const kpis: Kpi[] = [
     { key: "novosLeads", label: "Novos leads", value: k.novosLeads ?? 0, icon: UserPlus, to: "/admin/crm", tone: "text-primary bg-primary/10" },
@@ -64,6 +67,15 @@ export default function Dashboard() {
     { key: "propostas", label: "Propostas abertas", value: k.propostas ?? 0, icon: ClipboardList, to: "/admin/pre-matriculas", tone: "text-violet-600 bg-violet-500/10" },
     { key: "empresas", label: "Empresas para retornar", value: k.empresas ?? 0, icon: Building2, to: "/admin/crm/agenda", tone: "text-orange-600 bg-orange-500/10" },
   ];
+
+  if (!canSee) return (
+    <div className="min-h-[60vh] grid place-items-center p-6 text-center">
+      <div className="max-w-md space-y-2">
+        <h1 className="text-2xl font-bold text-primary">Acesso restrito</h1>
+        <p className="text-muted-foreground">O Dashboard geral é exclusivo do master e dos administradores. Use os módulos liberados no menu lateral.</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6 md:p-8 space-y-6">
