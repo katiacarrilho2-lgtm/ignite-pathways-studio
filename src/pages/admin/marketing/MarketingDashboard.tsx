@@ -82,6 +82,8 @@ export default function MarketingDashboard() {
         ))}
       </div>
 
+      <MarketingAgendaWidget />
+
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="p-4">
           <div className="flex items-center justify-between mb-3">
