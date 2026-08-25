@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { Megaphone, Target, TrendingUp, Users, Wallet, CheckCircle2, Loader2 } from "lucide-react";
+import MarketingAgendaWidget from "@/components/admin/MarketingAgendaWidget";
 
 type Campaign = {
   id: string; nome: string; canal: string; status: string;
