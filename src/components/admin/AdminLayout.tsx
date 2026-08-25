@@ -55,7 +55,8 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
 ];
 
 const AdminLayoutInner = () => {
-  const { user, loading, isStaff, hasPermission, signOut, isCertificadora, isSuperAdmin, isMaster } = useAuth();
+  const { user, loading, isStaff, hasPermission, signOut, isCertificadora, isSuperAdmin, isMaster, roles } = useAuth();
+  const canSeeDashboard = isMaster || roles.includes("admin");
   const { pathname } = useLocation();
   const { counts, markRead } = useAdminBadges();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -98,6 +99,8 @@ const AdminLayoutInner = () => {
           // Itens restritos ao master (não aparecem nem para quem tem permissões amplas)
           const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios", "/admin/auditoria"];
           if (masterOnly.includes(i.to) && !isMaster) return false;
+          // Dashboard geral: só master e admin
+          if (i.to === "/admin" && !canSeeDashboard) return false;
           if (i.mod && hasPermission(i.mod)) return true;
           // Item exclusivo de módulo (sem permissão legada) exige o mod_ correspondente
           if (i.mod && !i.perm) return false;
