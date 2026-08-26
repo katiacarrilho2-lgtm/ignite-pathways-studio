@@ -14,6 +14,7 @@ import { Barcode } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import RepasseSection from "@/components/admin/RepasseSection";
+import ParcelaComprovante from "@/components/admin/ParcelaComprovante";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
