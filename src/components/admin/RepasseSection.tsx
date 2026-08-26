@@ -400,10 +400,17 @@ export default function RepasseSection({ enrollments, installmentsCount }: Props
                             )}
                           </td>
                           <td className="p-3 text-right">
+                            {r.comprovante_path && (
+                              <button type="button" className="text-xs text-primary underline mr-2"
+                                onClick={() => abrirComprovante(r.comprovante_path!)}>
+                                Comprovante
+                              </button>
+                            )}
                             <Button size="sm" variant="outline" onClick={() => setBaixa(r)}>
                               <CheckCircle2 className="size-4 mr-1" /> {r.status === "a_receber" ? "Marcar recebido" : "Editar baixa"}
                             </Button>
                           </td>
+
                         </tr>
                       ))}
                       {rows.length === 0 && (
