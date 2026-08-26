@@ -19,7 +19,15 @@ export type RepasseParcela = {
   id: string; contrato_id: string; installment_id: string; numero: number;
   valor_aluno_cents: number; valor_repasse_cents: number; previsao: string | null;
   status: string; recebido_em: string | null; valor_recebido_cents: number | null;
+  comprovante_path?: string | null;
 };
+
+export const abrirComprovante = async (path: string) => {
+  const { data, error } = await supabase.storage.from("comprovantes").createSignedUrl(path, 3600);
+  if (error || !data?.signedUrl) return toast.error("Não foi possível abrir o comprovante");
+  window.open(data.signedUrl, "_blank");
+};
+
 
 export const brlCents = (c: number | null | undefined) =>
   ((Number(c) || 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
