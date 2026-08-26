@@ -44,7 +44,9 @@ type Installment = {
   id: string; enrollment_id: string; numero: number; valor_cents: number;
   vencimento: string | null; status: string; paid_at: string | null;
   forma_pagamento: string | null; desconto_cents: number | null; valor_final_cents: number | null;
+  comprovante_path?: string | null; comprovante_nome?: string | null;
 };
+
 type ExamRow = {
   id: string; application_id: string; course_title: string; status: string;
   score: number | null; passed: boolean | null; duration_minutes: number; passing_score: number;
