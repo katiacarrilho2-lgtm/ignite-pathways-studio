@@ -14,6 +14,7 @@ import { Barcode } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import RepasseSection from "@/components/admin/RepasseSection";
+import ParcelaComprovante from "@/components/admin/ParcelaComprovante";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
@@ -44,7 +45,9 @@ type Installment = {
   id: string; enrollment_id: string; numero: number; valor_cents: number;
   vencimento: string | null; status: string; paid_at: string | null;
   forma_pagamento: string | null; desconto_cents: number | null; valor_final_cents: number | null;
+  comprovante_path?: string | null; comprovante_nome?: string | null;
 };
+
 type ExamRow = {
   id: string; application_id: string; course_title: string; status: string;
   score: number | null; passed: boolean | null; duration_minutes: number; passing_score: number;
@@ -1424,9 +1427,11 @@ const Inner = () => {
                               <Button size="sm" variant="outline" onClick={() => enviarWhats(i)} title="Enviar via WhatsApp" className="text-emerald-600 hover:text-emerald-700">
                                 <MessageCircle className="size-4 mr-1" /> WhatsApp
                               </Button>
+                              <ParcelaComprovante installmentId={i.id} comprovantePath={i.comprovante_path} onChanged={load} />
                             </>
                           )}
                           <Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeParc(i.id)} title="Excluir"><Trash2 className="size-4" /></Button>
+
                         </div>
                       </td>
                     </tr>

@@ -2291,6 +2291,8 @@ export type Database = {
       installments: {
         Row: {
           account_id: string | null
+          comprovante_nome: string | null
+          comprovante_path: string | null
           created_at: string
           desconto_cents: number
           enrollment_id: string
@@ -2307,6 +2309,8 @@ export type Database = {
         }
         Insert: {
           account_id?: string | null
+          comprovante_nome?: string | null
+          comprovante_path?: string | null
           created_at?: string
           desconto_cents?: number
           enrollment_id: string
@@ -2323,6 +2327,8 @@ export type Database = {
         }
         Update: {
           account_id?: string | null
+          comprovante_nome?: string | null
+          comprovante_path?: string | null
           created_at?: string
           desconto_cents?: number
           enrollment_id?: string
