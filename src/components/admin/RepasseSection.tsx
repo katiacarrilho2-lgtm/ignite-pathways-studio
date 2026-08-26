@@ -19,7 +19,15 @@ export type RepasseParcela = {
   id: string; contrato_id: string; installment_id: string; numero: number;
   valor_aluno_cents: number; valor_repasse_cents: number; previsao: string | null;
   status: string; recebido_em: string | null; valor_recebido_cents: number | null;
+  comprovante_path?: string | null;
 };
+
+export const abrirComprovante = async (path: string) => {
+  const { data, error } = await supabase.storage.from("comprovantes").createSignedUrl(path, 3600);
+  if (error || !data?.signedUrl) return toast.error("Não foi possível abrir o comprovante");
+  window.open(data.signedUrl, "_blank");
+};
+
 
 export const brlCents = (c: number | null | undefined) =>
   ((Number(c) || 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -49,11 +57,15 @@ export function BaixaRepasseDialog({
   const [data, setData] = useState("");
   const [valor, setValor] = useState("");
   const [saving, setSaving] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [comprovante, setComprovante] = useState<string | null>(null);
 
   useEffect(() => {
     if (!parcela) return;
     setData(parcela.recebido_em ?? new Date().toISOString().slice(0, 10));
     setValor(((parcela.valor_recebido_cents ?? parcela.valor_repasse_cents) / 100).toFixed(2).replace(".", ","));
+    setFile(null);
+    setComprovante(parcela.comprovante_path ?? null);
   }, [parcela]);
 
   if (!parcela) return null;
@@ -62,10 +74,19 @@ export function BaixaRepasseDialog({
 
   const salvar = async () => {
     setSaving(true);
+    let path = comprovante;
+    if (file) {
+      const ext = file.name.split(".").pop() || "bin";
+      path = `repasses/${parcela.id}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("comprovantes")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (upErr) { setSaving(false); return toast.error(`Falha ao enviar comprovante: ${upErr.message}`); }
+    }
     const { error } = await supabase.from("repasse_parcelas" as any).update({
       status: diff === 0 ? "recebido" : "divergencia",
       recebido_em: data || null,
       valor_recebido_cents: recebidoCents,
+      comprovante_path: path,
     }).eq("id", parcela.id);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -83,6 +104,17 @@ export function BaixaRepasseDialog({
           </div>
           <div><Label>Data recebida</Label><Input type="date" value={data} onChange={e => setData(e.target.value)} /></div>
           <div><Label>Valor recebido (R$)</Label><Input value={valor} onChange={e => setValor(e.target.value)} inputMode="decimal" /></div>
+          <div>
+            <Label>Comprovante (PDF ou foto)</Label>
+            <Input type="file" accept="image/*,application/pdf" onChange={e => setFile(e.target.files?.[0] ?? null)} />
+            {comprovante && !file && (
+              <button type="button" className="text-xs text-primary underline mt-1"
+                onClick={() => abrirComprovante(comprovante)}>
+                Ver comprovante anexado
+              </button>
+            )}
+          </div>
+
           {diff !== 0 && (
             <div className="rounded-lg border border-amber-300 bg-amber-50 text-amber-900 p-3 text-sm">
               <p className="font-semibold">DIVERGÊNCIA</p>
@@ -368,10 +400,17 @@ export default function RepasseSection({ enrollments, installmentsCount }: Props
                             )}
                           </td>
                           <td className="p-3 text-right">
+                            {r.comprovante_path && (
+                              <button type="button" className="text-xs text-primary underline mr-2"
+                                onClick={() => abrirComprovante(r.comprovante_path!)}>
+                                Comprovante
+                              </button>
+                            )}
                             <Button size="sm" variant="outline" onClick={() => setBaixa(r)}>
                               <CheckCircle2 className="size-4 mr-1" /> {r.status === "a_receber" ? "Marcar recebido" : "Editar baixa"}
                             </Button>
                           </td>
+
                         </tr>
                       ))}
                       {rows.length === 0 && (

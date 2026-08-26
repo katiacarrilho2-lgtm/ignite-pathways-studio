@@ -17,7 +17,7 @@ import {
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { downloadCsv, brlCsv, dateCsv } from "@/lib/exportCsv";
 import {
-  BaixaRepasseDialog, brlCents, dateBr, STATUS_LABEL, statusClass,
+  BaixaRepasseDialog, brlCents, dateBr, STATUS_LABEL, statusClass, abrirComprovante,
   type RepasseParceiro, type RepasseParcela,
 } from "@/components/admin/RepasseSection";
 
@@ -355,10 +355,17 @@ const Inner = () => {
                                       )}
                                     </td>
                                     <td className="p-2 text-right">
+                                      {p.comprovante_path && (
+                                        <button type="button" className="text-xs text-primary underline mr-2"
+                                          onClick={(e) => { e.stopPropagation(); abrirComprovante(p.comprovante_path!); }}>
+                                          Comprovante
+                                        </button>
+                                      )}
                                       <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); setBaixa(p); }}>
                                         <CheckCircle2 className="size-4 mr-1" /> {p.status === "a_receber" ? "Marcar recebido" : "Editar baixa"}
                                       </Button>
                                     </td>
+
                                   </tr>
                                 ))}
                               </tbody>

@@ -3854,6 +3854,7 @@ export type Database = {
       }
       repasse_parcelas: {
         Row: {
+          comprovante_path: string | null
           contrato_id: string
           created_at: string
           id: string
@@ -3869,6 +3870,7 @@ export type Database = {
           valor_repasse_cents: number
         }
         Insert: {
+          comprovante_path?: string | null
           contrato_id: string
           created_at?: string
           id?: string
@@ -3884,6 +3886,7 @@ export type Database = {
           valor_repasse_cents?: number
         }
         Update: {
+          comprovante_path?: string | null
           contrato_id?: string
           created_at?: string
           id?: string
