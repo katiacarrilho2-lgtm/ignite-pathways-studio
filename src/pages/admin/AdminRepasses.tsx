@@ -17,7 +17,7 @@ import {
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { downloadCsv, brlCsv, dateCsv } from "@/lib/exportCsv";
 import {
-  BaixaRepasseDialog, brlCents, dateBr, STATUS_LABEL, statusClass,
+  BaixaRepasseDialog, brlCents, dateBr, STATUS_LABEL, statusClass, abrirComprovante,
   type RepasseParceiro, type RepasseParcela,
 } from "@/components/admin/RepasseSection";
 
