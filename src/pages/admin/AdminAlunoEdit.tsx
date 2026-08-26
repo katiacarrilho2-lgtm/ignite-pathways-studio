@@ -1426,9 +1426,11 @@ const Inner = () => {
                               <Button size="sm" variant="outline" onClick={() => enviarWhats(i)} title="Enviar via WhatsApp" className="text-emerald-600 hover:text-emerald-700">
                                 <MessageCircle className="size-4 mr-1" /> WhatsApp
                               </Button>
+                              <ParcelaComprovante installmentId={i.id} comprovantePath={i.comprovante_path} onChanged={load} />
                             </>
                           )}
                           <Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeParc(i.id)} title="Excluir"><Trash2 className="size-4" /></Button>
+
                         </div>
                       </td>
                     </tr>
