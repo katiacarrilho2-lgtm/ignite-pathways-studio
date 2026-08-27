@@ -4491,6 +4491,10 @@ export type Database = {
         }
         Returns: Json
       }
+      lead_bank_send_to_crm: {
+        Args: { _lead_bank_id: string; _owner_id: string }
+        Returns: Json
+      }
       next_username: { Args: never; Returns: string }
       repasse_previsao: {
         Args: { _fechamento: number; _pagamento: number; _venc: string }
