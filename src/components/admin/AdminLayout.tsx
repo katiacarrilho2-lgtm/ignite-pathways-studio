@@ -153,6 +153,7 @@ const AdminLayoutInner = () => {
 
       </main>
       <CrmUrgentAlerts />
+      <InternalMessageAlert />
     </div>
   );
 };
