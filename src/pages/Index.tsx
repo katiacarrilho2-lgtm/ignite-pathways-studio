@@ -62,8 +62,8 @@ const Index = () => {
             WebkitMaskImage: "linear-gradient(to left, transparent 0%, black 40%)",
           }}
         />
-        {/* Layer 4: vertical depth — darker top & bottom for cinematic anchor */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(220_75%_4%)]/60 via-transparent to-[hsl(220_75%_4%)]/70" />
+        {/* Layer 4: vertical depth — darker top & bottom, kept clear of faces */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[hsl(220_75%_4%)]/30 via-transparent via-[35%] to-[hsl(220_75%_4%)]/70" />
         {/* Layer 5: subtle tech grid texture for corporate technology feel */}
         <div
           className="absolute inset-0 opacity-[0.07] mix-blend-screen"
