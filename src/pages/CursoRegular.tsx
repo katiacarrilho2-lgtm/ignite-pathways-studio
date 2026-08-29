@@ -73,7 +73,7 @@ const planosRegular = [
   {
     titulo: "Técnico Regular 12 Meses",
     subtitulo: "Perfeito para quem busca conciliar estudos com uma mensalidade suave.",
-    mensal: "147,90",
+    mensal: "99,99",
     destaque: false,
     beneficios: [
       "Acesso integral a todas as disciplinas do portal EAD",
@@ -84,15 +84,15 @@ const planosRegular = [
     ],
   },
   {
-    titulo: "Técnico Regular 18 Meses",
-    subtitulo: "Ritmo flexível e estendido para aprender no seu tempo, com suporte dedicado.",
+    titulo: "Tecnólogo 24 Meses",
+    subtitulo: "Formação tecnólogo completa, 100% EAD, com diploma registrado no SISTEC-MEC.",
     mensal: "119,90",
     destaque: true,
     beneficios: [
-      "Acesso estendido a todas as disciplinas do portal",
+      "Acesso integral a todas as disciplinas do portal",
       "Todo material didático digital incluso",
-      "Acompanhamento VIP por tutores especializados",
-      "Emissão de diploma oficial registrado no SISTEC",
+      "Acompanhamento por tutores especializados",
+      "Diploma de tecnólogo oficial registrado no SISTEC",
       "Simulados extras de concursos públicos inclusos",
       "Plano de estudos customizado mensal",
     ],
