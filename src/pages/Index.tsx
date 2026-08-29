@@ -41,12 +41,12 @@ const Index = () => {
           height={1080}
           className="absolute inset-0 w-full h-full object-cover object-right"
         />
-        {/* Overlay: left-side legibility only; keep the people area clean */}
+        {/* Overlay: strong left-side legibility that fades before reaching the people */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, hsla(220, 75%, 4%, 0.92) 0%, hsla(220, 70%, 8%, 0.55) 45%, transparent 75%)",
+              "linear-gradient(90deg, hsla(220, 75%, 4%, 0.95) 0%, hsla(220, 70%, 8%, 0.75) 35%, hsla(220, 70%, 10%, 0.25) 55%, transparent 70%)",
           }}
         />
         {/* Bottom anchor for smooth transition to stats section */}
