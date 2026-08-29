@@ -73,7 +73,7 @@ const planosRegular = [
   {
     titulo: "Técnico Regular 12 Meses",
     subtitulo: "Perfeito para quem busca conciliar estudos com uma mensalidade suave.",
-    mensal: "147,90",
+    mensal: "99,99",
     destaque: false,
     beneficios: [
       "Acesso integral a todas as disciplinas do portal EAD",
@@ -84,15 +84,15 @@ const planosRegular = [
     ],
   },
   {
-    titulo: "Técnico Regular 18 Meses",
-    subtitulo: "Ritmo flexível e estendido para aprender no seu tempo, com suporte dedicado.",
+    titulo: "Tecnólogo 24 Meses",
+    subtitulo: "Formação tecnólogo completa, 100% EAD, com diploma registrado no SISTEC-MEC.",
     mensal: "119,90",
     destaque: true,
     beneficios: [
-      "Acesso estendido a todas as disciplinas do portal",
+      "Acesso integral a todas as disciplinas do portal",
       "Todo material didático digital incluso",
-      "Acompanhamento VIP por tutores especializados",
-      "Emissão de diploma oficial registrado no SISTEC",
+      "Acompanhamento por tutores especializados",
+      "Diploma de tecnólogo oficial registrado no SISTEC",
       "Simulados extras de concursos públicos inclusos",
       "Plano de estudos customizado mensal",
     ],
@@ -150,7 +150,7 @@ const faqs = [
   },
   {
     q: "Em quanto tempo consigo concluir o curso?",
-    a: "A duração é flexível, de 12 a 18 meses, conforme o plano escolhido e o seu ritmo de estudos.",
+    a: "A duração varia conforme o plano escolhido: Técnico Regular em 12 meses ou Tecnólogo em 24 meses.",
   },
   {
     q: "Há algum custo extra para emissão do diploma ou certificado?",
@@ -264,7 +264,7 @@ const CursoRegular = () => {
             { n: "1", t: "Escolha o curso", d: "Selecione a área técnica desejada e o plano de duração." },
             { n: "2", t: "Matrícula rápida", d: "Envie seus documentos e formalize a matrícula sem taxas." },
             { n: "3", t: "Estude no portal EAD", d: "Aulas gravadas, material digital e avaliações modulares online." },
-            { n: "4", t: "Receba o diploma", d: "Conclusão em 12 ou 18 meses, com registro no SISTEC-MEC." },
+            { n: "4", t: "Receba o diploma", d: "Conclusão em 12 meses (Técnico Regular) ou 24 meses (Tecnólogo), com registro no SISTEC-MEC." },
           ].map((s) => (
             <div key={s.n} className="p-6 rounded-xl bg-card border shadow-card-soft relative overflow-hidden">
               <div
