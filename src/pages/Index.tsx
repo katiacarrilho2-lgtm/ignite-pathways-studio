@@ -44,10 +44,22 @@ const Index = () => {
         {/* Premium overlay — metallic deep blue blending into brushed silver highlights */}
         {/* Layer 1: deep navy base, near-solid on the left for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(220_75%_4%)] via-[hsl(220_70%_7%)]/95 via-35% to-[hsl(215_55%_14%)]/55 to-80%" />
-        {/* Layer 2: metallic blue sheen — diagonal cool wash */}
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,hsl(220_80%_8%)_0%,hsl(215_70%_12%)_30%,hsl(210_45%_28%)_55%,hsl(210_30%_55%)_80%,hsl(0_0%_88%)_100%)] opacity-25 mix-blend-overlay" />
-        {/* Layer 3: silver highlight glow on the upper right */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_85%_15%,hsl(210_40%_85%)/0.18,transparent_55%)]" />
+        {/* Layer 2: subtle metallic sheen, fade out before the faces on the right */}
+        <div
+          className="absolute inset-0 bg-[linear-gradient(115deg,hsl(220_80%_8%)_0%,hsl(215_70%_12%)_35%,hsl(210_45%_28%)/60_55%,transparent_75%)] opacity-20 mix-blend-overlay"
+          style={{
+            maskImage: "linear-gradient(115deg, black 0%, black 55%, transparent 80%)",
+            WebkitMaskImage: "linear-gradient(115deg, black 0%, black 55%, transparent 80%)",
+          }}
+        />
+        {/* Layer 3: soft highlight, reduced over the right-side people */}
+        <div
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_10%,hsl(210_40%_85%)/0.12,transparent_50%)]"
+          style={{
+            maskImage: "linear-gradient(to left, transparent 0%, black 40%)",
+            WebkitMaskImage: "linear-gradient(to left, transparent 0%, black 40%)",
+          }}
+        />
         {/* Layer 4: vertical depth — darker top & bottom for cinematic anchor */}
         <div className="absolute inset-0 bg-gradient-to-b from-[hsl(220_75%_4%)]/60 via-transparent to-[hsl(220_75%_4%)]/70" />
         {/* Layer 5: subtle tech grid texture for corporate technology feel */}
