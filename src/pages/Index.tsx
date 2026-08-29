@@ -41,29 +41,22 @@ const Index = () => {
           height={1080}
           className="absolute inset-0 w-full h-full object-cover object-right"
         />
-        {/* Premium overlay — metallic deep blue blending into brushed silver highlights */}
-        {/* Layer 1: deep navy base, near-solid on the left for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(220_75%_4%)] via-[hsl(220_70%_7%)]/95 via-35% to-[hsl(215_55%_14%)]/55 to-80%" />
-        {/* Layer 2: subtle metallic sheen, fade out before the faces on the right */}
-        <div
-          className="absolute inset-0 opacity-20 mix-blend-overlay"
-          style={{
-            backgroundImage: "linear-gradient(115deg, hsl(220 80% 8%) 0%, hsl(215 70% 12%) 35%, hsla(210 45% 28% / 0.45) 55%, transparent 75%)",
-            maskImage: "linear-gradient(115deg, black 0%, black 55%, transparent 80%)",
-            WebkitMaskImage: "linear-gradient(115deg, black 0%, black 55%, transparent 80%)",
-          }}
-        />
-        {/* Layer 3: soft highlight, reduced over the right-side people */}
+        {/* Overlay: left-side legibility only; keep the people area clean */}
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "radial-gradient(ellipse at 80% 10%, hsla(210 40% 85% / 0.12), transparent 50%)",
-            maskImage: "linear-gradient(to left, transparent 0%, black 40%)",
-            WebkitMaskImage: "linear-gradient(to left, transparent 0%, black 40%)",
+            background:
+              "linear-gradient(90deg, hsla(220, 75%, 4%, 0.92) 0%, hsla(220, 70%, 8%, 0.55) 45%, transparent 75%)",
           }}
         />
-        {/* Layer 4: bottom anchor only — no top band over faces */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent via-[45%] to-[hsl(220_75%_4%)]/75" />
+        {/* Bottom anchor for smooth transition to stats section */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 55%, hsla(220, 75%, 6%, 0.75) 100%)",
+          }}
+        />
         {/* Layer 5: subtle tech grid texture for corporate technology feel */}
         <div
           className="absolute inset-0 opacity-[0.07] mix-blend-screen"
