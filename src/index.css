@@ -153,48 +153,48 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Multplick brand: deep navy, steel silver, white */
+    /* Colégio Técnico Universal brand: teal #0D8595 + navy #051C42 */
     --background: 0 0% 100%;
-    --foreground: 220 45% 12%;
+    --foreground: 217 86% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 45% 12%;
+    --card-foreground: 217 86% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 45% 12%;
+    --popover-foreground: 217 86% 14%;
 
-    --primary: 220 70% 22%;            /* deep navy */
+    --primary: 187 84% 32%;            /* teal Universal #0D8595 */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 215 85% 48%;       /* electric blue accent */
+    --primary-glow: 187 80% 45%;       /* teal claro para brilho */
 
-    --secondary: 215 25% 94%;
-    --secondary-foreground: 220 45% 12%;
+    --secondary: 190 30% 94%;
+    --secondary-foreground: 217 86% 14%;
 
-    --muted: 215 25% 96%;
-    --muted-foreground: 220 12% 42%;
+    --muted: 190 25% 96%;
+    --muted-foreground: 215 15% 42%;
 
-    --accent: 210 18% 88%;             /* silver */
-    --accent-foreground: 220 45% 12%;
+    --accent: 190 20% 88%;             /* cinza-azulado claro */
+    --accent-foreground: 217 86% 14%;
 
     --destructive: 0 84% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 20% 88%;
-    --input: 215 20% 88%;
-    --ring: 215 85% 48%;
+    --border: 195 20% 88%;
+    --input: 195 20% 88%;
+    --ring: 187 84% 32%;
 
     --radius: 0.75rem;
 
     --whatsapp: 142 70% 42%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(220 70% 12%) 0%, hsl(220 70% 22%) 45%, hsl(215 85% 38%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(220 70% 22%), hsl(215 85% 48%));
-    --gradient-silver: linear-gradient(135deg, hsl(210 18% 95%), hsl(210 12% 78%));
-    --gradient-overlay: linear-gradient(180deg, hsl(220 70% 10% / 0.85), hsl(220 70% 18% / 0.55));
+    --gradient-hero: linear-gradient(135deg, hsl(217 86% 10%) 0%, hsl(217 86% 14%) 45%, hsl(187 84% 32%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(217 86% 14%), hsl(187 84% 32%));
+    --gradient-silver: linear-gradient(135deg, hsl(190 25% 95%), hsl(195 15% 78%));
+    --gradient-overlay: linear-gradient(180deg, hsl(217 86% 8% / 0.85), hsl(187 84% 25% / 0.55));
 
-    --shadow-elegant: 0 20px 50px -20px hsl(220 70% 22% / 0.35);
-    --shadow-glow: 0 0 60px hsl(215 85% 48% / 0.35);
-    --shadow-card: 0 8px 30px -12px hsl(220 40% 20% / 0.15);
+    --shadow-elegant: 0 20px 50px -20px hsl(187 84% 32% / 0.35);
+    --shadow-glow: 0 0 60px hsl(187 80% 45% / 0.35);
+    --shadow-card: 0 8px 30px -12px hsl(217 40% 20% / 0.15);
 
     --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -216,25 +216,25 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 220 50% 6%;
-    --foreground: 210 40% 98%;
-    --card: 220 45% 10%;
-    --card-foreground: 210 40% 98%;
-    --popover: 220 45% 10%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 215 85% 55%;
-    --primary-foreground: 220 50% 6%;
-    --secondary: 220 30% 16%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 220 30% 14%;
-    --muted-foreground: 215 20% 70%;
-    --accent: 220 30% 18%;
-    --accent-foreground: 210 40% 98%;
+    --background: 217 60% 7%;
+    --foreground: 190 40% 97%;
+    --card: 217 50% 11%;
+    --card-foreground: 190 40% 97%;
+    --popover: 217 50% 11%;
+    --popover-foreground: 190 40% 97%;
+    --primary: 187 80% 42%;
+    --primary-foreground: 217 60% 7%;
+    --secondary: 217 35% 16%;
+    --secondary-foreground: 190 40% 97%;
+    --muted: 217 35% 15%;
+    --muted-foreground: 200 20% 70%;
+    --accent: 195 30% 18%;
+    --accent-foreground: 190 40% 97%;
     --destructive: 0 62% 45%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 30% 18%;
-    --input: 220 30% 18%;
-    --ring: 215 85% 55%;
+    --destructive-foreground: 190 40% 97%;
+    --border: 210 30% 18%;
+    --input: 210 30% 18%;
+    --ring: 187 80% 42%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
