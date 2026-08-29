@@ -8,8 +8,8 @@ const WHATSAPP = "5518996841902";
 const waLink = (msg: string) =>
   `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
-const ORANGE = "#F26522";
-const ORANGE_DARK = "#D9531A";
+const ORANGE = "#0D8595";
+const ORANGE_DARK = "#0B6A77";
 
 // Catálogo do parceiro — Colégio Técnico Universal
 const areas = [
@@ -185,7 +185,7 @@ const CursoRegular = () => {
       <section className="container -mt-6 mb-12">
         <div
           className="rounded-2xl border shadow-elegant p-6 md:p-8 flex flex-col md:flex-row items-center gap-6"
-          style={{ backgroundColor: "#FFF7F1", borderColor: `${ORANGE}33` }}
+          style={{ backgroundColor: "#EFF7F8", borderColor: `${ORANGE}33` }}
         >
           <div
             className="shrink-0 rounded-2xl px-6 py-5 text-center text-white shadow-elegant"
