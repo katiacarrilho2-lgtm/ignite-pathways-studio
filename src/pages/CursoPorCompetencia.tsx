@@ -2,9 +2,8 @@ import { PageHero } from "@/components/site/PageHero";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, ShieldCheck, Award, FileCheck, MessageCircle, GraduationCap, Sparkles, ScrollText, BadgeCheck, Star, CreditCard, Receipt, Wallet } from "lucide-react";
+import { CheckCircle2, Clock, ShieldCheck, Award, FileCheck, MessageCircle, GraduationCap, Sparkles, ScrollText, BadgeCheck, Star, CreditCard, Receipt, Wallet, Landmark, Newspaper } from "lucide-react";
 import { useState } from "react";
-import globaltecLogo from "@/assets/globaltec-logo.webp.asset.json";
 import { CampaignBanner } from "@/components/site/CampaignBanner";
 import { campanhaTecnico } from "@/config/campaigns";
 
@@ -12,110 +11,131 @@ const WHATSAPP = "5518996841902";
 const waLink = (msg: string) =>
   `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
-// Paleta laranja da certificadora (GlobalTec)
+// Paleta laranja institucional
 const ORANGE = "#F26522";
 const ORANGE_DARK = "#D9531A";
 
+// Catálogo do parceiro — Colégio Técnico Universal
 const areas = [
   {
-    title: "Área da Saúde",
+    title: "Área de Saúde",
+    desc: "Cursos essenciais voltados ao cuidado humano e gestão da saúde.",
     items: [
-      "Técnico em Enfermagem",
-      "Técnico em Análises Clínicas",
-      "Técnico em Farmácia",
-      "Técnico em Radiologia",
+      "Técnico em Enfermagem (apenas Competência)",
+      "Técnico em Nutrição e Dietética",
       "Técnico em Saúde Bucal",
       "Técnico em Estética",
-      "Técnico em Nutrição e Dietética",
-      "Técnico em Veterinária",
-      "Técnico em Cuidados de Idosos",
-      "Técnico em Agente Comunitário de Saúde",
     ],
   },
   {
-    title: "Administração e Gestão",
-    items: [
-      "Técnico em Administração",
-      "Técnico em Contabilidade",
-      "Técnico em Logística",
-      "Técnico em Marketing",
-      "Técnico em Recursos Humanos",
-      "Técnico em Vendas",
-      "Técnico em Qualidade",
-      "Técnico em Transações Imobiliárias",
-    ],
-  },
-  {
-    title: "Tecnologia e Informática",
+    title: "Área de Tecnologia",
+    desc: "Aprenda a projetar sistemas, gerenciar redes e programar.",
     items: [
       "Técnico em Desenvolvimento de Sistemas",
       "Técnico em Informática para Internet",
       "Técnico em Redes de Computadores",
-      "Técnico em Design Gráfico",
     ],
   },
   {
-    title: "Engenharia e Manutenção",
+    title: "Área de Administração",
+    desc: "Formação em gestão empresarial, logística e processos comerciais.",
+    items: [
+      "Técnico em Administração",
+      "Técnico em Logística",
+      "Técnico em Contabilidade",
+      "Técnico em Recursos Humanos",
+      "Técnico em Transações Imobiliárias",
+    ],
+  },
+  {
+    title: "Área de Indústria & Automação",
+    desc: "Prepare-se para o setor industrial moderno com foco em tecnologia.",
     items: [
       "Técnico em Eletrotécnica",
-      "Técnico em Eletrônica",
+      "Técnico em Mecânica",
       "Técnico em Automação Industrial",
       "Técnico em Eletromecânica",
-      "Técnico em Refrigeração e Climatização",
-      "Técnico em Soldagem",
     ],
   },
   {
-    title: "Construção e Infraestrutura",
+    title: "Área de Construção Civil",
+    desc: "Capacitação técnica para planejamento e acompanhamento de obras.",
+    items: ["Técnico em Edificações", "Técnico em Design de Interiores"],
+  },
+  {
+    title: "Área de Serviços & Meio Ambiente",
+    desc: "Habilidades voltadas para turismo, secretariado e segurança do trabalho.",
     items: [
-      "Técnico em Edificações",
-      "Técnico em Agrimensura",
       "Técnico em Segurança do Trabalho",
-    ],
-  },
-  {
-    title: "Serviços Especializados",
-    items: [
-      "Técnico em Gastronomia",
       "Técnico em Guia de Turismo",
-      "Técnico em Design de Interiores",
+      "Técnico em Secretariado",
     ],
   },
 ];
 
 const faqs = [
   {
-    q: "O que é um curso técnico por competência?",
-    a: "É a modalidade que valida sua experiência profissional para emissão do certificado técnico reconhecido pelo MEC, sem precisar repetir o que você já domina. Você comprova suas habilidades e recebe o certificado.",
+    q: "O diploma do Colégio Técnico Universal tem validade nacional?",
+    a: "Sim. Os cursos são cadastrados no SISTEC-MEC e reconhecidos/autorizados pelo Conselho Estadual de Educação do Pará (CEE/PA), o que garante validade plena do diploma em todo o território nacional.",
   },
   {
-    q: "Quem pode fazer a certificação por competência?",
-    a: "Profissionais com, no mínimo, 2 anos de experiência comprovada na área desejada. É necessário ter atuado formal ou informalmente na profissão.",
+    q: "Como funciona a Certificação por Competência?",
+    a: "É um processo fundamentado no Art. 41 da LDB (Lei nº 9.394/96): o profissional que já atua na área comprova sua experiência por documentação e passa por uma avaliação simplificada. Aprovado, recebe o diploma técnico oficial em até 48 horas, sem repetir o que já domina.",
   },
   {
-    q: "Quanto tempo leva para concluir?",
-    a: "Após a validação da documentação, é possível concluir em até 48 horas, dependendo da análise. O processo é ágil porque você não cursa disciplinas que já domina.",
+    q: "Posso tirar o registro no conselho profissional (COREN, CFT, CREA) com o diploma?",
+    a: "Sim. O diploma tem validade jurídica para registro profissional nos conselhos de classe, como COREN, CFT, CREA, CRA, CRQ e COFECI, respeitadas as regras específicas de cada conselho.",
   },
   {
-    q: "Como funciona a avaliação por competência?",
-    a: "Analisamos sua documentação profissional e, se necessário, solicitamos evidências complementares (portfólio, projetos, declarações ou entrevista técnica) para comprovar as competências.",
+    q: "Há algum custo extra para emissão do diploma ou certificado?",
+    a: "Não. Não há taxa de matrícula surpresa nem custo adicional para emissão do certificado físico e digital — está tudo incluso no valor combinado.",
   },
   {
-    q: "O certificado tem validade nacional?",
-    a: "Sim. O certificado é 100% reconhecido pelo MEC, com validade em todo o território nacional, aceito em concursos, conselhos de classe e empresas.",
+    q: "O curso é totalmente online ou há encontros presenciais?",
+    a: "O ensino é 100% EAD, em plataforma digital moderna. Você assiste às aulas e realiza as avaliações de qualquer lugar, no seu ritmo.",
   },
   {
-    q: "Serve para concursos públicos?",
-    a: "Sim, desde que o edital permita cursos técnicos de nível médio devidamente autorizados e cadastrados no MEC/SISTEC.",
+    q: "Quais são os pré-requisitos para fazer o curso técnico?",
+    a: "Para o Técnico Regular, é necessário estar cursando ou ter concluído o ensino médio. Para o Técnico por Competência, é exigida a comprovação de pelo menos 2 anos de atuação na área desejada.",
   },
 ];
 
 // Conselhos de classe reconhecedores
 const conselhos = [
-  { sigla: "COFECI", nome: "Conselho Federal de Corretores de Imóveis" },
-  { sigla: "CFTA", nome: "Conselho Federal dos Técnicos Agrícolas" },
-  { sigla: "CFO", nome: "Conselho Federal de Odontologia" },
   { sigla: "COREN", nome: "Conselho Regional de Enfermagem" },
+  { sigla: "CFT", nome: "Conselho Federal dos Técnicos Industriais" },
+  { sigla: "CREA", nome: "Conselho Regional de Engenharia e Agronomia" },
+  { sigla: "CRA", nome: "Conselho Regional de Administração" },
+  { sigla: "CRQ", nome: "Conselho Regional de Química" },
+  { sigla: "COFECI", nome: "Conselho Federal de Corretores de Imóveis" },
+];
+
+// Blocos de regulamentação (Colégio Técnico Universal)
+const regulamentacao = [
+  {
+    icon: ScrollText,
+    tag: "Parecer Técnico CEE nº 412/2022",
+    title: "Resolução do Conselho Estadual",
+    text: "Autorização concedida pelo Conselho Estadual de Educação do Pará (CEE/PA), validando os planos de curso e a oferta na modalidade EAD.",
+  },
+  {
+    icon: Newspaper,
+    tag: "Publicado em Seção 3 - DOU",
+    title: "Diário Oficial da União",
+    text: "Credenciamento da escola e autorização dos cursos conforme atos normativos do Conselho Estadual de Educação do Pará (CEE/PA).",
+  },
+  {
+    icon: Landmark,
+    tag: "LDB Artigo 41 (Lei 9.394/96)",
+    title: "Lei de Diretrizes e Bases",
+    text: "Resguarda legalmente que o conhecimento adquirido no trabalho pode ser objeto de aferição e certificação profissional.",
+  },
+  {
+    icon: BadgeCheck,
+    tag: "Cadastro Sistec Ativo",
+    title: "SISTEC-MEC",
+    text: "Todos os diplomas emitidos são cadastrados no Sistema Nacional de Informações da Educação Profissional e Tecnológica (SISTEC).",
+  },
 ];
 
 // Pacotes de certificação por competência (1 a 4 cursos)
@@ -126,23 +146,34 @@ const pacotesCompetencia = [
   { qtd: 4, parcela: "383,33", total: "4.599,90", destaque: false },
 ];
 
-// Planos do Técnico Regular (com base no site oficial GlobalTec)
+// Planos do Técnico Regular (Colégio Técnico Universal)
 const planosRegular = [
   {
-    titulo: "Conclusão em 12 meses",
-    subtitulo: "Cursos de 800 a 1.000 horas",
-    parcelado: { label: "12x", valor: "147,00" },
-    aVista: "1.200,00",
-    cartao: "1.600,00",
-    destaque: true,
+    titulo: "Técnico Regular 12 Meses",
+    subtitulo: "Conciliar estudos com uma mensalidade suave e acessível.",
+    mensal: "147,90",
+    destaque: false,
+    beneficios: [
+      "Acesso integral a todas as disciplinas do portal EAD",
+      "Apostilas e materiais digitais inclusos",
+      "Sem taxa de matrícula ou material didático",
+      "Emissão de certificado físico e digital sem custo",
+      "Suporte pedagógico via fórum do aluno",
+    ],
   },
   {
-    titulo: "Conclusão em 18 meses",
-    subtitulo: "Cursos com 1.200 horas ou mais",
-    parcelado: { label: "18x", valor: "147,00" },
-    aVista: "1.900,00",
-    cartao: "2.500,00",
-    destaque: false,
+    titulo: "Técnico Regular 18 Meses",
+    subtitulo: "Ritmo flexível e estendido, com suporte dedicado.",
+    mensal: "119,90",
+    destaque: true,
+    beneficios: [
+      "Acesso estendido a todas as disciplinas do portal",
+      "Todo material didático digital incluso",
+      "Acompanhamento VIP por tutores especializados",
+      "Emissão de diploma oficial registrado no SISTEC",
+      "Simulados extras de concursos públicos inclusos",
+      "Plano de estudos customizado mensal",
+    ],
   },
 ];
 
@@ -155,7 +186,7 @@ const CursoPorCompetencia = () => {
       <PageHero
         eyebrow="Certificação em até 48h"
         title="Técnico por Competência"
-        description="Valide sua experiência profissional e receba o certificado técnico reconhecido pelo MEC — sem precisar cursar do zero o que você já domina."
+        description="Valide sua experiência profissional e receba o diploma técnico com validade nacional — sem precisar cursar do zero o que você já domina."
       />
 
       {/* Faixa institucional da certificadora */}
@@ -164,22 +195,25 @@ const CursoPorCompetencia = () => {
           className="rounded-2xl border shadow-elegant p-6 md:p-8 flex flex-col md:flex-row items-center gap-6"
           style={{ backgroundColor: "#FFF7F1", borderColor: `${ORANGE}33` }}
         >
-          <img
-            src={globaltecLogo.url}
-            alt="GlobalTec — Colégio Técnico Global"
-            className="h-20 md:h-24 w-auto shrink-0"
-            loading="lazy"
-          />
+          <div
+            className="shrink-0 rounded-2xl px-6 py-5 text-center text-white shadow-elegant"
+            style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${ORANGE_DARK} 100%)` }}
+          >
+            <GraduationCap className="size-8 mx-auto mb-1 opacity-90" />
+            <div className="text-lg font-extrabold leading-tight">Colégio Técnico</div>
+            <div className="text-2xl font-extrabold tracking-wide leading-tight">UNIVERSAL</div>
+          </div>
           <div className="flex-1 text-center md:text-left">
             <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: ORANGE_DARK }}>
               Certificadora parceira
             </div>
             <h2 className="text-xl md:text-2xl font-bold text-primary mt-1">
-              Colégio Técnico Global — GlobalTec
+              Colégio Técnico Universal
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Instituição credenciada pela Resolução nº 291 de 24/05/2024 (Diário Oficial nº 35.847).
-              Certificados 100% reconhecidos pelo MEC, com validade nacional.
+              Cursos técnicos cadastrados no SISTEC-MEC e reconhecidos/autorizados pelo Conselho Estadual de
+              Educação do Pará (CEE/PA) — Parecer Técnico CEE nº 412/2022. Diplomas com validade plena em todo
+              o território nacional.
             </p>
           </div>
           <Button
@@ -199,9 +233,9 @@ const CursoPorCompetencia = () => {
       <section className="container py-8">
         <div className="grid md:grid-cols-4 gap-4">
           {[
-            { icon: Clock, title: "Em até 48h", text: "Certificação ágil após validação dos documentos." },
-            { icon: ShieldCheck, title: "Reconhecido pelo MEC", text: "Certificado válido em todo o Brasil." },
-            { icon: Award, title: "Lei 9.394/1996 · Art. 41", text: "Base legal da certificação por competência." },
+            { icon: Clock, title: "Diploma em até 48h", text: "Emissão ágil após validação documental." },
+            { icon: ShieldCheck, title: "Reconhecimento CEE/PA", text: "Cadastro no SISTEC-MEC e validade nacional." },
+            { icon: Award, title: "LDB · Art. 41 (Lei 9.394/96)", text: "Base legal da certificação por competência." },
             { icon: FileCheck, title: "Sem cursar do zero", text: "Sua experiência profissional é validada." },
           ].map((c) => (
             <div
@@ -237,8 +271,8 @@ const CursoPorCompetencia = () => {
           {[
             { n: "1", t: "Fale com um consultor", d: "Conte em qual área você atua e há quanto tempo." },
             { n: "2", t: "Envie sua documentação", d: "Comprovantes de experiência, RG, CPF e escolaridade." },
-            { n: "3", t: "Análise e validação", d: "Nossa equipe valida com a certificadora GlobalTec." },
-            { n: "4", t: "Receba seu certificado", d: "Certificado técnico reconhecido pelo MEC em até 48h." },
+            { n: "3", t: "Avaliação simplificada", d: "Análise documental e teórica conforme o Art. 41 da LDB." },
+            { n: "4", t: "Receba seu diploma", d: "Diploma técnico oficial registrado no SISTEC em até 48h." },
           ].map((s) => (
             <div key={s.n} className="p-6 rounded-xl bg-card border shadow-card-soft relative overflow-hidden">
               <div
@@ -262,11 +296,11 @@ const CursoPorCompetencia = () => {
       <section className="container py-12">
         <div className="text-center mb-10">
           <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
-            Áreas contempladas
+            Catálogo profissional
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary">Cursos técnicos disponíveis</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary">Nossos cursos técnicos</h2>
           <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-            Confira as áreas em que já certificamos profissionais por competência.
+            Formações planejadas para atender às demandas reais das empresas e dos conselhos reguladores.
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -276,10 +310,19 @@ const CursoPorCompetencia = () => {
               className="p-6 rounded-xl bg-card border shadow-card-soft hover:shadow-elegant transition-smooth"
               style={{ borderColor: `${ORANGE}22` }}
             >
-              <div className="flex items-center gap-2 mb-3">
-                <GraduationCap className="size-5" style={{ color: ORANGE }} />
-                <h3 className="font-bold text-primary">{a.title}</h3>
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="size-5" style={{ color: ORANGE }} />
+                  <h3 className="font-bold text-primary">{a.title}</h3>
+                </div>
+                <span
+                  className="text-[11px] font-bold px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: `${ORANGE}18`, color: ORANGE_DARK }}
+                >
+                  {a.items.length} cursos
+                </span>
               </div>
+              <p className="text-xs text-muted-foreground mb-3">{a.desc}</p>
               <ul className="space-y-2">
                 {a.items.map((it) => (
                   <li key={it} className="flex gap-2 text-sm text-foreground/80">
@@ -288,6 +331,20 @@ const CursoPorCompetencia = () => {
                   </li>
                 ))}
               </ul>
+              <Button
+                asChild
+                variant="outline"
+                className="w-full mt-4"
+                style={{ borderColor: ORANGE, color: ORANGE_DARK }}
+              >
+                <a
+                  href={waLink(`Olá! Gostaria de saber mais sobre os cursos de ${a.title.replace("Área de ", "")}.`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle className="size-4" /> Solicitar informações
+                </a>
+              </Button>
             </div>
           ))}
         </div>
@@ -297,97 +354,65 @@ const CursoPorCompetencia = () => {
       <section className="container py-12">
         <div className="text-center mb-10">
           <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
-            Segurança e Legalidade
+            Garantia legal
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary">Regulamentação e Credenciamento</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary">Regulamentação & Validade Nacional</h2>
           <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-            Instituição com todas as autorizações necessárias para oferecer cursos técnicos de qualidade e reconhecidos pelo MEC.
+            Nossos cursos operam sob a égide da legislação educacional brasileira, garantindo aceitação
+            nacional de ponta a ponta.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5">
-          {/* Regulamentação */}
-          <div className="p-6 rounded-xl bg-card border shadow-card-soft" style={{ borderColor: `${ORANGE}33` }}>
-            <div className="size-11 rounded-lg grid place-items-center mb-3 text-white" style={{ backgroundColor: ORANGE }}>
-              <ScrollText className="size-5" />
-            </div>
-            <h3 className="font-bold text-primary text-lg">Regulamentação do Colégio</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              O Colégio Técnico Global é devidamente regulamentado e autorizado a funcionar pela Secretaria de Educação,
-              garantindo a validade nacional de todos os certificados emitidos.
-            </p>
-            <div className="mt-4 rounded-lg p-3" style={{ backgroundColor: `${ORANGE}12` }}>
-              <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: ORANGE_DARK }}>
-                Resolução de Credenciamento
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {regulamentacao.map((r) => (
+            <div key={r.title} className="p-6 rounded-xl bg-card border shadow-card-soft" style={{ borderColor: `${ORANGE}33` }}>
+              <div className="size-11 rounded-lg grid place-items-center mb-3 text-white" style={{ backgroundColor: ORANGE }}>
+                <r.icon className="size-5" />
               </div>
-              <div className="text-sm font-semibold text-primary mt-1">Resolução nº 291 — 24/05/2024</div>
-              <div className="text-xs text-muted-foreground">Diário Oficial nº 35.847 · página 99</div>
+              <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: ORANGE_DARK }}>
+                {r.tag}
+              </div>
+              <h3 className="font-bold text-primary mt-1">{r.title}</h3>
+              <p className="text-sm text-muted-foreground mt-2">{r.text}</p>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Conselhos */}
-          <div className="p-6 rounded-xl bg-card border shadow-card-soft" style={{ borderColor: `${ORANGE}33` }}>
-            <div className="size-11 rounded-lg grid place-items-center mb-3 text-white" style={{ backgroundColor: ORANGE }}>
-              <BadgeCheck className="size-5" />
-            </div>
-            <h3 className="font-bold text-primary text-lg">Credenciamento dos Cursos</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              Nossos cursos contam com credenciamento junto aos principais conselhos de classe profissionais,
-              assegurando o reconhecimento do mercado de trabalho.
-            </p>
-            <ul className="mt-4 space-y-2">
-              {conselhos.map((c) => (
-                <li key={c.sigla} className="flex items-start gap-2 text-sm">
-                  <span
-                    className="shrink-0 inline-flex items-center justify-center min-w-[56px] px-2 py-0.5 rounded-md text-[11px] font-bold text-white"
-                    style={{ backgroundColor: ORANGE }}
-                  >
-                    {c.sigla}
-                  </span>
-                  <span className="text-foreground/80">{c.nome}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="mt-8 p-6 rounded-xl bg-card border" style={{ borderColor: `${ORANGE}22` }}>
+          <div className="flex items-center gap-2 mb-4">
+            <BadgeCheck className="size-5" style={{ color: ORANGE }} />
+            <h3 className="font-bold text-primary">
+              Aceito e reconhecido pelos principais órgãos e conselhos reguladores
+            </h3>
           </div>
-
-          {/* Lei */}
-          <div className="p-6 rounded-xl bg-card border shadow-card-soft" style={{ borderColor: `${ORANGE}33` }}>
-            <div className="size-11 rounded-lg grid place-items-center mb-3 text-white" style={{ backgroundColor: ORANGE }}>
-              <Award className="size-5" />
-            </div>
-            <h3 className="font-bold text-primary text-lg">Certificação por Competência</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              A certificação por competência foi regulamentada no Brasil pela{" "}
-              <strong>Lei nº 9.394/1996, artigo 41</strong>, permitindo que profissionais com experiência prática
-              obtenham certificação técnica através da validação de suas competências.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {["Lei 9.394/1996", "Artigo 41", "Reconhecido MEC"].map((t) => (
+          <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {conselhos.map((c) => (
+              <li key={c.sigla} className="flex items-start gap-2 text-sm">
                 <span
-                  key={t}
-                  className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
-                  style={{ backgroundColor: `${ORANGE}18`, color: ORANGE_DARK }}
+                  className="shrink-0 inline-flex items-center justify-center min-w-[64px] px-2 py-0.5 rounded-md text-[11px] font-bold text-white"
+                  style={{ backgroundColor: ORANGE }}
                 >
-                  {t}
+                  {c.sigla}
                 </span>
-              ))}
-            </div>
-          </div>
+                <span className="text-foreground/80">{c.nome}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
       {/* Banner de campanha promocional (editável em src/config/campaigns.ts) */}
       <CampaignBanner campaign={campanhaTecnico} />
 
-      {/* Investimento Acessível — Planos e Preços */}
+      {/* Investimento — Planos e Preços */}
       <section className="container py-12">
         <div className="text-center mb-8">
           <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
-            Investimento Acessível
+            Investimento transparente
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary">Planos e Preços</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary">Planos e Valores Especiais</h2>
           <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-            Escolha a modalidade ideal e invista no seu futuro com condições que cabem no bolso.
+            Sua qualificação cabe no bolso. Sem taxas surpresas de matrícula ou de emissão de diploma.
           </p>
         </div>
 
@@ -415,86 +440,56 @@ const CursoPorCompetencia = () => {
         </div>
 
         {planoTab === "regular" && (
-          <>
-            <div className="max-w-3xl mx-auto mb-6 p-5 rounded-xl bg-card border" style={{ borderColor: `${ORANGE}22` }}>
-              <h3 className="font-bold text-primary flex items-center gap-2">
-                <Clock className="size-4" style={{ color: ORANGE }} /> Carga Horária e Tempo de Conclusão
-              </h3>
-              <ul className="text-sm text-foreground/80 mt-2 space-y-1">
-                <li>• Curso de 800 horas → conclusão em <strong>12 meses</strong></li>
-                <li>• Curso de 1.000 horas → conclusão em <strong>12 meses</strong></li>
-                <li>• Curso de 1.200 horas → conclusão em <strong>18 meses</strong></li>
-              </ul>
-              <div className="mt-4 text-sm p-3 rounded-lg" style={{ backgroundColor: `${ORANGE}12`, color: ORANGE_DARK }}>
-                <strong>Matrícula:</strong> valor mínimo de <strong>R$ 150,00</strong>.
-                <span className="opacity-80"> *Pix/Boleto e Cartão à vista (12x sem juros) não pagam matrícula.</span>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {planosRegular.map((p) => (
-                <div
-                  key={p.titulo}
-                  className="relative p-6 rounded-2xl bg-card border shadow-card-soft"
-                  style={{ borderColor: p.destaque ? ORANGE : `${ORANGE}33`, borderWidth: p.destaque ? 2 : 1 }}
-                >
-                  {p.destaque && (
-                    <span
-                      className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold px-3 py-1 rounded-full text-white flex items-center gap-1"
-                      style={{ backgroundColor: ORANGE }}
-                    >
-                      <Star className="size-3" /> Mais procurado
-                    </span>
-                  )}
-                  <h3 className="text-xl font-bold text-primary">{p.titulo}</h3>
-                  <p className="text-xs text-muted-foreground">{p.subtitulo}</p>
-
-                  <div className="mt-5 rounded-xl p-4" style={{ backgroundColor: `${ORANGE}10` }}>
-                    <div className="text-xs font-semibold uppercase tracking-wider" style={{ color: ORANGE_DARK }}>
-                      Boleto parcelado
-                    </div>
-                    <div className="mt-1 flex items-baseline gap-1">
-                      <span className="text-sm font-semibold text-primary">{p.parcelado.label}</span>
-                      <span className="text-3xl font-extrabold text-primary">R$ {p.parcelado.valor}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-lg border" style={{ borderColor: `${ORANGE}22` }}>
-                      <div className="text-[11px] flex items-center gap-1 text-muted-foreground">
-                        <Receipt className="size-3" /> Pix/Boleto à vista
-                      </div>
-                      <div className="text-base font-bold text-primary mt-0.5">R$ {p.aVista}</div>
-                    </div>
-                    <div className="p-3 rounded-lg border" style={{ borderColor: `${ORANGE}22` }}>
-                      <div className="text-[11px] flex items-center gap-1 text-muted-foreground">
-                        <CreditCard className="size-3" /> Cartão 12x sem juros
-                      </div>
-                      <div className="text-base font-bold text-primary mt-0.5">R$ {p.cartao}</div>
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-muted-foreground mt-3">
-                    *Pix/Boleto e Cartão à vista (12x sem juros) não pagam matrícula.
-                  </p>
-
-                  <Button
-                    asChild
-                    className="w-full mt-5 text-white hover:opacity-90"
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {planosRegular.map((p) => (
+              <div
+                key={p.titulo}
+                className="relative p-6 rounded-2xl bg-card border shadow-card-soft"
+                style={{ borderColor: p.destaque ? ORANGE : `${ORANGE}33`, borderWidth: p.destaque ? 2 : 1 }}
+              >
+                {p.destaque && (
+                  <span
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold px-3 py-1 rounded-full text-white flex items-center gap-1 whitespace-nowrap"
                     style={{ backgroundColor: ORANGE }}
                   >
-                    <a
-                      href={waLink(`Olá! Quero saber mais sobre o Técnico Regular — ${p.titulo}.`)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <MessageCircle className="size-4" /> Quero esse plano
-                    </a>
-                  </Button>
+                    <Star className="size-3" /> Melhor custo-benefício
+                  </span>
+                )}
+                <h3 className="text-xl font-bold text-primary">{p.titulo}</h3>
+                <p className="text-xs text-muted-foreground">{p.subtitulo}</p>
+
+                <div className="mt-5 rounded-xl p-4" style={{ backgroundColor: `${ORANGE}10` }}>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-extrabold text-primary">R$ {p.mensal}</span>
+                    <span className="text-sm font-semibold text-muted-foreground">/mês</span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </>
+
+                <ul className="mt-4 space-y-2">
+                  {p.beneficios.map((b) => (
+                    <li key={b} className="flex gap-2 text-sm text-foreground/80">
+                      <CheckCircle2 className="size-4 mt-0.5 shrink-0" style={{ color: ORANGE }} />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  asChild
+                  className="w-full mt-5 text-white hover:opacity-90"
+                  style={{ backgroundColor: ORANGE }}
+                >
+                  <a
+                    href={waLink(`Olá! Quero me matricular no ${p.titulo}.`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="size-4" /> Quero esse plano
+                  </a>
+                </Button>
+              </div>
+            ))}
+          </div>
         )}
 
         {planoTab === "competencia" && (
@@ -547,7 +542,7 @@ const CursoPorCompetencia = () => {
                     className="mt-4 text-center text-[11px] font-semibold px-2 py-1 rounded-full mx-auto"
                     style={{ backgroundColor: `${ORANGE}18`, color: ORANGE_DARK }}
                   >
-                    100% Reconhecido MEC
+                    Registrado no SISTEC-MEC
                   </div>
 
                   <Button
@@ -571,8 +566,8 @@ const CursoPorCompetencia = () => {
 
             <div className="mt-8 grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {[
-                { icon: BadgeCheck, t: "Certificado MEC", d: "100% reconhecido pelo Ministério da Educação." },
-                { icon: Wallet, t: "Sem matrícula", d: "Pagamentos no cartão em 12x sem taxas adicionais." },
+                { icon: BadgeCheck, t: "Diploma com validade nacional", d: "Cadastrado no SISTEC-MEC, reconhecido pelo CEE/PA." },
+                { icon: Wallet, t: "Sem taxas surpresas", d: "Sem custo extra de matrícula ou emissão de diploma." },
                 { icon: Clock, t: "Emissão em até 48h", d: "Após a validação da documentação enviada." },
               ].map((b) => (
                 <div key={b.t} className="p-4 rounded-xl bg-card border text-sm" style={{ borderColor: `${ORANGE}22` }}>
@@ -592,7 +587,7 @@ const CursoPorCompetencia = () => {
           <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
             Dúvidas frequentes
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary">Perguntas frequentes</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary">Perguntas respondidas</h2>
         </div>
         <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="w-full">
@@ -614,16 +609,16 @@ const CursoPorCompetencia = () => {
         >
           <Sparkles className="size-10 mx-auto mb-3 opacity-90" />
           <h2 className="text-3xl md:text-4xl font-bold">
-            Pronto para conquistar seu certificado técnico?
+            Seu futuro profissional começa hoje.
           </h2>
           <p className="mt-3 max-w-2xl mx-auto opacity-95">
-            Tire suas dúvidas em minutos e receba um roteiro personalizado para concluir sua certificação.
+            Fale com nossos consultores e inicie sua avaliação de competência com condições especiais de matrícula.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Button
               asChild
               size="lg"
-              className="bg-white text-[color:var(--tw-orange,#D9531A)] hover:bg-white/90"
+              className="bg-white hover:bg-white/90"
               style={{ color: ORANGE_DARK }}
             >
               <a href={waLink(waMsg)} target="_blank" rel="noopener noreferrer">
@@ -640,7 +635,7 @@ const CursoPorCompetencia = () => {
             </Button>
           </div>
           <p className="text-xs mt-6 opacity-80">
-            Atendimento rápido • Resposta no mesmo dia • Certificação em até 48h
+            Atendimento rápido • Resposta no mesmo dia • Diploma em até 48h
           </p>
         </div>
       </section>
