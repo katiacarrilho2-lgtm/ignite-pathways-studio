@@ -46,16 +46,18 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(220_75%_4%)] via-[hsl(220_70%_7%)]/95 via-35% to-[hsl(215_55%_14%)]/55 to-80%" />
         {/* Layer 2: subtle metallic sheen, fade out before the faces on the right */}
         <div
-          className="absolute inset-0 bg-[linear-gradient(115deg,hsl(220_80%_8%)_0%,hsl(215_70%_12%)_35%,hsl(210_45%_28%)/60_55%,transparent_75%)] opacity-20 mix-blend-overlay"
+          className="absolute inset-0 opacity-20 mix-blend-overlay"
           style={{
+            backgroundImage: "linear-gradient(115deg, hsl(220 80% 8%) 0%, hsl(215 70% 12%) 35%, hsla(210 45% 28% / 0.45) 55%, transparent 75%)",
             maskImage: "linear-gradient(115deg, black 0%, black 55%, transparent 80%)",
             WebkitMaskImage: "linear-gradient(115deg, black 0%, black 55%, transparent 80%)",
           }}
         />
         {/* Layer 3: soft highlight, reduced over the right-side people */}
         <div
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_10%,hsl(210_40%_85%)/0.12,transparent_50%)]"
+          className="absolute inset-0"
           style={{
+            backgroundImage: "radial-gradient(ellipse at 80% 10%, hsla(210 40% 85% / 0.12), transparent 50%)",
             maskImage: "linear-gradient(to left, transparent 0%, black 40%)",
             WebkitMaskImage: "linear-gradient(to left, transparent 0%, black 40%)",
           }}
