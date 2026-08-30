@@ -144,7 +144,7 @@ const regulamentacao = [
 const faqs = [
   {
     q: "O diploma tem validade nacional?",
-    a: "Sim. Os cursos são cadastrados no SISTEC-MEC e reconhecidos/autorizados pelo Conselho Estadual de Educação do Pará (CEE/PA), garantindo validade plena em todo o território nacional.",
+    a: "Sim. Os cursos são cadastrados no SISTEC-MEC e emitidos pela Faculdade LA, credenciada e recredenciada pelo MEC (Portarias nº 1.074/2024 e nº 1.378), garantindo validade plena em todo o território nacional.",
   },
   {
     q: "O curso é totalmente online ou há encontros presenciais?",
@@ -475,7 +475,7 @@ const CursoRegular = () => {
 
         <div className="mt-8 grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
           {[
-            { icon: Award, t: "Diploma registrado no SISTEC", d: "Validade nacional e reconhecimento CEE/PA." },
+            { icon: Award, t: "Diploma registrado no SISTEC", d: "Validade nacional e credenciamento MEC." },
             { icon: CreditCard, t: "Mensalidade sem surpresas", d: "Sem taxa de matrícula ou custo de material." },
             { icon: Users, t: "Suporte acadêmico", d: "Tutores dedicados do início ao fim do curso." },
           ].map((b) => (
