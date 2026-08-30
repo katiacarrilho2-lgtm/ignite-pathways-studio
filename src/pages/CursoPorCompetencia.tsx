@@ -77,7 +77,7 @@ const areas = [
 
 const faqs = [
   {
-    q: "O diploma do Faculdade LA tem validade nacional?",
+    q: "O diploma da Faculdade LA tem validade nacional?",
     a: "Sim. Os cursos são cadastrados no SISTEC-MEC e emitidos pela Faculdade LA, credenciada e recredenciada pelo MEC (Portarias nº 1.074/2024 e nº 1.378), o que garante validade plena do diploma em todo o território nacional.",
   },
   {
