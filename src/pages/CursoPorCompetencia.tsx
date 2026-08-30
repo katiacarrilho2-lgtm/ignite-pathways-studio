@@ -19,7 +19,7 @@ const NAVY_DARK = "#071F45";
 const MAGENTA = "#D6247C";
 const GREEN = "#1FA855";
 
-// Catálogo do parceiro — Colégio Técnico Universal
+// Catálogo — Faculdade LA
 const areas = [
   {
     title: "Área de Saúde",
@@ -79,8 +79,8 @@ const areas = [
 
 const faqs = [
   {
-    q: "O diploma do Colégio Técnico Universal tem validade nacional?",
-    a: "Sim. Os cursos são cadastrados no SISTEC-MEC e reconhecidos/autorizados pelo Conselho Estadual de Educação do Pará (CEE/PA), o que garante validade plena do diploma em todo o território nacional.",
+    q: "O diploma do Faculdade LA tem validade nacional?",
+    a: "Sim. Os cursos são cadastrados no SISTEC-MEC e emitidos pela Faculdade LA, credenciada e recredenciada pelo MEC (Portarias nº 1.074/2024 e nº 1.378), o que garante validade plena do diploma em todo o território nacional.",
   },
   {
     q: "Como funciona a Certificação por Competência?",
@@ -108,25 +108,26 @@ const faqs = [
 const conselhos = [
   { sigla: "COREN", nome: "Conselho Regional de Enfermagem" },
   { sigla: "CFT", nome: "Conselho Federal dos Técnicos Industriais" },
+  { sigla: "CRT", nome: "Conselho Regional dos Técnicos" },
   { sigla: "CREA", nome: "Conselho Regional de Engenharia e Agronomia" },
   { sigla: "CRA", nome: "Conselho Regional de Administração" },
   { sigla: "CRQ", nome: "Conselho Regional de Química" },
   { sigla: "COFECI", nome: "Conselho Federal de Corretores de Imóveis" },
 ];
 
-// Blocos de regulamentação (Colégio Técnico Universal)
+// Blocos de regulamentação (Faculdade LA)
 const regulamentacao = [
   {
     icon: ScrollText,
-    tag: "Parecer Técnico CEE nº 412/2022",
-    title: "Resolução do Conselho Estadual",
-    text: "Autorização concedida pelo Conselho Estadual de Educação do Pará (CEE/PA), validando os planos de curso e a oferta na modalidade EAD.",
+    tag: "Portaria MEC nº 1.074/2024",
+    title: "Credenciamento MEC",
+    text: "Instituição credenciada e recredenciada junto ao Ministério da Educação, com publicação no Diário Oficial da União em 29/10/2024.",
   },
   {
     icon: Newspaper,
-    tag: "Publicado em Seção 3 - DOU",
+    tag: "Portaria MEC nº 1.378 — Nota máxima EaD",
     title: "Diário Oficial da União",
-    text: "Credenciamento da escola e autorização dos cursos conforme atos normativos do Conselho Estadual de Educação do Pará (CEE/PA).",
+    text: "Autorização plena para a modalidade Educação a Distância com nota máxima no MEC, garantindo diplomas válidos em todo o território nacional.",
   },
   {
     icon: Landmark,
@@ -150,7 +151,7 @@ const pacotesCompetencia = [
   { qtd: 4, parcela: "383,33", total: "4.599,90", destaque: false },
 ];
 
-// Planos do Técnico Regular (Colégio Técnico Universal)
+// Planos do Técnico Regular (Faculdade LA)
 const planosRegular = [
   {
     titulo: "Técnico Regular 12 Meses",
@@ -276,7 +277,7 @@ const CursoPorCompetencia = () => {
       {/* Como funciona */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Passo a passo
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Como funciona a certificação</h2>
@@ -312,7 +313,7 @@ const CursoPorCompetencia = () => {
       {/* Cursos disponíveis */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Catálogo profissional
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Nossos cursos técnicos</h2>
@@ -370,7 +371,7 @@ const CursoPorCompetencia = () => {
       {/* Regulamentação e Credenciamento */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Garantia legal
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Regulamentação & Validade Nacional</h2>
@@ -424,7 +425,7 @@ const CursoPorCompetencia = () => {
       {/* Investimento — Planos e Preços */}
       <section className="container py-12">
         <div className="text-center mb-8">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Investimento transparente
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Planos e Valores Especiais</h2>
@@ -494,7 +495,7 @@ const CursoPorCompetencia = () => {
                 <Button
                   asChild
                   className="w-full mt-5 text-white hover:opacity-90"
-                  style={{ backgroundColor: NAVY }}
+                    style={{ backgroundColor: GREEN }}
                 >
                   <a
                     href={waLink(`Olá! Quero me matricular no ${p.titulo}.`)}
@@ -565,7 +566,7 @@ const CursoPorCompetencia = () => {
                   <Button
                     asChild
                     className="w-full mt-5 text-white hover:opacity-90"
-                    style={{ backgroundColor: NAVY }}
+                    style={{ backgroundColor: GREEN }}
                   >
                     <a
                       href={waLink(
@@ -583,7 +584,7 @@ const CursoPorCompetencia = () => {
 
             <div className="mt-8 grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {[
-                { icon: BadgeCheck, t: "Diploma com validade nacional", d: "Cadastrado no SISTEC-MEC, reconhecido pelo CEE/PA." },
+                { icon: BadgeCheck, t: "Diploma com validade nacional", d: "Cadastrado no SISTEC-MEC, emitido pela Faculdade LA." },
                 { icon: Wallet, t: "Sem taxas surpresas", d: "Sem custo extra de matrícula ou emissão de diploma." },
                 { icon: Clock, t: "Emissão em até 48h", d: "Após a validação da documentação enviada." },
               ].map((b) => (
@@ -601,7 +602,7 @@ const CursoPorCompetencia = () => {
       {/* FAQ */}
       <section className="container py-12">
         <div className="text-center mb-8">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Dúvidas frequentes
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Perguntas respondidas</h2>
@@ -655,6 +656,14 @@ const CursoPorCompetencia = () => {
             Atendimento rápido • Resposta no mesmo dia • Diploma em até 48h
           </p>
         </div>
+      </section>
+      {/* Rodapé institucional — Faculdade LA */}
+      <section className="container pb-10">
+        <p className="text-[11px] text-muted-foreground text-center max-w-3xl mx-auto">
+          Todos os direitos reservados à Faculdade LA. CNPJ: 36.131.612/0001-60. Cursos técnicos e
+          superiores emitidos em conformidade com as diretrizes do MEC e do SISTEC. Comercializado por
+          revendedor autorizado do Grupo LA Educação.
+        </p>
       </section>
     </>
   );
