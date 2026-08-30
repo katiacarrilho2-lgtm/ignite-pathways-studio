@@ -209,41 +209,38 @@ const CursoPorCompetencia = () => {
         </div>
       </section>
 
-      {/* Faixa institucional da certificadora */}
+      {/* Faixa institucional da certificadora — Faculdade LA */}
       <section className="container -mt-6 mb-12">
         <div
           className="rounded-2xl border shadow-elegant p-6 md:p-8 flex flex-col md:flex-row items-center gap-6"
           style={{ backgroundColor: "#EEF2F9", borderColor: `${NAVY}33` }}
         >
-          <div
-            className="shrink-0 rounded-2xl px-6 py-5 text-center text-white shadow-elegant"
-            style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_DARK} 100%)` }}
-          >
-            <GraduationCap className="size-8 mx-auto mb-1 opacity-90" />
-            <div className="text-lg font-extrabold leading-tight">Colégio Técnico</div>
-            <div className="text-2xl font-extrabold tracking-wide leading-tight">UNIVERSAL</div>
+          <div className="shrink-0 rounded-2xl px-6 py-5 bg-white shadow-elegant grid place-items-center">
+            <img src={laLogo} alt="Faculdade LA — Grupo LA Educação" className="h-20 w-auto" />
           </div>
           <div className="flex-1 text-center md:text-left">
-            <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: NAVY_DARK }}>
-              Certificadora parceira
+            <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: MAGENTA }}>
+              Instituição certificadora
             </div>
             <h2 className="text-xl md:text-2xl font-bold text-primary mt-1">
-              Colégio Técnico Universal
+              Faculdade LA (Grupo LA Educação)
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Cursos técnicos cadastrados no SISTEC-MEC e reconhecidos/autorizados pelo Conselho Estadual de
-              Educação do Pará (CEE/PA) — Parecer Técnico CEE nº 412/2022. Diplomas com validade plena em todo
-              o território nacional.
+              Cursos técnicos cadastrados no SISTEC-MEC e emitidos pela Faculdade LA. Instituição devidamente
+              credenciada e recredenciada junto ao Ministério da Educação através da Portaria MEC nº 1.074 de
+              25/10/2024 (DOU 29/10/2024) e Portaria MEC nº 1.378 para a modalidade EaD com nota máxima.
+              Diplomas com validade plena em todo o território nacional e direito ao registro profissional
+              (CFT, CRT, COREN, CREA).
             </p>
           </div>
           <Button
             asChild
             size="lg"
             className="shrink-0 text-white hover:opacity-90"
-            style={{ backgroundColor: NAVY }}
+            style={{ backgroundColor: GREEN }}
           >
             <a href={waLink(waMsg)} target="_blank" rel="noopener noreferrer">
-              <MessageCircle className="size-4" /> Falar comigo
+              <MessageCircle className="size-4" /> Falar com Consultor no WhatsApp
             </a>
           </Button>
         </div>
