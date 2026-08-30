@@ -187,11 +187,27 @@ const CursoPorCompetencia = () => {
 
   return (
     <>
-      <PageHero
-        eyebrow="Certificação em até 48h"
-        title="Técnico por Competência"
-        description="Valide sua experiência profissional e receba o diploma técnico com validade nacional — sem precisar cursar do zero o que você já domina."
-      />
+      {/* Hero institucional — azul-marinho Faculdade LA */}
+      <section
+        className="text-white"
+        style={{ background: `linear-gradient(135deg, ${NAVY_DARK} 0%, ${NAVY} 60%, #123B7A 100%)` }}
+      >
+        <div className="container py-20 md:py-28 text-center">
+          <span
+            className="text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full"
+            style={{ backgroundColor: `${MAGENTA}22`, color: "#F8BBD9" }}
+          >
+            Certificação em até 48h
+          </span>
+          <h1 className="mt-4 text-4xl md:text-6xl font-bold text-balance animate-fade-up">
+            Técnico por Competência
+          </h1>
+          <p className="mt-5 text-lg text-white/85 max-w-2xl mx-auto">
+            Valide sua experiência profissional e receba o diploma técnico com validade nacional — sem
+            precisar cursar do zero o que você já domina.
+          </p>
+        </div>
+      </section>
 
       {/* Faixa institucional da certificadora */}
       <section className="container -mt-6 mb-12">
