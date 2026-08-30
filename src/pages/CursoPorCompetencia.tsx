@@ -250,10 +250,10 @@ const CursoPorCompetencia = () => {
       <section className="container py-8">
         <div className="grid md:grid-cols-4 gap-4">
           {[
-            { icon: Clock, title: "Diploma em até 48h", text: "Emissão ágil após validação documental." },
-            { icon: ShieldCheck, title: "Reconhecimento CEE/PA", text: "Cadastro no SISTEC-MEC e validade nacional." },
-            { icon: Award, title: "LDB · Art. 41 (Lei 9.394/96)", text: "Base legal da certificação por competência." },
-            { icon: FileCheck, title: "Sem cursar do zero", text: "Sua experiência profissional é validada." },
+            { icon: Clock, title: "Emissão Ágil", text: "Processo ágil de certificação e registro após a validação documental da sua experiência." },
+            { icon: ShieldCheck, title: "Consulta no SISTEC/MEC", text: "Seu diploma é cadastrado diretamente no sistema oficial do governo federal, garantindo autenticidade pública." },
+            { icon: Scale, title: "LDB - Art. 41 (Lei 9.394/96)", text: "Base legal sólida que regulamenta e autoriza a aferição técnica por competência profissional em todo o país." },
+            { icon: TrendingUp, title: "Aproveite sua Experiência", text: "Valide os anos trabalhados e conquiste o seu registro profissional para progredir na carreira de forma rápida e segura." },
           ].map((c) => (
             <div
               key={c.title}
