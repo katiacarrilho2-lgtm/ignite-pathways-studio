@@ -154,7 +154,7 @@ const planosRegular = [
   {
     titulo: "Técnico Regular 12 Meses",
     subtitulo: "Conciliar estudos com uma mensalidade suave e acessível.",
-    mensal: "99,99",
+    mensal: "129,90",
     destaque: false,
     beneficios: [
       "Acesso integral a todas as disciplinas do portal EAD",
