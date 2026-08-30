@@ -1,15 +1,20 @@
-import { PageHero } from "@/components/site/PageHero";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, ShieldCheck, Award, MessageCircle, GraduationCap, Sparkles, ScrollText, BadgeCheck, Star, CreditCard, BookOpen, Users, Laptop, Landmark, Newspaper } from "lucide-react";
+import laLogoAsset from "@/assets/la-educacao-logo.png.asset.json";
+
+const laLogo = laLogoAsset.url;
 
 const WHATSAPP = "5518996841902";
 const waLink = (msg: string) =>
   `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
+// Paleta Faculdade LA — azul-marinho + magenta, CTA verde WhatsApp
 const NAVY = "#0A2A5E";
 const NAVY_DARK = "#071F45";
+const MAGENTA = "#D6247C";
+const GREEN = "#1FA855";
 
 // Catálogo do parceiro — Colégio Técnico Universal
 const areas = [
