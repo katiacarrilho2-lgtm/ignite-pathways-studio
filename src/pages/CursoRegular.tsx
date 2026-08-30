@@ -1,17 +1,20 @@
-import { PageHero } from "@/components/site/PageHero";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, ShieldCheck, Award, MessageCircle, GraduationCap, Sparkles, ScrollText, BadgeCheck, Star, CreditCard, BookOpen, Users, Laptop, Landmark, Newspaper } from "lucide-react";
+const laLogo = "/la-educacao-logo.png";
 
 const WHATSAPP = "5518996841902";
 const waLink = (msg: string) =>
   `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
-const ORANGE = "#0D8595";
-const ORANGE_DARK = "#0B6A77";
+// Paleta Faculdade LA — azul-marinho + magenta, CTA verde WhatsApp
+const NAVY = "#0A2A5E";
+const NAVY_DARK = "#071F45";
+const MAGENTA = "#D6247C";
+const GREEN = "#1FA855";
 
-// Catálogo do parceiro — Colégio Técnico Universal
+// Catálogo — Faculdade LA
 const areas = [
   {
     title: "Área de Saúde",
@@ -102,6 +105,7 @@ const planosRegular = [
 const conselhos = [
   { sigla: "COREN", nome: "Conselho Regional de Enfermagem" },
   { sigla: "CFT", nome: "Conselho Federal dos Técnicos Industriais" },
+  { sigla: "CRT", nome: "Conselho Regional dos Técnicos" },
   { sigla: "CREA", nome: "Conselho Regional de Engenharia e Agronomia" },
   { sigla: "CRA", nome: "Conselho Regional de Administração" },
   { sigla: "CRQ", nome: "Conselho Regional de Química" },
@@ -111,15 +115,15 @@ const conselhos = [
 const regulamentacao = [
   {
     icon: ScrollText,
-    tag: "Parecer Técnico CEE nº 412/2022",
-    title: "Resolução do Conselho Estadual",
-    text: "Autorização concedida pelo Conselho Estadual de Educação do Pará (CEE/PA), validando os planos de curso e a oferta na modalidade EAD.",
+    tag: "Portaria MEC nº 1.074/2024",
+    title: "Credenciamento MEC",
+    text: "Instituição credenciada e recredenciada junto ao Ministério da Educação, com publicação no Diário Oficial da União em 29/10/2024.",
   },
   {
     icon: Newspaper,
-    tag: "Publicado em Seção 3 - DOU",
+    tag: "Portaria MEC nº 1.378 — Nota máxima EaD",
     title: "Diário Oficial da União",
-    text: "Credenciamento da escola e autorização dos cursos conforme atos normativos do Conselho Estadual de Educação do Pará (CEE/PA).",
+    text: "Autorização plena para a modalidade Educação a Distância com nota máxima no MEC, garantindo diplomas válidos em todo o território nacional.",
   },
   {
     icon: Landmark,
@@ -138,7 +142,7 @@ const regulamentacao = [
 const faqs = [
   {
     q: "O diploma tem validade nacional?",
-    a: "Sim. Os cursos são cadastrados no SISTEC-MEC e reconhecidos/autorizados pelo Conselho Estadual de Educação do Pará (CEE/PA), garantindo validade plena em todo o território nacional.",
+    a: "Sim. Os cursos são cadastrados no SISTEC-MEC e emitidos pela Faculdade LA, credenciada e recredenciada pelo MEC (Portarias nº 1.074/2024 e nº 1.378), garantindo validade plena em todo o território nacional.",
   },
   {
     q: "O curso é totalmente online ou há encontros presenciais?",
@@ -175,47 +179,59 @@ const CursoRegular = () => {
 
   return (
     <>
-      <PageHero
-        eyebrow="Formação Técnica Completa"
-        title="Técnico Regular"
-        description="Formação técnica do zero, 100% EAD, com diploma registrado no SISTEC-MEC e validade nacional."
-      />
-
-      {/* Faixa institucional da certificadora */}
+      {/* Hero institucional — azul-marinho Faculdade LA */}
+      <section
+        className="text-white"
+        style={{ background: `linear-gradient(135deg, ${NAVY_DARK} 0%, ${NAVY} 60%, #123B7A 100%)` }}
+      >
+        <div className="container py-20 md:py-28 text-center">
+          <span
+            className="text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full"
+            style={{ backgroundColor: `${MAGENTA}22`, color: "#F8BBD9" }}
+          >
+            Ensino Técnico Regular
+          </span>
+          <h1 className="mt-4 text-4xl md:text-6xl font-bold text-balance animate-fade-up">
+            Técnico Regular & Tecnólogo
+          </h1>
+          <p className="mt-5 text-lg text-white/85 max-w-2xl mx-auto">
+            Cursos técnicos completos, do zero ao diploma — válidos em todo o Brasil e cadastrados no
+            SISTEC-MEC.
+          </p>
+        </div>
+      </section>
+      {/* Faixa institucional da certificadora — Faculdade LA */}
       <section className="container -mt-6 mb-12">
         <div
           className="rounded-2xl border shadow-elegant p-6 md:p-8 flex flex-col md:flex-row items-center gap-6"
-          style={{ backgroundColor: "#EFF7F8", borderColor: `${ORANGE}33` }}
+          style={{ backgroundColor: "#EEF2F9", borderColor: `${NAVY}33` }}
         >
-          <div
-            className="shrink-0 rounded-2xl px-6 py-5 text-center text-white shadow-elegant"
-            style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${ORANGE_DARK} 100%)` }}
-          >
-            <GraduationCap className="size-8 mx-auto mb-1 opacity-90" />
-            <div className="text-lg font-extrabold leading-tight">Colégio Técnico</div>
-            <div className="text-2xl font-extrabold tracking-wide leading-tight">UNIVERSAL</div>
+          <div className="shrink-0 rounded-2xl px-6 py-5 bg-white shadow-elegant grid place-items-center">
+            <img src={laLogo} alt="Faculdade LA — Grupo LA Educação" className="h-20 w-auto" />
           </div>
           <div className="flex-1 text-center md:text-left">
-            <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: ORANGE_DARK }}>
-              Certificadora parceira
+            <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: MAGENTA }}>
+              Instituição certificadora
             </div>
             <h2 className="text-xl md:text-2xl font-bold text-primary mt-1">
-              Colégio Técnico Universal
+              Faculdade LA (Grupo LA Educação)
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Cursos técnicos cadastrados no SISTEC-MEC e reconhecidos/autorizados pelo Conselho Estadual de
-              Educação do Pará (CEE/PA) — Parecer Técnico CEE nº 412/2022. Diplomas com validade plena em todo
-              o território nacional.
+              Cursos técnicos cadastrados no SISTEC-MEC e emitidos pela Faculdade LA. Instituição devidamente
+              credenciada e recredenciada junto ao Ministério da Educação através da Portaria MEC nº 1.074 de
+              25/10/2024 (DOU 29/10/2024) e Portaria MEC nº 1.378 para a modalidade EaD com nota máxima.
+              Diplomas com validade plena em todo o território nacional e direito ao registro profissional
+              (CFT, CRT, COREN, CREA).
             </p>
           </div>
           <Button
             asChild
             size="lg"
             className="shrink-0 text-white hover:opacity-90"
-            style={{ backgroundColor: ORANGE }}
+            style={{ backgroundColor: GREEN }}
           >
             <a href={waLink(waMsg)} target="_blank" rel="noopener noreferrer">
-              <MessageCircle className="size-4" /> Falar comigo
+              <MessageCircle className="size-4" /> Falar com Consultor no WhatsApp
             </a>
           </Button>
         </div>
@@ -226,18 +242,18 @@ const CursoRegular = () => {
         <div className="grid md:grid-cols-4 gap-4">
           {[
             { icon: BookOpen, title: "Do zero ao diploma", text: "Formação estruturada, sem exigir experiência prévia." },
-            { icon: ShieldCheck, title: "Reconhecimento CEE/PA", text: "Cadastro no SISTEC-MEC e validade nacional." },
+            { icon: ShieldCheck, title: "Credenciamento MEC", text: "Cadastro no SISTEC-MEC e validade nacional." },
             { icon: Laptop, title: "Ensino 100% EAD", text: "Plataforma digital moderna, estude de qualquer lugar." },
             { icon: Users, title: "Professores especializados", text: "Especialistas, mestres e doutores com vivência de mercado." },
           ].map((c) => (
             <div
               key={c.title}
               className="p-5 rounded-xl bg-card border shadow-card-soft"
-              style={{ borderColor: `${ORANGE}33` }}
+              style={{ borderColor: `${NAVY}33` }}
             >
               <div
                 className="size-11 rounded-lg grid place-items-center mb-3 text-white"
-                style={{ backgroundColor: ORANGE }}
+                style={{ backgroundColor: NAVY }}
               >
                 <c.icon className="size-5" />
               </div>
@@ -251,7 +267,7 @@ const CursoRegular = () => {
       {/* Como funciona */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Passo a passo
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Como funciona o Técnico Regular</h2>
@@ -269,11 +285,11 @@ const CursoRegular = () => {
             <div key={s.n} className="p-6 rounded-xl bg-card border shadow-card-soft relative overflow-hidden">
               <div
                 className="absolute -top-6 -right-6 size-20 rounded-full opacity-10"
-                style={{ backgroundColor: ORANGE }}
+                style={{ backgroundColor: NAVY }}
               />
               <div
                 className="size-10 rounded-full grid place-items-center font-bold text-white mb-3"
-                style={{ backgroundColor: ORANGE }}
+                style={{ backgroundColor: NAVY }}
               >
                 {s.n}
               </div>
@@ -287,7 +303,7 @@ const CursoRegular = () => {
       {/* Cursos disponíveis */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Catálogo profissional
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Nossos cursos técnicos</h2>
@@ -300,16 +316,16 @@ const CursoRegular = () => {
             <div
               key={a.title}
               className="p-6 rounded-xl bg-card border shadow-card-soft hover:shadow-elegant transition-smooth"
-              style={{ borderColor: `${ORANGE}22` }}
+              style={{ borderColor: `${NAVY}22` }}
             >
               <div className="flex items-center justify-between gap-2 mb-1">
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="size-5" style={{ color: ORANGE }} />
+                  <GraduationCap className="size-5" style={{ color: NAVY }} />
                   <h3 className="font-bold text-primary">{a.title}</h3>
                 </div>
                 <span
                   className="text-[11px] font-bold px-2 py-0.5 rounded-full"
-                  style={{ backgroundColor: `${ORANGE}18`, color: ORANGE_DARK }}
+                  style={{ backgroundColor: `${NAVY}18`, color: NAVY_DARK }}
                 >
                   {a.items.length} cursos
                 </span>
@@ -318,7 +334,7 @@ const CursoRegular = () => {
               <ul className="space-y-2">
                 {a.items.map((it) => (
                   <li key={it} className="flex gap-2 text-sm text-foreground/80">
-                    <CheckCircle2 className="size-4 mt-0.5 shrink-0" style={{ color: ORANGE }} />
+                    <CheckCircle2 className="size-4 mt-0.5 shrink-0" style={{ color: NAVY }} />
                     <span>{it}</span>
                   </li>
                 ))}
@@ -327,7 +343,7 @@ const CursoRegular = () => {
                 asChild
                 variant="outline"
                 className="w-full mt-4"
-                style={{ borderColor: ORANGE, color: ORANGE_DARK }}
+                style={{ borderColor: NAVY, color: NAVY_DARK }}
               >
                 <a
                   href={waLink(`Olá! Gostaria de saber mais sobre os cursos de ${a.title.replace("Área de ", "")}.`)}
@@ -345,7 +361,7 @@ const CursoRegular = () => {
       {/* Regulamentação */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Garantia legal
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Regulamentação & Validade Nacional</h2>
@@ -356,11 +372,11 @@ const CursoRegular = () => {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
           {regulamentacao.map((r) => (
-            <div key={r.title} className="p-6 rounded-xl bg-card border shadow-card-soft" style={{ borderColor: `${ORANGE}33` }}>
-              <div className="size-11 rounded-lg grid place-items-center mb-3 text-white" style={{ backgroundColor: ORANGE }}>
+            <div key={r.title} className="p-6 rounded-xl bg-card border shadow-card-soft" style={{ borderColor: `${NAVY}33` }}>
+              <div className="size-11 rounded-lg grid place-items-center mb-3 text-white" style={{ backgroundColor: NAVY }}>
                 <r.icon className="size-5" />
               </div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: ORANGE_DARK }}>
+              <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: NAVY_DARK }}>
                 {r.tag}
               </div>
               <h3 className="font-bold text-primary mt-1">{r.title}</h3>
@@ -369,9 +385,9 @@ const CursoRegular = () => {
           ))}
         </div>
 
-        <div className="mt-8 p-6 rounded-xl bg-card border" style={{ borderColor: `${ORANGE}22` }}>
+        <div className="mt-8 p-6 rounded-xl bg-card border" style={{ borderColor: `${NAVY}22` }}>
           <div className="flex items-center gap-2 mb-4">
-            <BadgeCheck className="size-5" style={{ color: ORANGE }} />
+            <BadgeCheck className="size-5" style={{ color: NAVY }} />
             <h3 className="font-bold text-primary">
               Aceito e reconhecido pelos principais órgãos e conselhos reguladores
             </h3>
@@ -381,7 +397,7 @@ const CursoRegular = () => {
               <li key={c.sigla} className="flex items-start gap-2 text-sm">
                 <span
                   className="shrink-0 inline-flex items-center justify-center min-w-[64px] px-2 py-0.5 rounded-md text-[11px] font-bold text-white"
-                  style={{ backgroundColor: ORANGE }}
+                  style={{ backgroundColor: NAVY }}
                 >
                   {c.sigla}
                 </span>
@@ -395,7 +411,7 @@ const CursoRegular = () => {
       {/* Planos e Preços */}
       <section className="container py-12">
         <div className="text-center mb-8">
-          <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Investimento transparente
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Planos e Valores Especiais</h2>
@@ -409,12 +425,12 @@ const CursoRegular = () => {
             <div
               key={p.titulo}
               className="relative p-6 rounded-2xl bg-card border shadow-card-soft"
-              style={{ borderColor: p.destaque ? ORANGE : `${ORANGE}33`, borderWidth: p.destaque ? 2 : 1 }}
+              style={{ borderColor: p.destaque ? NAVY : `${NAVY}33`, borderWidth: p.destaque ? 2 : 1 }}
             >
               {p.destaque && (
                 <span
                   className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold px-3 py-1 rounded-full text-white flex items-center gap-1 whitespace-nowrap"
-                  style={{ backgroundColor: ORANGE }}
+                  style={{ backgroundColor: NAVY }}
                 >
                   <Star className="size-3" /> Melhor custo-benefício
                 </span>
@@ -422,7 +438,7 @@ const CursoRegular = () => {
               <h3 className="text-xl font-bold text-primary">{p.titulo}</h3>
               <p className="text-xs text-muted-foreground">{p.subtitulo}</p>
 
-              <div className="mt-5 rounded-xl p-4" style={{ backgroundColor: `${ORANGE}10` }}>
+              <div className="mt-5 rounded-xl p-4" style={{ backgroundColor: `${NAVY}10` }}>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-extrabold text-primary">R$ {p.mensal}</span>
                   <span className="text-sm font-semibold text-muted-foreground">/mês</span>
@@ -432,7 +448,7 @@ const CursoRegular = () => {
               <ul className="mt-4 space-y-2">
                 {p.beneficios.map((b) => (
                   <li key={b} className="flex gap-2 text-sm text-foreground/80">
-                    <CheckCircle2 className="size-4 mt-0.5 shrink-0" style={{ color: ORANGE }} />
+                    <CheckCircle2 className="size-4 mt-0.5 shrink-0" style={{ color: NAVY }} />
                     <span>{b}</span>
                   </li>
                 ))}
@@ -441,7 +457,7 @@ const CursoRegular = () => {
               <Button
                 asChild
                 className="w-full mt-5 text-white hover:opacity-90"
-                style={{ backgroundColor: ORANGE }}
+                    style={{ backgroundColor: GREEN }}
               >
                 <a
                   href={waLink(`Olá! Quero me matricular no ${p.titulo}.`)}
@@ -457,12 +473,12 @@ const CursoRegular = () => {
 
         <div className="mt-8 grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
           {[
-            { icon: Award, t: "Diploma registrado no SISTEC", d: "Validade nacional e reconhecimento CEE/PA." },
+            { icon: Award, t: "Diploma registrado no SISTEC", d: "Validade nacional e credenciamento MEC." },
             { icon: CreditCard, t: "Mensalidade sem surpresas", d: "Sem taxa de matrícula ou custo de material." },
             { icon: Users, t: "Suporte acadêmico", d: "Tutores dedicados do início ao fim do curso." },
           ].map((b) => (
-            <div key={b.t} className="p-4 rounded-xl bg-card border text-sm" style={{ borderColor: `${ORANGE}22` }}>
-              <b.icon className="size-5 mb-2" style={{ color: ORANGE }} />
+            <div key={b.t} className="p-4 rounded-xl bg-card border text-sm" style={{ borderColor: `${NAVY}22` }}>
+              <b.icon className="size-5 mb-2" style={{ color: NAVY }} />
               <div className="font-semibold text-primary">{b.t}</div>
               <div className="text-muted-foreground">{b.d}</div>
             </div>
@@ -473,7 +489,7 @@ const CursoRegular = () => {
       {/* FAQ */}
       <section className="container py-12">
         <div className="text-center mb-8">
-          <Badge className="mb-3" style={{ backgroundColor: `${ORANGE}22`, color: ORANGE_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Dúvidas frequentes
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Perguntas respondidas</h2>
@@ -494,7 +510,7 @@ const CursoRegular = () => {
       <section className="container py-16">
         <div
           className="rounded-2xl p-8 md:p-12 text-white text-center shadow-elegant"
-          style={{ background: `linear-gradient(135deg, ${ORANGE} 0%, ${ORANGE_DARK} 100%)` }}
+          style={{ background: `linear-gradient(135deg, ${NAVY} 0%, ${NAVY_DARK} 100%)` }}
         >
           <Sparkles className="size-10 mx-auto mb-3 opacity-90" />
           <h2 className="text-3xl md:text-4xl font-bold">
@@ -504,7 +520,7 @@ const CursoRegular = () => {
             Fale com nossos consultores pedagógicos e garanta condições especiais de matrícula.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg" className="bg-white hover:bg-white/90" style={{ color: ORANGE_DARK }}>
+            <Button asChild size="lg" className="bg-white hover:bg-white/90" style={{ color: NAVY_DARK }}>
               <a href={waLink(waMsg)} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="size-4" /> Falar agora no WhatsApp
               </a>
@@ -517,6 +533,14 @@ const CursoRegular = () => {
             Atendimento rápido • Resposta no mesmo dia • Diploma com validade nacional
           </p>
         </div>
+      </section>
+      {/* Rodapé institucional — Faculdade LA */}
+      <section className="container pb-10">
+        <p className="text-[11px] text-muted-foreground text-center max-w-3xl mx-auto">
+          Todos os direitos reservados à Faculdade LA. CNPJ: 36.131.612/0001-60. Cursos técnicos e
+          superiores emitidos em conformidade com as diretrizes do MEC e do SISTEC. Comercializado por
+          revendedor autorizado do Grupo LA Educação.
+        </p>
       </section>
     </>
   );
