@@ -16,7 +16,7 @@ const NAVY_DARK = "#071F45";
 const MAGENTA = "#D6247C";
 const GREEN = "#1FA855";
 
-// Catálogo do parceiro — Colégio Técnico Universal
+// Catálogo — Faculdade LA
 const areas = [
   {
     title: "Área de Saúde",
@@ -107,6 +107,7 @@ const planosRegular = [
 const conselhos = [
   { sigla: "COREN", nome: "Conselho Regional de Enfermagem" },
   { sigla: "CFT", nome: "Conselho Federal dos Técnicos Industriais" },
+  { sigla: "CRT", nome: "Conselho Regional dos Técnicos" },
   { sigla: "CREA", nome: "Conselho Regional de Engenharia e Agronomia" },
   { sigla: "CRA", nome: "Conselho Regional de Administração" },
   { sigla: "CRQ", nome: "Conselho Regional de Química" },
@@ -116,15 +117,15 @@ const conselhos = [
 const regulamentacao = [
   {
     icon: ScrollText,
-    tag: "Parecer Técnico CEE nº 412/2022",
-    title: "Resolução do Conselho Estadual",
-    text: "Autorização concedida pelo Conselho Estadual de Educação do Pará (CEE/PA), validando os planos de curso e a oferta na modalidade EAD.",
+    tag: "Portaria MEC nº 1.074/2024",
+    title: "Credenciamento MEC",
+    text: "Instituição credenciada e recredenciada junto ao Ministério da Educação, com publicação no Diário Oficial da União em 29/10/2024.",
   },
   {
     icon: Newspaper,
-    tag: "Publicado em Seção 3 - DOU",
+    tag: "Portaria MEC nº 1.378 — Nota máxima EaD",
     title: "Diário Oficial da União",
-    text: "Credenciamento da escola e autorização dos cursos conforme atos normativos do Conselho Estadual de Educação do Pará (CEE/PA).",
+    text: "Autorização plena para a modalidade Educação a Distância com nota máxima no MEC, garantindo diplomas válidos em todo o território nacional.",
   },
   {
     icon: Landmark,
@@ -243,7 +244,7 @@ const CursoRegular = () => {
         <div className="grid md:grid-cols-4 gap-4">
           {[
             { icon: BookOpen, title: "Do zero ao diploma", text: "Formação estruturada, sem exigir experiência prévia." },
-            { icon: ShieldCheck, title: "Reconhecimento CEE/PA", text: "Cadastro no SISTEC-MEC e validade nacional." },
+            { icon: ShieldCheck, title: "Credenciamento MEC", text: "Cadastro no SISTEC-MEC e validade nacional." },
             { icon: Laptop, title: "Ensino 100% EAD", text: "Plataforma digital moderna, estude de qualquer lugar." },
             { icon: Users, title: "Professores especializados", text: "Especialistas, mestres e doutores com vivência de mercado." },
           ].map((c) => (
@@ -268,7 +269,7 @@ const CursoRegular = () => {
       {/* Como funciona */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Passo a passo
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Como funciona o Técnico Regular</h2>
@@ -304,7 +305,7 @@ const CursoRegular = () => {
       {/* Cursos disponíveis */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Catálogo profissional
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Nossos cursos técnicos</h2>
@@ -362,7 +363,7 @@ const CursoRegular = () => {
       {/* Regulamentação */}
       <section className="container py-12">
         <div className="text-center mb-10">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Garantia legal
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Regulamentação & Validade Nacional</h2>
@@ -412,7 +413,7 @@ const CursoRegular = () => {
       {/* Planos e Preços */}
       <section className="container py-12">
         <div className="text-center mb-8">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Investimento transparente
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Planos e Valores Especiais</h2>
@@ -458,7 +459,7 @@ const CursoRegular = () => {
               <Button
                 asChild
                 className="w-full mt-5 text-white hover:opacity-90"
-                style={{ backgroundColor: NAVY }}
+                    style={{ backgroundColor: GREEN }}
               >
                 <a
                   href={waLink(`Olá! Quero me matricular no ${p.titulo}.`)}
@@ -490,7 +491,7 @@ const CursoRegular = () => {
       {/* FAQ */}
       <section className="container py-12">
         <div className="text-center mb-8">
-          <Badge className="mb-3" style={{ backgroundColor: `${NAVY}22`, color: NAVY_DARK }}>
+          <Badge className="mb-3" style={{ backgroundColor: `${MAGENTA}18`, color: MAGENTA }}>
             Dúvidas frequentes
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-primary">Perguntas respondidas</h2>
@@ -534,6 +535,14 @@ const CursoRegular = () => {
             Atendimento rápido • Resposta no mesmo dia • Diploma com validade nacional
           </p>
         </div>
+      </section>
+      {/* Rodapé institucional — Faculdade LA */}
+      <section className="container pb-10">
+        <p className="text-[11px] text-muted-foreground text-center max-w-3xl mx-auto">
+          Todos os direitos reservados à Faculdade LA. CNPJ: 36.131.612/0001-60. Cursos técnicos e
+          superiores emitidos em conformidade com as diretrizes do MEC e do SISTEC. Comercializado por
+          revendedor autorizado do Grupo LA Educação.
+        </p>
       </section>
     </>
   );
