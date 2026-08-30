@@ -2,9 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, ShieldCheck, Award, MessageCircle, GraduationCap, Sparkles, ScrollText, BadgeCheck, Star, CreditCard, BookOpen, Users, Laptop, Landmark, Newspaper } from "lucide-react";
-import laLogoAsset from "@/assets/la-educacao-logo.png.asset.json";
-
-const laLogo = laLogoAsset.url;
+const laLogo = "/la-educacao-logo.png";
 
 const WHATSAPP = "5518996841902";
 const waLink = (msg: string) =>

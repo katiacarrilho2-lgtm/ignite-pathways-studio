@@ -5,9 +5,7 @@ import { CheckCircle2, Clock, ShieldCheck, Scale, TrendingUp, MessageCircle, Gra
 import { useState } from "react";
 import { CampaignBanner } from "@/components/site/CampaignBanner";
 import { campanhaTecnico } from "@/config/campaigns";
-import laLogoAsset from "@/assets/la-educacao-logo.png.asset.json";
-
-const laLogo = laLogoAsset.url;
+const laLogo = "/la-educacao-logo.png";
 
 const WHATSAPP = "5518996841902";
 const waLink = (msg: string) =>
