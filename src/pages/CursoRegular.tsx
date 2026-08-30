@@ -180,10 +180,27 @@ const CursoRegular = () => {
 
   return (
     <>
-      <PageHero
-        eyebrow="Formação Técnica Completa"
-        title="Técnico Regular"
-        description="Formação técnica do zero, 100% EAD, com diploma registrado no SISTEC-MEC e validade nacional."
+      {/* Hero institucional — azul-marinho Faculdade LA */}
+      <section
+        className="text-white"
+        style={{ background: `linear-gradient(135deg, ${NAVY_DARK} 0%, ${NAVY} 60%, #123B7A 100%)` }}
+      >
+        <div className="container py-20 md:py-28 text-center">
+          <span
+            className="text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full"
+            style={{ backgroundColor: `${MAGENTA}22`, color: "#F8BBD9" }}
+          >
+            Ensino Técnico Regular
+          </span>
+          <h1 className="mt-4 text-4xl md:text-6xl font-bold text-balance animate-fade-up">
+            Técnico Regular & Tecnólogo
+          </h1>
+          <p className="mt-5 text-lg text-white/85 max-w-2xl mx-auto">
+            Cursos técnicos completos, do zero ao diploma — válidos em todo o Brasil e cadastrados no
+            SISTEC-MEC.
+          </p>
+        </div>
+      </section>
       />
 
       {/* Faixa institucional da certificadora */}
