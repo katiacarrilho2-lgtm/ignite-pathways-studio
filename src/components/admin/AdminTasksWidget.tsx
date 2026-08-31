@@ -271,8 +271,12 @@ export default function AdminTasksWidget() {
                         {new Date(t.due_date + "T00:00:00").toLocaleDateString("pt-BR")}{t.due_time ? ` · ${t.due_time.slice(0, 5)}` : ""}
                       </p>
                     )}
+                    {t.notes && <p className="truncate text-xs text-muted-foreground">{t.notes}</p>}
                   </div>
-                  <Button size="icon" variant="ghost" className="size-7 text-destructive" onClick={() => removeTask(t.id)}>
+                  <Button size="icon" variant="ghost" className="size-7" onClick={() => openEdit(t)} aria-label={`Editar tarefa ${t.title}`}>
+                    <Pencil className="size-3.5" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="size-7 text-destructive" onClick={() => removeTask(t.id)} aria-label={`Excluir tarefa ${t.title}`}>
                     <Trash2 className="size-3.5" />
                   </Button>
                 </div>
