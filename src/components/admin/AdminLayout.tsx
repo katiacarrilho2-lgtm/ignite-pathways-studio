@@ -7,6 +7,7 @@ import logo from "@/assets/multplick-logo.png";
 import { AdminBadgesProvider, useAdminBadges, BadgeChannel } from "@/hooks/useAdminBadges";
 import { NotificationsProvider } from "@/hooks/useNotifications";
 import { NotificationBell } from "@/components/admin/NotificationBell";
+import UrgencyCenter from "@/components/admin/UrgencyCenter";
 import { useEffect, useState } from "react";
 import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
 import InternalMessageAlert from "@/components/admin/InternalMessageAlert";
@@ -144,10 +145,14 @@ const AdminLayoutInner = () => {
           <SheetContent side="left" className="p-0 w-72 flex flex-col">{SidebarBody}</SheetContent>
         </Sheet>
         <img src={logo} alt="Multplick" className="h-8 w-auto" />
-        <NotificationBell />
+        <div className="flex items-center gap-1">
+          <UrgencyCenter />
+          <NotificationBell />
+        </div>
       </header>
       <main className="flex-1 min-w-0 overflow-x-hidden">
-        <div className="hidden md:flex sticky top-0 z-30 h-12 items-center justify-end px-4 bg-background/80 backdrop-blur border-b border-border">
+        <div className="hidden md:flex sticky top-0 z-30 h-12 items-center justify-end gap-2 px-4 bg-background/80 backdrop-blur border-b border-border">
+          <UrgencyCenter />
           <NotificationBell />
         </div>
         <Outlet />
