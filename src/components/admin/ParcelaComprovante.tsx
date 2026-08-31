@@ -8,6 +8,8 @@ type Props = {
   installmentId: string;
   comprovantePath?: string | null;
   onChanged?: () => void;
+  /** Botão compacto (só ícone), para ficar ao lado do boleto */
+  compact?: boolean;
 };
 
 export const abrirComprovanteParcela = async (path: string) => {
@@ -16,7 +18,7 @@ export const abrirComprovanteParcela = async (path: string) => {
   window.open(data.signedUrl, "_blank", "noopener,noreferrer");
 };
 
-const ParcelaComprovante = ({ installmentId, comprovantePath, onChanged }: Props) => {
+const ParcelaComprovante = ({ installmentId, comprovantePath, onChanged, compact }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
@@ -54,9 +56,10 @@ const ParcelaComprovante = ({ installmentId, comprovantePath, onChanged }: Props
           variant="outline"
           className="text-emerald-600 hover:text-emerald-700"
           onClick={() => abrirComprovanteParcela(comprovantePath)}
-          title="Ver comprovante anexado"
+          onContextMenu={(e) => { e.preventDefault(); inputRef.current?.click(); }}
+          title="Ver comprovante anexado (clique com o botão direito para substituir)"
         >
-          <FileCheck2 className="size-4 mr-1" /> Comprovante
+          <FileCheck2 className="size-4" />{!compact && <span className="ml-1">Comprovante</span>}
         </Button>
       ) : (
         <Button
@@ -66,7 +69,7 @@ const ParcelaComprovante = ({ installmentId, comprovantePath, onChanged }: Props
           onClick={() => inputRef.current?.click()}
           title="Anexar comprovante de pagamento"
         >
-          <Paperclip className="size-4 mr-1" /> {busy ? "Enviando…" : "Anexar comprovante"}
+          <Paperclip className="size-4" />{compact ? (busy ? <span className="ml-1">…</span> : null) : <span className="ml-1">{busy ? "Enviando…" : "Anexar comprovante"}</span>}
         </Button>
       )}
     </>
