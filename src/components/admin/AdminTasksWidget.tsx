@@ -246,6 +246,10 @@ export default function AdminTasksWidget() {
                   <Button size="icon" variant="ghost" className="size-7" onClick={() => openEdit(t)} aria-label={`Editar tarefa ${t.title}`}>
                     <Pencil className="size-3.5" />
                   </Button>
+                </div>
+              );
+            })}
+                  </Button>
               );
             })}
           </div>
