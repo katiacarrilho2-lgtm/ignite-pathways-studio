@@ -152,7 +152,7 @@ const pacotesCompetencia = [
 // Planos do Técnico Regular (Faculdade LA)
 const planosRegular = [
   {
-    titulo: "Técnico Regular 12 Meses",
+    titulo: "Técnico Regular · 6 a 12 Meses",
     subtitulo: "Conciliar estudos com uma mensalidade suave e acessível.",
     mensal: "129,90",
     destaque: false,
@@ -165,7 +165,7 @@ const planosRegular = [
     ],
   },
   {
-    titulo: "Tecnólogo 24 Meses",
+    titulo: "Tecnólogo · 12, 18 ou 24 Meses",
     subtitulo: "Formação tecnólogo completa, 100% EAD, com diploma registrado no SISTEC-MEC.",
     mensal: "119,90",
     destaque: true,
