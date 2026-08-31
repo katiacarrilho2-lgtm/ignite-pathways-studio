@@ -296,9 +296,6 @@ export default function AdminTasksWidget() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
