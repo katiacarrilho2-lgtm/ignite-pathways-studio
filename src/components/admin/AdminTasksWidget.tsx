@@ -79,7 +79,6 @@ export default function AdminTasksWidget() {
   const selDay = dayItems(selected);
   const pending = tasks.filter((t) => !t.done);
 
-  const saveTask = async () => {
   const openNew = () => {
     setEditing(null);
     setForm({ title: "", due_date: selected, due_time: "", notes: "" });
