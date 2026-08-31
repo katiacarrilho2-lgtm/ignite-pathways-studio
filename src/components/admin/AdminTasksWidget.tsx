@@ -249,9 +249,6 @@ export default function AdminTasksWidget() {
                 </div>
               );
             })}
-                  </Button>
-              );
-            })}
           </div>
         </div>
 
