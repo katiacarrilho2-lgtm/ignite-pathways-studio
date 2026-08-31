@@ -256,28 +256,27 @@ export default function AdminTasksWidget() {
           <h3 className="font-semibold flex items-center gap-2 mb-2">
             <ListChecks className="size-4 text-primary" />Checklist ({pending.length} pendente{pending.length === 1 ? "" : "s"})
           </h3>
-          <div className="space-y-1.5 max-h-[320px] overflow-y-auto pr-1">
-            {tasks.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma tarefa cadastrada.</p>}
+          <div className="grid sm:grid-cols-2 gap-1.5 max-h-[360px] overflow-y-auto pr-1">
+            {tasks.length === 0 && <p className="text-sm text-muted-foreground sm:col-span-2">Nenhuma tarefa cadastrada.</p>}
             {[...tasks].sort((a, b) => Number(a.done) - Number(b.done) || (a.due_date ?? "").localeCompare(b.due_date ?? "")).map((t) => {
               const late = !t.done && t.due_date && t.due_date < todayIso;
               return (
-                <div key={t.id} className={`flex items-start gap-2 rounded-lg border px-2.5 py-1.5 text-sm
+                <div key={t.id} title={`${t.title}${t.notes ? ` — ${t.notes}` : ""}`} className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 text-sm min-w-0
                   ${t.done ? "border-emerald-500/50 bg-emerald-500/15" : late ? "border-destructive/50 bg-destructive/15" : "border-sky-500/40 bg-sky-500/10"}`}>
                   <StarBox done={t.done} onToggle={() => toggle(t)} />
                   <div className="min-w-0 flex-1">
                     <p className={`truncate ${t.done ? "line-through text-muted-foreground" : ""}`}>{t.title}</p>
                     {t.due_date && (
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(t.due_date + "T00:00:00").toLocaleDateString("pt-BR")}{t.due_time ? ` · ${t.due_time.slice(0, 5)}` : ""}
+                      <p className="text-[11px] text-muted-foreground truncate">
+                        {new Date(t.due_date + "T00:00:00").toLocaleDateString("pt-BR")}{t.due_time ? ` · ${t.due_time.slice(0, 5)}` : ""}{t.notes ? ` · ${t.notes}` : ""}
                       </p>
                     )}
-                    {t.notes && <p className="truncate text-xs text-muted-foreground">{t.notes}</p>}
                   </div>
-                  <Button size="icon" variant="ghost" className="size-7" onClick={() => openEdit(t)} aria-label={`Editar tarefa ${t.title}`}>
-                    <Pencil className="size-3.5" />
+                  <Button size="icon" variant="ghost" className="size-6 shrink-0" onClick={() => openEdit(t)} aria-label={`Editar tarefa ${t.title}`}>
+                    <Pencil className="size-3" />
                   </Button>
-                  <Button size="icon" variant="ghost" className="size-7 text-destructive" onClick={() => removeTask(t.id)} aria-label={`Excluir tarefa ${t.title}`}>
-                    <Trash2 className="size-3.5" />
+                  <Button size="icon" variant="ghost" className="size-6 shrink-0 text-destructive" onClick={() => removeTask(t.id)} aria-label={`Excluir tarefa ${t.title}`}>
+                    <Trash2 className="size-3" />
                   </Button>
                 </div>
               );
