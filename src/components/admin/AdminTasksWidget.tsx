@@ -38,7 +38,9 @@ export default function AdminTasksWidget() {
   const [appts, setAppts] = useState<Appt[]>([]);
   const [selected, setSelected] = useState<string>(iso(new Date()));
   const [dlg, setDlg] = useState(false);
+  const [editing, setEditing] = useState<Task | null>(null);
   const [form, setForm] = useState({ title: "", due_date: iso(new Date()), due_time: "", notes: "" });
+
 
   const load = async () => {
     const [{ data: t }, { data: a }] = await Promise.all([
