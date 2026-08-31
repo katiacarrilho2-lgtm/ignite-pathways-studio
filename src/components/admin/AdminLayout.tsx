@@ -7,6 +7,7 @@ import logo from "@/assets/multplick-logo.png";
 import { AdminBadgesProvider, useAdminBadges, BadgeChannel } from "@/hooks/useAdminBadges";
 import { NotificationsProvider } from "@/hooks/useNotifications";
 import { NotificationBell } from "@/components/admin/NotificationBell";
+import UrgencyCenter from "@/components/admin/UrgencyCenter";
 import { useEffect, useState } from "react";
 import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
 import InternalMessageAlert from "@/components/admin/InternalMessageAlert";
