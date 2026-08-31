@@ -279,9 +279,9 @@ export default function AdminTasksWidget() {
         </div>
       </div>
 
-      <Dialog open={dlg} onOpenChange={setDlg}>
+      <Dialog open={dlg} onOpenChange={(o) => { setDlg(o); if (!o) setEditing(null); }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Nova tarefa</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editing ? "Editar tarefa" : "Nova tarefa"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div><Label>Título *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-3">
@@ -291,9 +291,12 @@ export default function AdminTasksWidget() {
             <div><Label>Anotação</Label><Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setDlg(false)}>Cancelar</Button>
-            <Button onClick={saveTask}>Criar</Button>
+            <Button variant="ghost" onClick={() => { setDlg(false); setEditing(null); }}>Cancelar</Button>
+            <Button onClick={saveTask}>{editing ? "Salvar" : "Criar"}</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
         </DialogContent>
       </Dialog>
     </div>
