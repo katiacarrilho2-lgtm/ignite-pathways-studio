@@ -177,7 +177,7 @@ export default function AdminTasksWidget() {
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={exportIcs}><Download className="size-4 mr-1" />Google (.ics)</Button>
-            <Button size="sm" onClick={() => { setForm({ ...form, due_date: selected }); setDlg(true); }}>
+            <Button size="sm" onClick={openNew}>
               <Plus className="size-4 mr-1" />Tarefa
             </Button>
           </div>
