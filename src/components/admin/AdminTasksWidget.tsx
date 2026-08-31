@@ -241,9 +241,11 @@ export default function AdminTasksWidget() {
                 <div key={t.id} className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm
                   ${t.done ? "border-emerald-500/50 bg-emerald-500/15" : late ? "border-destructive/50 bg-destructive/15" : "border-sky-500/40 bg-sky-500/10"}`}>
                   <StarBox done={t.done} onToggle={() => toggle(t)} />
-                  <span className={t.done ? "line-through text-muted-foreground" : ""}>{t.title}</span>
-                  {t.due_time && <span className="text-xs text-muted-foreground ml-auto">{t.due_time.slice(0, 5)}</span>}
-                </div>
+                  <span className={`min-w-0 flex-1 ${t.done ? "line-through text-muted-foreground" : ""}`}>{t.title}</span>
+                  {t.due_time && <span className="text-xs text-muted-foreground">{t.due_time.slice(0, 5)}</span>}
+                  <Button size="icon" variant="ghost" className="size-7" onClick={() => openEdit(t)} aria-label={`Editar tarefa ${t.title}`}>
+                    <Pencil className="size-3.5" />
+                  </Button>
               );
             })}
           </div>
