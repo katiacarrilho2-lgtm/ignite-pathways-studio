@@ -80,22 +80,51 @@ export default function AdminTasksWidget() {
   const pending = tasks.filter((t) => !t.done);
 
   const saveTask = async () => {
+  const openNew = () => {
+    setEditing(null);
+    setForm({ title: "", due_date: selected, due_time: "", notes: "" });
+    setDlg(true);
+  };
+
+  const openEdit = (t: Task) => {
+    setEditing(t);
+    setForm({
+      title: t.title,
+      due_date: t.due_date ?? "",
+      due_time: t.due_time ? t.due_time.slice(0, 5) : "",
+      notes: t.notes ?? "",
+    });
+    setDlg(true);
+  };
+
+  const saveTask = async () => {
     if (!form.title.trim()) return toast.error("Informe o título");
-    const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from("admin_tasks").insert({
+    const payload = {
       title: form.title.trim(),
       due_date: form.due_date || null,
       due_time: form.due_time || null,
       notes: form.notes.trim() || null,
-      created_by: user?.id ?? null,
-      owner_id: user?.id ?? null,
-    });
-    if (error) return toast.error(error.message);
-    toast.success("Tarefa criada");
+    };
+    if (editing) {
+      const { error } = await supabase.from("admin_tasks").update(payload).eq("id", editing.id);
+      if (error) return toast.error(error.message);
+      toast.success("Tarefa atualizada");
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase.from("admin_tasks").insert({
+        ...payload,
+        created_by: user?.id ?? null,
+        owner_id: user?.id ?? null,
+      });
+      if (error) return toast.error(error.message);
+      toast.success("Tarefa criada");
+    }
     setDlg(false);
+    setEditing(null);
     setForm({ title: "", due_date: selected, due_time: "", notes: "" });
     load();
   };
+
 
   const toggle = async (t: Task) => {
     const { error } = await supabase.from("admin_tasks")
