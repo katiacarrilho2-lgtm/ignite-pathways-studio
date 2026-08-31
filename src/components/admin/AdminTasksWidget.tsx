@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { buildICS, downloadICS } from "@/lib/crm";
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Trash2, Download, ListChecks, Star } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Download, ListChecks, Star } from "lucide-react";
 
 const StarBox = ({ done, onToggle }: { done: boolean; onToggle: () => void }) => (
   <button
