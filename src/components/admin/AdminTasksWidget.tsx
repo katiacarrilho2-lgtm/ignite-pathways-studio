@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { buildICS, downloadICS } from "@/lib/crm";
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Trash2, Download, ListChecks, Star } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Download, ListChecks, Star } from "lucide-react";
 
 const StarBox = ({ done, onToggle }: { done: boolean; onToggle: () => void }) => (
   <button
@@ -38,7 +38,9 @@ export default function AdminTasksWidget() {
   const [appts, setAppts] = useState<Appt[]>([]);
   const [selected, setSelected] = useState<string>(iso(new Date()));
   const [dlg, setDlg] = useState(false);
+  const [editing, setEditing] = useState<Task | null>(null);
   const [form, setForm] = useState({ title: "", due_date: iso(new Date()), due_time: "", notes: "" });
+
 
   const load = async () => {
     const [{ data: t }, { data: a }] = await Promise.all([
@@ -77,23 +79,51 @@ export default function AdminTasksWidget() {
   const selDay = dayItems(selected);
   const pending = tasks.filter((t) => !t.done);
 
+  const openNew = () => {
+    setEditing(null);
+    setForm({ title: "", due_date: selected, due_time: "", notes: "" });
+    setDlg(true);
+  };
+
+  const openEdit = (t: Task) => {
+    setEditing(t);
+    setForm({
+      title: t.title,
+      due_date: t.due_date ?? "",
+      due_time: t.due_time ? t.due_time.slice(0, 5) : "",
+      notes: t.notes ?? "",
+    });
+    setDlg(true);
+  };
+
   const saveTask = async () => {
     if (!form.title.trim()) return toast.error("Informe o título");
-    const { data: { user } } = await supabase.auth.getUser();
-    const { error } = await supabase.from("admin_tasks").insert({
+    const payload = {
       title: form.title.trim(),
       due_date: form.due_date || null,
       due_time: form.due_time || null,
       notes: form.notes.trim() || null,
-      created_by: user?.id ?? null,
-      owner_id: user?.id ?? null,
-    });
-    if (error) return toast.error(error.message);
-    toast.success("Tarefa criada");
+    };
+    if (editing) {
+      const { error } = await supabase.from("admin_tasks").update(payload).eq("id", editing.id);
+      if (error) return toast.error(error.message);
+      toast.success("Tarefa atualizada");
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase.from("admin_tasks").insert({
+        ...payload,
+        created_by: user?.id ?? null,
+        owner_id: user?.id ?? null,
+      });
+      if (error) return toast.error(error.message);
+      toast.success("Tarefa criada");
+    }
     setDlg(false);
+    setEditing(null);
     setForm({ title: "", due_date: selected, due_time: "", notes: "" });
     load();
   };
+
 
   const toggle = async (t: Task) => {
     const { error } = await supabase.from("admin_tasks")
@@ -147,7 +177,7 @@ export default function AdminTasksWidget() {
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={exportIcs}><Download className="size-4 mr-1" />Google (.ics)</Button>
-            <Button size="sm" onClick={() => { setForm({ ...form, due_date: selected }); setDlg(true); }}>
+            <Button size="sm" onClick={openNew}>
               <Plus className="size-4 mr-1" />Tarefa
             </Button>
           </div>
@@ -211,8 +241,11 @@ export default function AdminTasksWidget() {
                 <div key={t.id} className={`flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-sm
                   ${t.done ? "border-emerald-500/50 bg-emerald-500/15" : late ? "border-destructive/50 bg-destructive/15" : "border-sky-500/40 bg-sky-500/10"}`}>
                   <StarBox done={t.done} onToggle={() => toggle(t)} />
-                  <span className={t.done ? "line-through text-muted-foreground" : ""}>{t.title}</span>
-                  {t.due_time && <span className="text-xs text-muted-foreground ml-auto">{t.due_time.slice(0, 5)}</span>}
+                  <span className={`min-w-0 flex-1 ${t.done ? "line-through text-muted-foreground" : ""}`}>{t.title}</span>
+                  {t.due_time && <span className="text-xs text-muted-foreground">{t.due_time.slice(0, 5)}</span>}
+                  <Button size="icon" variant="ghost" className="size-7" onClick={() => openEdit(t)} aria-label={`Editar tarefa ${t.title}`}>
+                    <Pencil className="size-3.5" />
+                  </Button>
                 </div>
               );
             })}
@@ -238,8 +271,12 @@ export default function AdminTasksWidget() {
                         {new Date(t.due_date + "T00:00:00").toLocaleDateString("pt-BR")}{t.due_time ? ` · ${t.due_time.slice(0, 5)}` : ""}
                       </p>
                     )}
+                    {t.notes && <p className="truncate text-xs text-muted-foreground">{t.notes}</p>}
                   </div>
-                  <Button size="icon" variant="ghost" className="size-7 text-destructive" onClick={() => removeTask(t.id)}>
+                  <Button size="icon" variant="ghost" className="size-7" onClick={() => openEdit(t)} aria-label={`Editar tarefa ${t.title}`}>
+                    <Pencil className="size-3.5" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="size-7 text-destructive" onClick={() => removeTask(t.id)} aria-label={`Excluir tarefa ${t.title}`}>
                     <Trash2 className="size-3.5" />
                   </Button>
                 </div>
@@ -249,9 +286,9 @@ export default function AdminTasksWidget() {
         </div>
       </div>
 
-      <Dialog open={dlg} onOpenChange={setDlg}>
+      <Dialog open={dlg} onOpenChange={(o) => { setDlg(o); if (!o) setEditing(null); }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Nova tarefa</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editing ? "Editar tarefa" : "Nova tarefa"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div><Label>Título *</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-3">
@@ -261,8 +298,8 @@ export default function AdminTasksWidget() {
             <div><Label>Anotação</Label><Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} /></div>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setDlg(false)}>Cancelar</Button>
-            <Button onClick={saveTask}>Criar</Button>
+            <Button variant="ghost" onClick={() => { setDlg(false); setEditing(null); }}>Cancelar</Button>
+            <Button onClick={saveTask}>{editing ? "Salvar" : "Criar"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
