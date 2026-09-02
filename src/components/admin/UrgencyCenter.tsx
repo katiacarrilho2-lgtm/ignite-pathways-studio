@@ -114,19 +114,24 @@ export default function UrgencyCenter() {
     setItems(list);
   }, [user, canSeeAll]);
 
+  const loadRef = useRef(load);
+  useEffect(() => { loadRef.current = load; }, [load]);
+
   useEffect(() => {
     if (!user) return;
-    load();
-    const ch = supabase.channel("urgency-center")
-      .on("postgres_changes", { event: "*", schema: "public", table: "crm_leads" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "admin_tasks" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "crm_appointments" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "internal_requests" }, load)
-      .on("postgres_changes", { event: "*", schema: "public", table: "support_tickets" }, load)
+    const run = () => { loadRef.current(); };
+    run();
+    const ch = supabase.channel(`urgency-center-${user.id}-${Math.random().toString(36).slice(2)}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "crm_leads" }, run)
+      .on("postgres_changes", { event: "*", schema: "public", table: "admin_tasks" }, run)
+      .on("postgres_changes", { event: "*", schema: "public", table: "crm_appointments" }, run)
+      .on("postgres_changes", { event: "*", schema: "public", table: "internal_requests" }, run)
+      .on("postgres_changes", { event: "*", schema: "public", table: "support_tickets" }, run)
       .subscribe();
-    const t = setInterval(load, 5 * 60 * 1000);
+    const t = setInterval(run, 5 * 60 * 1000);
     return () => { supabase.removeChannel(ch); clearInterval(t); };
-  }, [user, load]);
+  }, [user]);
+
 
   const visible = useMemo(() => {
     const now = Date.now();
