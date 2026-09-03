@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminTasksWidget from "@/components/admin/AdminTasksWidget";
 import { useAuth } from "@/hooks/useAuth";
+import { usePortalBase } from "@/lib/portal";
 import FinanceWidget from "@/components/admin/FinanceWidget";
 
 const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -18,6 +19,7 @@ type Kpi = { key: string; label: string; value: string | number; icon: any; to: 
 
 export default function Dashboard() {
   const { isMaster, roles } = useAuth();
+  const base = usePortalBase();
   const canSee = isMaster || roles.includes("admin");
   const [loading, setLoading] = useState(true);
   const [k, setK] = useState<Record<string, number>>({});
@@ -57,15 +59,15 @@ export default function Dashboard() {
   useEffect(() => { if (canSee) load(); }, [canSee]);
 
   const kpis: Kpi[] = [
-    { key: "novosLeads", label: "Novos leads", value: k.novosLeads ?? 0, icon: UserPlus, to: "/admin/crm", tone: "text-primary bg-primary/10" },
-    { key: "semResposta", label: "Leads sem resposta", value: k.semResposta ?? 0, icon: MessageSquareWarning, to: "/admin/crm", tone: "text-amber-600 bg-amber-500/10" },
-    { key: "matriculas", label: "Matrículas", value: k.matriculas ?? 0, icon: GraduationCap, to: "/admin/alunos", tone: "text-emerald-600 bg-emerald-500/10" },
-    { key: "recebimentos", label: "Recebimentos", value: brl(k.recebimentos ?? 0), icon: DollarSign, to: "/admin/financeiro", tone: "text-emerald-600 bg-emerald-500/10" },
-    { key: "vencidas", label: "Parcelas vencidas", value: k.vencidas ?? 0, icon: AlertTriangle, to: "/admin/relatorios/pagamentos", tone: "text-destructive bg-destructive/10" },
-    { key: "turmasHoje", label: "Turmas hoje", value: k.turmasHoje ?? 0, icon: Users2, to: "/admin/turmas", tone: "text-primary bg-primary/10" },
-    { key: "presentes", label: "Alunos presentes", value: k.presentes ?? 0, icon: UserCheck, to: "/admin/andamento", tone: "text-sky-600 bg-sky-500/10" },
-    { key: "propostas", label: "Propostas abertas", value: k.propostas ?? 0, icon: ClipboardList, to: "/admin/pre-matriculas", tone: "text-violet-600 bg-violet-500/10" },
-    { key: "empresas", label: "Empresas para retornar", value: k.empresas ?? 0, icon: Building2, to: "/admin/crm/agenda", tone: "text-orange-600 bg-orange-500/10" },
+    { key: "novosLeads", label: "Novos leads", value: k.novosLeads ?? 0, icon: UserPlus, to: `${base}/crm`, tone: "text-primary bg-primary/10" },
+    { key: "semResposta", label: "Leads sem resposta", value: k.semResposta ?? 0, icon: MessageSquareWarning, to: `${base}/crm`, tone: "text-amber-600 bg-amber-500/10" },
+    { key: "matriculas", label: "Matrículas", value: k.matriculas ?? 0, icon: GraduationCap, to: `${base}/alunos`, tone: "text-emerald-600 bg-emerald-500/10" },
+    { key: "recebimentos", label: "Recebimentos", value: brl(k.recebimentos ?? 0), icon: DollarSign, to: `${base}/financeiro`, tone: "text-emerald-600 bg-emerald-500/10" },
+    { key: "vencidas", label: "Parcelas vencidas", value: k.vencidas ?? 0, icon: AlertTriangle, to: `${base}/relatorios/pagamentos`, tone: "text-destructive bg-destructive/10" },
+    { key: "turmasHoje", label: "Turmas hoje", value: k.turmasHoje ?? 0, icon: Users2, to: `${base}/turmas`, tone: "text-primary bg-primary/10" },
+    { key: "presentes", label: "Alunos presentes", value: k.presentes ?? 0, icon: UserCheck, to: `${base}/andamento`, tone: "text-sky-600 bg-sky-500/10" },
+    { key: "propostas", label: "Propostas abertas", value: k.propostas ?? 0, icon: ClipboardList, to: `${base}/pre-matriculas`, tone: "text-violet-600 bg-violet-500/10" },
+    { key: "empresas", label: "Empresas para retornar", value: k.empresas ?? 0, icon: Building2, to: `${base}/crm/agenda`, tone: "text-orange-600 bg-orange-500/10" },
   ];
 
   if (!canSee) return (

@@ -2,19 +2,22 @@ import { NavLink, Outlet } from "react-router-dom";
 import { Kanban, Calendar, BarChart3, Users2, Ticket, ListChecks, Database } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import CrmPromoBanner from "./CrmPromoBanner";
+import { usePortalBase } from "@/lib/portal";
 
-const tabs = [
-  { to: "/admin/crm", label: "Pipeline", icon: Kanban, end: true },
-  { to: "/admin/crm/banco-leads", label: "Banco de Leads", icon: Database },
-  { to: "/admin/crm/agenda", label: "Agenda", icon: Calendar },
-  { to: "/admin/crm/relatorios", label: "Relatórios", icon: BarChart3 },
-  { to: "/admin/crm/listagem", label: "Listagem / Excel", icon: ListChecks, master: true },
-  { to: "/admin/crm/pre-matriculas", label: "Pré-matrículas", icon: Ticket, master: true },
-  { to: "/admin/crm/equipe", label: "Equipe", icon: Users2, master: true },
+const mkTabs = (base: string) => [
+  { to: `${base}/crm`, label: "Pipeline", icon: Kanban, end: true },
+  { to: `${base}/crm/banco-leads`, label: "Banco de Leads", icon: Database },
+  { to: `${base}/crm/agenda`, label: "Agenda", icon: Calendar },
+  { to: `${base}/crm/relatorios`, label: "Relatórios", icon: BarChart3 },
+  { to: `${base}/crm/listagem`, label: "Listagem / Excel", icon: ListChecks, master: true },
+  { to: `${base}/crm/pre-matriculas`, label: "Pré-matrículas", icon: Ticket, master: true },
+  { to: `${base}/crm/equipe`, label: "Equipe", icon: Users2, master: true },
 ];
 
 export default function CrmLayout() {
   const { isMaster } = useAuth();
+  const base = usePortalBase();
+  const tabs = mkTabs(base);
   const canSeeEquipe = isMaster;
   return (
     <div className="flex flex-col min-h-full">
