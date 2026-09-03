@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
+import { usePortalBase } from "@/lib/portal";
 import { buildStudentContractPdf } from "@/lib/contracts/studentContractPdf";
 
 type App = {
