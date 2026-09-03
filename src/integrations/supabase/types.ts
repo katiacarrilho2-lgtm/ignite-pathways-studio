@@ -2072,6 +2072,11 @@ export type Database = {
           mother_name: string | null
           naturalidade: string | null
           neighborhood: string | null
+          network_review_message: string | null
+          network_review_status: string | null
+          network_reviewed_at: string | null
+          network_reviewed_by: string | null
+          network_submitted_at: string | null
           notes: string | null
           paid_amount_cents: number | null
           paid_at: string | null
@@ -2111,6 +2116,11 @@ export type Database = {
           mother_name?: string | null
           naturalidade?: string | null
           neighborhood?: string | null
+          network_review_message?: string | null
+          network_review_status?: string | null
+          network_reviewed_at?: string | null
+          network_reviewed_by?: string | null
+          network_submitted_at?: string | null
           notes?: string | null
           paid_amount_cents?: number | null
           paid_at?: string | null
@@ -2150,6 +2160,11 @@ export type Database = {
           mother_name?: string | null
           naturalidade?: string | null
           neighborhood?: string | null
+          network_review_message?: string | null
+          network_review_status?: string | null
+          network_reviewed_at?: string | null
+          network_reviewed_by?: string | null
+          network_submitted_at?: string | null
           notes?: string | null
           paid_amount_cents?: number | null
           paid_at?: string | null
@@ -4641,6 +4656,20 @@ export type Database = {
         Returns: Json
       }
       next_username: { Args: never; Returns: string }
+      notify_account_users: {
+        Args: {
+          _account: string
+          _corpo: string
+          _link: string
+          _titulo: string
+        }
+        Returns: undefined
+      }
+      notify_network_master: {
+        Args: { _corpo: string; _link: string; _titulo: string }
+        Returns: undefined
+      }
+      polo_reenviar_pre_matricula: { Args: { _id: string }; Returns: Json }
       rede_equipe: {
         Args: { _account: string }
         Returns: {
@@ -4649,6 +4678,30 @@ export type Database = {
           display_name: string
           user_id: string
           username: string
+        }[]
+      }
+      rede_fila_pre_matriculas: {
+        Args: never
+        Returns: {
+          account_id: string
+          city: string
+          course_id: string
+          course_title: string
+          cpf: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          network_review_message: string
+          network_review_status: string
+          network_reviewed_at: string
+          network_submitted_at: string
+          phone: string
+          polo: string
+          state: string
+          status: string
+          submitted_by: string
+          submitted_by_name: string
         }[]
       }
       rede_matriculas: {
@@ -4676,6 +4729,10 @@ export type Database = {
           state: string
           status: string
         }[]
+      }
+      rede_review_pre_matricula: {
+        Args: { _action: string; _id: string; _message?: string }
+        Returns: Json
       }
       rede_stats: {
         Args: never
