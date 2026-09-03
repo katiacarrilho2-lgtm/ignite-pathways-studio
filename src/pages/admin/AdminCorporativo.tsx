@@ -9,7 +9,7 @@ const items = [
   { to: "/admin/corporativo/contratos", title: "Contratos e Termos", desc: "Minutas editáveis: prestação de serviços, licenciamento, NDA, revenda, PJ.", icon: ScrollText, status: "Disponível" },
   { to: "/admin/corporativo/controle", title: "Controle de Propostas", desc: "Histórico, métricas, taxa de fechamento e responsável por cada proposta.", icon: LineChart, status: "Disponível" },
   { to: "/admin/corporativo/configuracoes", title: "Configurações da Empresa", desc: "Dados institucionais da Multplick usados no cabeçalho, rodapé e assinatura.", icon: Building2, status: "Disponível" },
-  { to: "/admin/corporativo/parceiros", title: "Licenciados e Parceiros", desc: "Cadastro, comissões, contratos ativos e desempenho comercial.", icon: Handshake, status: "Em breve" },
+  { to: "/admin/licenciados", title: "Licenciados e Parceiros", desc: "Rede Multplick: cadastro de Polos e Revendedores, desempenho e gestão das unidades.", icon: Handshake, status: "Disponível" },
   { to: "/admin/corporativo/modelos", title: "Biblioteca de Modelos", desc: "Modelos prontos por segmento: hospitais, usinas, prefeituras, agro.", icon: Library, status: "Em breve" },
 ];
 
