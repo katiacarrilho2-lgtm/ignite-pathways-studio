@@ -8,6 +8,13 @@
       "when": 1788449068925,
       "tag": "0000_multi_account_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788449217965,
+      "tag": "0001_account_impersonation_semantics",
+      "breakpoints": true
     }
   ]
 }
