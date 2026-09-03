@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Users, Inbox, ClipboardList, GraduationCap, Eye } from "lucide-react";
 import { Unidade, tipoLabel, statusInfo, brl, dataBr } from "./AdminLicenciados";
 
+import PoloComercialResumo from "@/components/admin/PoloComercialResumo";
+
 export default function AdminLicenciadoDetalhe() {
   const { id = "" } = useParams();
   const { toast } = useToast();
@@ -173,6 +175,7 @@ export default function AdminLicenciadoDetalhe() {
               {linha("Taxa de implantação", brl(u.taxa_implantacao_cents))}
               {linha("Data de ativação", dataBr(u.data_ativacao))}
             </CardContent>
+            <CardContent><PoloComercialResumo accountId={u.id} /></CardContent>
           </Card>
         </TabsContent>
       </Tabs>

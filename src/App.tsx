@@ -39,6 +39,7 @@ import AdminLicenciados from "./pages/admin/AdminLicenciados.tsx";
 import AdminLicenciadoDetalhe from "./pages/admin/AdminLicenciadoDetalhe.tsx";
 import AdminRedeMatriculas from "./pages/admin/AdminRedeMatriculas.tsx";
 import AdminRedeSuporte from "./pages/admin/AdminRedeSuporte.tsx";
+import AdminRegrasComerciais from "./pages/admin/AdminRegrasComerciais";
 import RequireNetworkMaster from "./components/admin/RequireNetworkMaster.tsx";
 
 import CorpCrm from "./pages/admin/corp/CorpCrm";
@@ -239,6 +240,7 @@ const App = () => (
               <Route path="corporativo/configuracoes" element={<AdminCompanySettings />} />
               <Route path="licenciados" element={<RequireNetworkMaster><AdminLicenciados /></RequireNetworkMaster>} />
               <Route path="licenciados/matriculas" element={<RequireNetworkMaster><AdminRedeMatriculas /></RequireNetworkMaster>} />
+              <Route path="licenciados/regras" element={<AdminRegrasComerciais />} />
               <Route path="licenciados/suporte" element={<RequireNetworkMaster><AdminRedeSuporte /></RequireNetworkMaster>} />
               <Route path="licenciados/:id" element={<RequireNetworkMaster><AdminLicenciadoDetalhe /></RequireNetworkMaster>} />
 

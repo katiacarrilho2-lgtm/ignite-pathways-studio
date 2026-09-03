@@ -421,6 +421,15 @@ const Inner = () => {
   const generateContract = async () => {
     if (!contractApp) return;
     if (!cValorTotal.trim()) return toast.error("Informe o valor total do curso.");
+    // Etapa 5A — o Polo não pode fechar venda abaixo do preço mínimo da regra comercial.
+    if (isPolo && contractApp.course_id) {
+      const valorCents = Math.round(parseFloat(cValorTotal.replace(/\./g, "").replace(",", ".")) * 100) || 0;
+      const { data: minimo } = await supabase.rpc("polo_preco_minimo", { _course_id: contractApp.course_id });
+      const min = Number(minimo ?? 0);
+      if (min > 0 && valorCents < min) {
+        return toast.error(`Valor abaixo do preço mínimo permitido (${(min / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}).`);
+      }
+    }
     setGeneratingContract(true);
     try {
       const { data: company } = await supabase.from("company_settings")

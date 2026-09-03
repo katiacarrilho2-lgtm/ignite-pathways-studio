@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { DollarSign, TrendingUp, AlertCircle, Calculator, Download, MessageCircle } from "lucide-react";
 import { RequirePermission } from "@/components/admin/AdminLayout";
+import PoloComercialResumo from "@/components/admin/PoloComercialResumo";
+import useCommercialAccounts from "@/hooks/useCommercialAccounts";
+import { ROOT_ACCOUNT_ID } from "@/lib/multiAccount";
 import { useAuth } from "@/hooks/useAuth";
 import jsPDF from "jspdf";
 import logoUrl from "@/assets/multplick-logo.png";
@@ -29,6 +32,8 @@ const statusColor: Record<string, string> = {
 
 const Inner = () => {
   const { hasPermission, isSuperAdmin } = useAuth();
+  const { activeAccountId } = useCommercialAccounts();
+  const isPolo = !!activeAccountId && activeAccountId !== ROOT_ACCOUNT_ID;
   const canSettle = isSuperAdmin || hasPermission("settle_boletos") || hasPermission("manage_courses");
   const [rows, setRows] = useState<Row[]>([]);
   const [search, setSearch] = useState("");
@@ -246,6 +251,8 @@ const Inner = () => {
           </div>
         ))}
       </div>
+
+      {isPolo && <PoloComercialResumo />}
 
       <div className="flex flex-wrap gap-3 items-center">
         <Input placeholder="Buscar aluno, e-mail ou curso…" value={search} onChange={e => setSearch(e.target.value)} className="max-w-sm" />
