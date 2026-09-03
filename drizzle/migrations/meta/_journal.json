@@ -29,6 +29,13 @@
       "when": 1788452974073,
       "tag": "0003_harden_multi_account_foundation",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788453374862,
+      "tag": "0004_tighten_account_function_grants",
+      "breakpoints": true
     }
   ]
 }
