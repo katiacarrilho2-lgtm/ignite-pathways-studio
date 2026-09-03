@@ -81,7 +81,15 @@ const PoloLayoutInner = () => {
 
   if (loading || loadingAccounts) return <div className="min-h-screen grid place-items-center text-muted-foreground">Carregando…</div>;
   if (!user) return <Navigate to="/auth" state={{ from: pathname }} replace />;
-  if (!isStaff) return <Navigate to="/aluno" replace />;
+  if (!isStaff) return (
+    <div className="min-h-screen grid place-items-center p-6 text-center">
+      <div className="max-w-md space-y-4">
+        <h1 className="text-2xl font-bold text-primary">Acesso restrito</h1>
+        <p className="text-muted-foreground">Sua conta não tem acesso ao Portal do Licenciado.</p>
+        <Button asChild variant="outline"><Link to="/aluno">Ir para a Área do Aluno</Link></Button>
+      </div>
+    </div>
+  );
 
   const impersonating = isSuperAdmin && homeAccountId === ROOT_ACCOUNT_ID && !!activeAccountId && activeAccountId !== ROOT_ACCOUNT_ID;
   // Master na visão global não tem contexto de Polo — volta ao painel da Matriz.
