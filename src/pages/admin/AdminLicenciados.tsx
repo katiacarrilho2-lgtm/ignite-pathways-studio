@@ -61,7 +61,7 @@ export const STATUS = [
   { value: "inativo", label: "Inativo", cls: "bg-muted text-muted-foreground" },
   { value: "bloqueado", label: "Bloqueado", cls: "bg-destructive/10 text-destructive" },
 ];
-export const tipoLabel = (v?: string | null) => TIPOS.find((t) => t.value === v)?.label ?? (v ?? "—");
+export const tipoLabel = (v?: string | null) => TIPOS_LABEL.find((t) => t.value === v)?.label ?? (v ?? "—");
 export const statusInfo = (v?: string | null) => STATUS.find((s) => s.value === v) ?? { value: v ?? "", label: v ?? "—", cls: "bg-muted text-muted-foreground" };
 export const brl = (cents?: number | null) => ((cents ?? 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 export const dataBr = (v?: string | null) => (v ? new Date(v).toLocaleDateString("pt-BR") : "—");
