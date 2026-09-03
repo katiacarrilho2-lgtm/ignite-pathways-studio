@@ -26,7 +26,7 @@ type Result = {
 };
 
 export const useCommercialAccounts = (): Result => {
-  const { user, isSuperAdmin, roles } = useAuth();
+  const { user, isSuperAdmin } = useAuth();
   const [accounts, setAccounts] = useState<CommercialAccount[]>([]);
   const [homeAccountId, setHomeAccountId] = useState<string | null>(null);
   const [activeAccountId, setActive] = useState<string | null>(null);
@@ -63,9 +63,8 @@ export const useCommercialAccounts = (): Result => {
 
   useEffect(() => { load(); }, [load]);
 
-  // Master = super_admin/admin da conta raiz. O banco revalida em toda operação.
-  const canSwitchAccount =
-    (isSuperAdmin || roles.includes("admin")) && homeAccountId === ROOT_ACCOUNT_ID;
+  // Network Master = super_admin da conta raiz. O banco revalida em toda operação.
+  const canSwitchAccount = isSuperAdmin && homeAccountId === ROOT_ACCOUNT_ID;
 
   const setActiveAccountId = useCallback(
     async (id: string | null) => {
