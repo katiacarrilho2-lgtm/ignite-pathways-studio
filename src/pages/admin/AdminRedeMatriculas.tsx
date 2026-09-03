@@ -88,7 +88,7 @@ export default function AdminRedeMatriculas() {
     if (action === "correcao" && !msg.trim()) return toast.error("Informe o que precisa ser corrigido.");
     setSaving(true);
     const { error } = await supabase.rpc("rede_review_pre_matricula", {
-      _id: viewing.id, _action: action, _message: msg.trim() || null,
+      _id: viewing.id, _action: action, _message: msg.trim() || undefined,
     });
     setSaving(false);
     if (error) return toast.error(error.message);
