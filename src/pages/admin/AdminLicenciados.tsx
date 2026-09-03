@@ -69,8 +69,8 @@ export const dataBr = (v?: string | null) => (v ? new Date(v).toLocaleDateString
 const centrais = [
   { title: "Visão Geral da Rede", desc: "Resumo e desempenho das unidades Multplick.", icon: Network, ready: true },
   { title: "Unidades e Licenciados", desc: "Cadastro e administração dos Polos e Revendedores.", icon: Building2, ready: true },
-  { title: "Matrículas da Rede", desc: "Pré-matrículas e matrículas por unidade.", icon: GraduationCap, ready: true, to: "/admin/pre-matriculas" },
-  { title: "Suporte da Rede", desc: "Chamados abertos pelas unidades.", icon: LifeBuoy, ready: true, to: "/admin/suporte" },
+  { title: "Matrículas da Rede", desc: "Pré-matrículas e matrículas por unidade.", icon: GraduationCap, ready: true, to: "/admin/licenciados/matriculas" },
+  { title: "Suporte da Rede", desc: "Chamados abertos pelas unidades.", icon: LifeBuoy, ready: true, to: "/admin/licenciados/suporte" },
   { title: "Treinamentos", desc: "Capacitação de licenciados e equipes.", icon: Trophy, ready: true, to: "/admin/treinamentos" },
   { title: "Financeiro da Rede", desc: "Faturamento e repasses dos licenciados.", icon: DollarSign, ready: false },
   { title: "Fechamentos e NF", desc: "Fechamento mensal por unidade e notas fiscais.", icon: FileSpreadsheet, ready: false },
