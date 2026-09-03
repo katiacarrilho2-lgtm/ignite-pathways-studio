@@ -27,6 +27,8 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/cursos", label: "Cursos", icon: GraduationCap, perm: "manage_courses", mod: "mod_cursos" },
   { to: "/admin/cursos/ia", label: "Gerar Curso IA", icon: Sparkles, perm: "manage_courses", mod: "mod_cursos_ia" },
   { to: "/admin/corporativo", label: "Corporativo", icon: Briefcase, perm: "manage_courses", mod: "mod_corporativo" },
+  { to: "/admin/licenciados", label: "Rede Multplick", icon: Network, perm: "manage_users" },
+
   { to: "/admin/categorias", label: "Categorias", icon: FolderTree, perm: "manage_courses", mod: "mod_categorias" },
   { to: "/admin/andamento", label: "Andamento", icon: Activity, perm: "manage_courses", mod: "mod_andamento" },
   { to: "/admin/imagens", label: "Imagens", icon: ImageIcon, perm: "manage_courses", mod: "mod_imagens" },
