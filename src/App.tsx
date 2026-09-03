@@ -35,6 +35,10 @@ import AdminCursoPreview from "./pages/admin/AdminCursoPreview.tsx";
 import AdminCursoIA from "./pages/admin/AdminCursoIA.tsx";
 import AdminAndamento from "./pages/admin/AdminAndamento.tsx";
 import AdminCorporativo from "./pages/admin/AdminCorporativo.tsx";
+import AdminLicenciados from "./pages/admin/AdminLicenciados.tsx";
+import AdminLicenciadoDetalhe from "./pages/admin/AdminLicenciadoDetalhe.tsx";
+import RequireNetworkMaster from "./components/admin/RequireNetworkMaster.tsx";
+
 import CorpCrm from "./pages/admin/corp/CorpCrm";
 import AdminCorpPropostas from "./pages/admin/AdminCorpPropostas.tsx";
 import AdminCorpPropostaEditor from "./pages/admin/AdminCorpPropostaEditor.tsx";
@@ -194,6 +198,9 @@ const App = () => (
               <Route path="corporativo/contratos" element={<AdminCorpContratos />} />
               <Route path="corporativo/contratos/:id" element={<AdminCorpContratoEditor />} />
               <Route path="corporativo/configuracoes" element={<AdminCompanySettings />} />
+              <Route path="licenciados" element={<RequireNetworkMaster><AdminLicenciados /></RequireNetworkMaster>} />
+              <Route path="licenciados/:id" element={<RequireNetworkMaster><AdminLicenciadoDetalhe /></RequireNetworkMaster>} />
+
               <Route path="imagens" element={<AdminImagens />} />
               <Route path="alunos" element={<AdminAlunos />} />
               <Route path="alunos/:userId" element={<AdminAlunoEdit />} />

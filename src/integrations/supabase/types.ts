@@ -1063,48 +1063,96 @@ export type Database = {
       contas_comerciais: {
         Row: {
           atualizado_em: string
+          cep: string | null
+          cidade: string | null
           configuracoes: Json
           criado_em: string
           criado_por: string | null
+          data_ativacao: string | null
           documento_fiscal: string | null
           email_contato: string | null
+          email_institucional: string | null
+          endereco: string | null
+          estado: string | null
           id: string
+          identidade_observacoes: string | null
+          logo_url: string | null
+          modelo_fachada: string | null
           nome: string
+          nome_fantasia: string | null
+          nome_publico: string | null
+          observacoes: string | null
           parent_id: string | null
+          responsavel_nome: string | null
+          responsavel_user_id: string | null
           slug: string
           status: string
+          taxa_implantacao_cents: number
           telefone_contato: string | null
           tipo_da_conta: string
+          whatsapp: string | null
         }
         Insert: {
           atualizado_em?: string
+          cep?: string | null
+          cidade?: string | null
           configuracoes?: Json
           criado_em?: string
           criado_por?: string | null
+          data_ativacao?: string | null
           documento_fiscal?: string | null
           email_contato?: string | null
+          email_institucional?: string | null
+          endereco?: string | null
+          estado?: string | null
           id?: string
+          identidade_observacoes?: string | null
+          logo_url?: string | null
+          modelo_fachada?: string | null
           nome: string
+          nome_fantasia?: string | null
+          nome_publico?: string | null
+          observacoes?: string | null
           parent_id?: string | null
+          responsavel_nome?: string | null
+          responsavel_user_id?: string | null
           slug: string
           status?: string
+          taxa_implantacao_cents?: number
           telefone_contato?: string | null
           tipo_da_conta?: string
+          whatsapp?: string | null
         }
         Update: {
           atualizado_em?: string
+          cep?: string | null
+          cidade?: string | null
           configuracoes?: Json
           criado_em?: string
           criado_por?: string | null
+          data_ativacao?: string | null
           documento_fiscal?: string | null
           email_contato?: string | null
+          email_institucional?: string | null
+          endereco?: string | null
+          estado?: string | null
           id?: string
+          identidade_observacoes?: string | null
+          logo_url?: string | null
+          modelo_fachada?: string | null
           nome?: string
+          nome_fantasia?: string | null
+          nome_publico?: string | null
+          observacoes?: string | null
           parent_id?: string | null
+          responsavel_nome?: string | null
+          responsavel_user_id?: string | null
           slug?: string
           status?: string
+          taxa_implantacao_cents?: number
           telefone_contato?: string | null
           tipo_da_conta?: string
+          whatsapp?: string | null
         }
         Relationships: [
           {

@@ -25,6 +25,7 @@ Deno.serve(async (req) => {
       email: emailInput, phone1, phone2, cpf, rg, cep, street, address_number,
       neighborhood, city, state, birth_date, responsible_name, responsible_rg,
       responsible_cpf, sex, polo, notes, avatar_url,
+      account_id: requestedAccountId,
     } = body as Record<string, any>;
 
     if (!password || password.length < 4) return json({ error: "Senha inválida" }, 400);
@@ -33,6 +34,12 @@ Deno.serve(async (req) => {
     const { count: superAdminCount } = await admin
       .from("user_roles").select("id", { count: "exact", head: true }).eq("role", "super_admin");
     const isBootstrap = (superAdminCount ?? 0) === 0;
+
+    const ROOT_ACCOUNT_ID = "00000000-0000-0000-0000-000000000001";
+    // Conta de destino do novo usuário. NUNCA é escolhida livremente pelo cliente:
+    // - Network Master pode direcionar para qualquer unidade existente;
+    // - qualquer outro operador só cria usuário DENTRO da própria unidade.
+    let targetAccountId = ROOT_ACCOUNT_ID;
 
     if (!isBootstrap) {
       const authHeader = req.headers.get("Authorization");
@@ -44,7 +51,26 @@ Deno.serve(async (req) => {
         _user_id: userData.user.id, _permission: "manage_users",
       });
       if (!hasPerm) return json({ error: "Sem permissão" }, 403);
+
+      const { data: isNetworkMaster } = await admin.rpc("is_network_master", { _uid: userData.user.id });
+      const { data: callerHome } = await admin.rpc("user_home_account_id", { _uid: userData.user.id });
+      const callerAccount = callerHome || ROOT_ACCOUNT_ID;
+
+      if (isNetworkMaster) {
+        if (requestedAccountId && requestedAccountId !== callerAccount) {
+          const { data: unit } = await admin
+            .from("contas_comerciais").select("id").eq("id", requestedAccountId).maybeSingle();
+          if (!unit) return json({ error: "Unidade inválida" }, 400);
+          targetAccountId = unit.id;
+        } else {
+          targetAccountId = callerAccount;
+        }
+      } else {
+        // Licenciado / staff de Polo: sempre a própria unidade, ignorando o que veio do cliente
+        targetAccountId = callerAccount;
+      }
     }
+
 
     const prefix = String(username_prefix ?? "").replace(/[^A-Za-z]/g, "").toUpperCase().slice(0, 3);
 
@@ -128,13 +154,16 @@ Deno.serve(async (req) => {
     }
 
     // Basic login profile used by admin lists and auth hooks
+    // account_id vem SEMPRE do backend (nunca do payload do cliente).
     await admin.from("profiles").upsert({
       user_id: created.user.id,
       username,
       display_name: full_name ?? `Usuário ${username}`,
       email: loginEmail,
       avatar_url: avatar_url || null,
+      account_id: targetAccountId,
     }, { onConflict: "user_id" });
+
 
     // Detailed student data lives in student_profiles in the restored schema
     await admin.from("student_profiles").upsert({
@@ -161,7 +190,7 @@ Deno.serve(async (req) => {
       foto_url: avatar_url || null,
     }, { onConflict: "user_id" });
 
-    return json({ username, user_id: created.user.id, bootstrap: isBootstrap });
+    return json({ username, user_id: created.user.id, bootstrap: isBootstrap, account_id: targetAccountId });
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
   }

@@ -11,6 +11,8 @@ import UrgencyCenter from "@/components/admin/UrgencyCenter";
 import { useEffect, useState } from "react";
 import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
 import InternalMessageAlert from "@/components/admin/InternalMessageAlert";
+import AccountContextBanner from "@/components/admin/AccountContextBanner";
+
 
 
 const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?: Permission; badge?: BadgeChannel }[] = [
@@ -25,6 +27,8 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/cursos", label: "Cursos", icon: GraduationCap, perm: "manage_courses", mod: "mod_cursos" },
   { to: "/admin/cursos/ia", label: "Gerar Curso IA", icon: Sparkles, perm: "manage_courses", mod: "mod_cursos_ia" },
   { to: "/admin/corporativo", label: "Corporativo", icon: Briefcase, perm: "manage_courses", mod: "mod_corporativo" },
+  { to: "/admin/licenciados", label: "Rede Multplick", icon: Network, perm: "manage_users" },
+
   { to: "/admin/categorias", label: "Categorias", icon: FolderTree, perm: "manage_courses", mod: "mod_categorias" },
   { to: "/admin/andamento", label: "Andamento", icon: Activity, perm: "manage_courses", mod: "mod_andamento" },
   { to: "/admin/imagens", label: "Imagens", icon: ImageIcon, perm: "manage_courses", mod: "mod_imagens" },
@@ -99,7 +103,7 @@ const AdminLayoutInner = () => {
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {navItems.filter(i => {
           // Itens restritos ao master (não aparecem nem para quem tem permissões amplas)
-          const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios", "/admin/auditoria"];
+          const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios", "/admin/auditoria", "/admin/licenciados"];
           if (masterOnly.includes(i.to) && !isMaster) return false;
           // Dashboard geral: só master e admin
           if (i.to === "/admin" && !canSeeDashboard) return false;
@@ -155,7 +159,9 @@ const AdminLayoutInner = () => {
           <UrgencyCenter />
           <NotificationBell />
         </div>
+        <AccountContextBanner />
         <Outlet />
+
 
       </main>
       <CrmUrgentAlerts />

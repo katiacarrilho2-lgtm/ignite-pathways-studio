@@ -24,3 +24,11 @@
 
 ## Regras fixas
 - Repasses de Faculdades (`repasse_*`) é Faculdade↔Multplick: não tocar, não reutilizar para Licenciado.
+
+## Etapa 2 — Central Master da Rede Multplick (concluída)
+- /admin/licenciados + /admin/licenciados/:id (exclusivo Network Master, guard + RLS)
+- contas_comerciais com dados cadastrais/comerciais/identidade (migração 0005)
+- Funções SECURITY DEFINER de leads filtradas por conta
+- admin-create-user grava profiles.account_id da unidade (Polo nunca escapa da própria conta)
+- Banner "Visualizando como Polo" no AdminLayout; Repasses de Faculdades intocado
+- Próxima etapa (não iniciada): Portal /polo, Financeiro da Rede, InfinitePay, manuais
