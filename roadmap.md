@@ -48,3 +48,5 @@
 - `/polo/pre-matriculas` mostra status da análise, mensagem de correção e botão de reenvio.
 - Alertas reaproveitam `UrgencyCenter` (Matriz) e `NotificationBell` (Polo). Aprovar não matricula.
 - Matricular reaproveita o fluxo da Matriz (troca de contexto para o Polo + `/admin/pre-matriculas`).
+
+- [x] Etapa 5A — Regras comerciais (polo_regras) + visão comercial do Polo (recebido/elegível/repasse previsto). Etapa 6 (fechamento, NF, pagamento dia 15, InfinitePay) NÃO iniciada.
