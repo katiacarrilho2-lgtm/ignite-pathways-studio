@@ -20,9 +20,14 @@ type Kpi = { key: string; label: string; value: string | number; icon: any; to: 
 export default function Dashboard() {
   const { isMaster, roles } = useAuth();
   const base = usePortalBase();
+  const isPolo = base === "/polo";
+  const { activeAccountId, loading: loadingAccounts } = useCommercialAccounts();
   const canSee = isMaster || roles.includes("admin");
   const [loading, setLoading] = useState(true);
   const [k, setK] = useState<Record<string, number>>({});
+
+  /** No Portal do Polo todas as consultas ficam presas ao account_id da unidade. */
+  const scoped = (q: any) => (isPolo && activeAccountId ? q.eq("account_id", activeAccountId) : q);
 
   const load = async () => {
     setLoading(true);
