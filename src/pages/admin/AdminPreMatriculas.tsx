@@ -224,6 +224,16 @@ const Inner = () => {
     load();
   };
 
+  /** Etapa 4 — o Polo corrige e devolve a ficha para a fila da Matriz. */
+  const reenviarAnalise = async (id: string) => {
+    const { error } = await supabase.rpc("polo_reenviar_pre_matricula", { _id: id });
+    if (error) return toast.error(error.message);
+    toast.success("Ficha reenviada para análise da Multplick");
+    setOpen(false);
+    load();
+  };
+
+
   const setSeller = async (id: string, seller_id: string | null) => {
     const { error } = await supabase.from("enrollment_applications").update({ seller_id }).eq("id", id);
     if (error) return toast.error(error.message);
