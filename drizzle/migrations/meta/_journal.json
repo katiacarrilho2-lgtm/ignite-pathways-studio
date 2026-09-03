@@ -36,6 +36,13 @@
       "when": 1788453374862,
       "tag": "0004_tighten_account_function_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788453963658,
+      "tag": "0005_rede_multplick_unidades_e_definer_hardening",
+      "breakpoints": true
     }
   ]
 }
