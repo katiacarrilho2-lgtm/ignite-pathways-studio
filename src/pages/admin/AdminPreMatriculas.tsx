@@ -702,6 +702,16 @@ const Inner = () => {
           <DialogHeader><DialogTitle>Ficha de pré-matrícula</DialogTitle></DialogHeader>
           {viewing && (
             <div className="space-y-5 text-sm">
+              {isPolo ? (
+                <div className="rounded-xl border border-border bg-secondary/40 p-4">
+                  <div className="font-semibold text-primary flex items-center gap-2">
+                    <UserPlus className="size-4" /> Ficha comercial do Polo
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    A matrícula definitiva, a aprovação e a geração do acesso do aluno são feitas pela Matriz Multplick.
+                  </p>
+                </div>
+              ) : (
               <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div className="font-semibold text-primary flex items-center gap-2">
@@ -726,6 +736,7 @@ const Inner = () => {
                   <UserPlus className="size-5" /> Matricular aluno agora
                 </Button>
               </div>
+              )}
               <Section title="Acompanhamento (admin)">
                 <div>
                   <Label className="text-xs">Data de entrada do aluno</Label>
