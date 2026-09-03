@@ -197,6 +197,7 @@ const Inner = () => {
 
   const updateStatus = async (id: string, status: string) => {
     if (status === "matriculado") {
+      if (isPolo) return toast.error("A matrícula definitiva é feita pela Matriz Multplick.");
       const app = list.find(x => x.id === id);
       if (app) {
         if (!app.course_id) return toast.error("Ficha sem curso vinculado — vincule antes de matricular.");
