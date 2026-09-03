@@ -48,11 +48,13 @@ export type Unidade = {
   criado_em: string | null;
 };
 
+/** Tipos que podem ser cadastrados na Rede. A Matriz é única e não é criada aqui. */
 export const TIPOS = [
   { value: "revendedor", label: "Revendedor Multplick", taxa: 0 },
   { value: "licenciado", label: "Licenciado / Polo Multplick", taxa: 20000 },
-  { value: "matriz", label: "Matriz Multplick", taxa: 0 },
 ];
+/** Rótulo inclui a Matriz apenas para exibição. */
+const TIPOS_LABEL = [...TIPOS, { value: "matriz", label: "Matriz Multplick", taxa: 0 }];
 export const STATUS = [
   { value: "em_implantacao", label: "Em implantação", cls: "bg-amber-100 text-amber-700" },
   { value: "ativo", label: "Ativo", cls: "bg-emerald-100 text-emerald-700" },
