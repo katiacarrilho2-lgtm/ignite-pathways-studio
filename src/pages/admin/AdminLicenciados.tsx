@@ -74,7 +74,7 @@ const centrais = [
   { title: "Treinamentos", desc: "Capacitação de licenciados e equipes.", icon: Trophy, ready: true, to: "/admin/treinamentos" },
   { title: "Financeiro da Rede", desc: "Faturamento e repasses dos licenciados.", icon: DollarSign, ready: false },
   { title: "Fechamentos e NF", desc: "Fechamento mensal por unidade e notas fiscais.", icon: FileSpreadsheet, ready: false },
-  { title: "Regras Comerciais", desc: "Taxas, comissões e políticas da Rede.", icon: Scale, ready: false },
+  { title: "Regras Comerciais", desc: "Preço mínimo, preço sugerido e condição comercial.", icon: Scale, ready: true, to: "/admin/licenciados/regras" },
   { title: "Criativos da Rede", desc: "Materiais aprovados para os Polos.", icon: Images, ready: false },
 ];
 
