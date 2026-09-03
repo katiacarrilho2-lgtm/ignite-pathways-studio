@@ -4641,6 +4641,68 @@ export type Database = {
         Returns: Json
       }
       next_username: { Args: never; Returns: string }
+      rede_equipe: {
+        Args: { _account: string }
+        Returns: {
+          ativo: boolean
+          cargo: string
+          display_name: string
+          user_id: string
+          username: string
+        }[]
+      }
+      rede_matriculas: {
+        Args: { _account?: string }
+        Returns: {
+          account_id: string
+          aluno: string
+          curso: string
+          enrolled_at: string
+          id: string
+          polo: string
+          status: string
+        }[]
+      }
+      rede_pre_matriculas: {
+        Args: { _account?: string }
+        Returns: {
+          account_id: string
+          city: string
+          course_title: string
+          created_at: string
+          full_name: string
+          id: string
+          polo: string
+          state: string
+          status: string
+        }[]
+      }
+      rede_stats: {
+        Args: never
+        Returns: {
+          account_id: string
+          leads: number
+          matriculas: number
+          pre_matriculas: number
+          ultima_atividade: string
+          usuarios: number
+        }[]
+      }
+      rede_suporte: {
+        Args: never
+        Returns: {
+          account_id: string
+          assunto: string
+          categoria: string
+          created_at: string
+          id: string
+          mensagem: string
+          polo: string
+          prioridade: string
+          resposta: string
+          status: string
+        }[]
+      }
       repasse_previsao: {
         Args: { _fechamento: number; _pagamento: number; _venc: string }
         Returns: string
