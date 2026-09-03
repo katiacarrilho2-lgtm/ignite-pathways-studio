@@ -15,6 +15,13 @@
       "when": 1788449217965,
       "tag": "0001_account_impersonation_semantics",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788449259895,
+      "tag": "0002_contas_comerciais_read_own",
+      "breakpoints": true
     }
   ]
 }
