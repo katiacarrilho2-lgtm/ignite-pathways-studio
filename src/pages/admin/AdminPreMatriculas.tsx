@@ -694,6 +694,18 @@ const Inner = () => {
                     <SelectTrigger className={`h-7 text-xs w-32 ${statusColor[a.status] ?? ""}`}><SelectValue /></SelectTrigger>
                     <SelectContent>{STATUS.filter(s => !isPolo || s.v !== "matriculado").map(s => <SelectItem key={s.v} value={s.v}>{s.label}</SelectItem>)}</SelectContent>
                   </Select>
+                  {isPolo && a.network_review_status && (
+                    <div className="mt-1 space-y-1">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${NET_STATUS[a.network_review_status]?.cls ?? "bg-muted"}`}>
+                        {NET_STATUS[a.network_review_status]?.label ?? a.network_review_status}
+                      </span>
+                      {a.network_review_status === "correcao_solicitada" && (
+                        <Button size="sm" variant="outline" className="h-6 text-[10px] w-full" onClick={() => reenviarAnalise(a.id)}>
+                          Reenviar para análise
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </td>
                 <td className="p-3 text-right whitespace-nowrap">
                   {!isPolo && isPending(a) && a.course_id && (
