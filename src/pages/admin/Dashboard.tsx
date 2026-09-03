@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminTasksWidget from "@/components/admin/AdminTasksWidget";
 import { useAuth } from "@/hooks/useAuth";
 import { usePortalBase } from "@/lib/portal";
+import useCommercialAccounts from "@/hooks/useCommercialAccounts";
 import FinanceWidget from "@/components/admin/FinanceWidget";
 
 const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
