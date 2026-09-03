@@ -29,6 +29,9 @@ type App = {
   seller_id: string | null;
   paid_at: string | null;
   paid_amount_cents: number | null;
+  network_review_status?: string | null;
+  network_review_message?: string | null;
+  network_reviewed_at?: string | null;
 };
 
 const STATUS = [
@@ -45,6 +48,16 @@ const statusColor: Record<string, string> = {
   em_contato: "bg-amber-100 text-amber-800",
   matriculado: "bg-emerald-100 text-emerald-800",
   cancelado: "bg-muted text-muted-foreground",
+};
+
+/** Etapa 4 — análise da Rede (Polo -> Matriz). */
+export const NET_STATUS: Record<string, { label: string; cls: string }> = {
+  aguardando_analise: { label: "AGUARDANDO ANÁLISE DA MULTPLICK", cls: "bg-amber-100 text-amber-900" },
+  em_analise: { label: "EM ANÁLISE", cls: "bg-blue-100 text-blue-900" },
+  correcao_solicitada: { label: "CORREÇÃO SOLICITADA", cls: "bg-rose-100 text-rose-900" },
+  aprovada: { label: "APROVADA", cls: "bg-emerald-100 text-emerald-900" },
+  recusada: { label: "RECUSADA", cls: "bg-muted text-muted-foreground" },
+  matriculada: { label: "MATRICULADA", cls: "bg-primary/15 text-primary" },
 };
 
 const payLabel = (v: string | null) => v ? ({
