@@ -35,6 +35,10 @@ import AdminCursoPreview from "./pages/admin/AdminCursoPreview.tsx";
 import AdminCursoIA from "./pages/admin/AdminCursoIA.tsx";
 import AdminAndamento from "./pages/admin/AdminAndamento.tsx";
 import AdminCorporativo from "./pages/admin/AdminCorporativo.tsx";
+import AdminLicenciados from "./pages/admin/AdminLicenciados.tsx";
+import AdminLicenciadoDetalhe from "./pages/admin/AdminLicenciadoDetalhe.tsx";
+import RequireNetworkMaster from "./components/admin/RequireNetworkMaster.tsx";
+
 import CorpCrm from "./pages/admin/corp/CorpCrm";
 import AdminCorpPropostas from "./pages/admin/AdminCorpPropostas.tsx";
 import AdminCorpPropostaEditor from "./pages/admin/AdminCorpPropostaEditor.tsx";
