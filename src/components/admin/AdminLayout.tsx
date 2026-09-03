@@ -94,17 +94,9 @@ const AdminLayoutInner = () => {
 
   // Usuário de Polo/Revendedor nunca opera no painel da Matriz: é levado ao Portal.
   if (isStaff && homeAccountId && homeAccountId !== ROOT_ACCOUNT_ID) {
-    const target = mapAdminPathToPolo(pathname);
-    if (target) return <Navigate to={target} replace />;
-    return (
-      <div className="min-h-screen grid place-items-center p-6 text-center">
-        <div className="max-w-md space-y-3">
-          <h1 className="text-2xl font-bold text-destructive">Acesso negado</h1>
-          <p className="text-muted-foreground">Esta área é exclusiva da administração Multplick. Use o Portal do seu Polo.</p>
-          <Button asChild variant="outline"><Link to="/polo">Ir para o Portal</Link></Button>
-        </div>
-      </div>
-    );
+    // Sem equivalente no Portal: o Polo nunca permanece dentro do Admin da Matriz.
+    const target = mapAdminPathToPolo(pathname) ?? "/polo";
+    return <Navigate to={target} replace />;
   }
   if (!isStaff) return (
     <div className="min-h-screen grid place-items-center p-6 text-center">
