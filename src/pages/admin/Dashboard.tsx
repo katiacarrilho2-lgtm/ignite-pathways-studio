@@ -76,6 +76,9 @@ export default function Dashboard() {
     { key: "empresas", label: "Empresas para retornar", value: k.empresas ?? 0, icon: Building2, to: `${base}/crm/agenda`, tone: "text-orange-600 bg-orange-500/10" },
   ];
 
+  // KPIs corporativos são exclusivos da Matriz.
+  const kpis = isPolo ? allKpis.filter((kpi) => kpi.key !== "empresas") : allKpis;
+
   if (!canSee) return (
     <div className="min-h-[60vh] grid place-items-center p-6 text-center">
       <div className="max-w-md space-y-2">
