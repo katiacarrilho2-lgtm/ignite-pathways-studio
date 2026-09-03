@@ -12,6 +12,9 @@ import { useEffect, useState } from "react";
 import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
 import InternalMessageAlert from "@/components/admin/InternalMessageAlert";
 import AccountContextBanner from "@/components/admin/AccountContextBanner";
+import useCommercialAccounts from "@/hooks/useCommercialAccounts";
+import { ROOT_ACCOUNT_ID } from "@/lib/multiAccount";
+import { mapAdminPathToPolo } from "@/lib/portal";
 
 
 
@@ -66,6 +69,7 @@ const AdminLayoutInner = () => {
   const { pathname } = useLocation();
   const { counts, markRead } = useAdminBadges();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { homeAccountId, loading: loadingAccounts } = useCommercialAccounts();
 
   // Marcar canal como lido ao entrar na rota correspondente
   useEffect(() => {
@@ -85,8 +89,23 @@ const AdminLayoutInner = () => {
     return <Navigate to="/admin/certificacao" replace />;
   }
 
-  if (loading) return <div className="min-h-screen grid place-items-center text-muted-foreground">Carregando…</div>;
+  if (loading || loadingAccounts) return <div className="min-h-screen grid place-items-center text-muted-foreground">Carregando…</div>;
   if (!user) return <Navigate to="/auth" state={{ from: pathname }} replace />;
+
+  // Usuário de Polo/Revendedor nunca opera no painel da Matriz: é levado ao Portal.
+  if (isStaff && homeAccountId && homeAccountId !== ROOT_ACCOUNT_ID) {
+    const target = mapAdminPathToPolo(pathname);
+    if (target) return <Navigate to={target} replace />;
+    return (
+      <div className="min-h-screen grid place-items-center p-6 text-center">
+        <div className="max-w-md space-y-3">
+          <h1 className="text-2xl font-bold text-destructive">Acesso negado</h1>
+          <p className="text-muted-foreground">Esta área é exclusiva da administração Multplick. Use o Portal do seu Polo.</p>
+          <Button asChild variant="outline"><Link to="/polo">Ir para o Portal</Link></Button>
+        </div>
+      </div>
+    );
+  }
   if (!isStaff) return (
     <div className="min-h-screen grid place-items-center p-6 text-center">
       <div className="max-w-md space-y-4">
@@ -177,7 +196,8 @@ export const AdminLayout = () => (
 
 export const RequirePermission = ({ perm, children }: { perm: Permission; children: React.ReactNode }) => {
   const { hasPermission } = useAuth();
-  const { pathname } = useLocation();
+  const { pathname: rawPath } = useLocation();
+  const pathname = rawPath.replace(/^\/polo/, "/admin");
   // Permissão por pasta: se o usuário tem o "mod_" da rota atual, o acesso é liberado.
   const match = navItems
     .filter(i => i.mod && (pathname === i.to || pathname.startsWith(i.to + "/")))

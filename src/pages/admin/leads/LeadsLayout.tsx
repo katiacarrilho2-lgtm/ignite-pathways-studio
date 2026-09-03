@@ -1,14 +1,16 @@
 import { NavLink, Outlet } from "react-router-dom";
 import { Inbox, Database, Upload } from "lucide-react";
 import { RequirePermission } from "@/components/admin/AdminLayout";
+import { usePortalBase } from "@/lib/portal";
 
-const tabs = [
-  { to: "/admin/leads", label: "Recebidos", icon: Inbox, end: true },
-  { to: "/admin/leads/banco", label: "Banco de Leads", icon: Database },
-  { to: "/admin/leads/importar", label: "Importar / Colar lista", icon: Upload },
+const mkTabs = (base: string) => [
+  { to: `${base}/leads`, label: "Recebidos", icon: Inbox, end: true },
+  { to: `${base}/leads/banco`, label: "Banco de Leads", icon: Database },
+  { to: `${base}/leads/importar`, label: "Importar / Colar lista", icon: Upload },
 ];
 
 export default function LeadsLayout() {
+  const tabs = mkTabs(usePortalBase());
   return (
     <RequirePermission perm="manage_leads">
       <div className="flex flex-col min-h-full">

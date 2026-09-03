@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Eye, X } from "lucide-react";
 import useCommercialAccounts from "@/hooks/useCommercialAccounts";
@@ -19,9 +20,12 @@ export const AccountContextBanner = () => {
         <strong className="text-foreground">{activeAccount?.name ?? "Unidade"}</strong>
         <span className="text-muted-foreground hidden sm:inline">— você está vendo os dados desta unidade.</span>
       </div>
-      <Button size="sm" variant="outline" onClick={() => setActiveAccountId(null)}>
-        <X className="size-4" /> Voltar para visão global
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button asChild size="sm" variant="secondary"><Link to="/polo">Abrir Portal do Polo</Link></Button>
+        <Button size="sm" variant="outline" onClick={() => setActiveAccountId(null)}>
+          <X className="size-4" /> Voltar para visão global
+        </Button>
+      </div>
     </div>
   );
 };

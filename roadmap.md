@@ -32,3 +32,12 @@
 - admin-create-user grava profiles.account_id da unidade (Polo nunca escapa da própria conta)
 - Banner "Visualizando como Polo" no AdminLayout; Repasses de Faculdades intocado
 - Próxima etapa (não iniciada): Portal /polo, Financeiro da Rede, InfinitePay, manuais
+
+## Etapa 3 — Portal do Polo (/polo) — concluída
+- `src/lib/portal.ts`: `usePortalBase`, `POLO_ALLOWED_PATHS`, `mapAdminPathToPolo` (Repasses de Faculdades fora do Polo).
+- `src/components/polo/PoloLayout.tsx`: layout institucional próprio, menu setorizado por permissões `mod_*`, banner de impersonação do Master.
+- Rotas `/polo/*` em `App.tsx` reutilizando 100% das páginas existentes (nenhuma duplicada).
+- `AdminLayout`: usuário de unidade não-matriz é redirecionado do `/admin` para o equivalente `/polo`; módulos exclusivos da Matriz mostram "Acesso negado".
+- `RequirePermission` reconhece caminhos `/polo`; abas de CRM/Leads e links do Dashboard usam base dinâmica.
+- Testado com unidade fixture + Playwright: 20 rotas do portal carregam, master global cai em `/admin`, fixtures removidas.
+- Pendente (Etapas 4+): financeiro de licenciados, InfinitePay, manuais.

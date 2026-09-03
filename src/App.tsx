@@ -113,6 +113,7 @@ import ConnectHistorico from "./pages/admin/connect/ConnectHistorico.tsx";
 import ConnectApiConfig from "./pages/admin/connect/ConnectApiConfig.tsx";
 import { SiteLayout } from "./components/site/SiteLayout";
 import { AdminLayout } from "./components/admin/AdminLayout";
+import { PoloLayout } from "./components/polo/PoloLayout";
 import { AlunoLayout } from "./components/aluno/AlunoLayout";
 import { AuthProvider } from "./hooks/useAuth";
 import { useReferralCapture } from "./hooks/useReferralCapture";
@@ -167,6 +168,42 @@ const App = () => (
               <Route path="treinamentos/:slug" element={<AlunoTreinamentoPlayer />} />
               <Route path="perfil" element={<AlunoPerfil />} />
               <Route path="documentos" element={<AlunoDocumentos />} />
+            </Route>
+            <Route path="/polo" element={<PoloLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="agenda" element={<AdminAgenda />} />
+              <Route path="crm" element={<CrmLayout />}>
+                <Route index element={<CrmKanban />} />
+                <Route path="banco-leads" element={<LeadsBanco />} />
+                <Route path="agenda" element={<CrmAgenda />} />
+                <Route path="relatorios" element={<CrmRelatorios />} />
+                <Route path="equipe" element={<CrmEquipe />} />
+              </Route>
+              <Route path="leads" element={<LeadsLayout />}>
+                <Route index element={<LeadsRecebidos />} />
+                <Route path="banco" element={<LeadsBanco />} />
+                <Route path="importar" element={<LeadsImportar />} />
+              </Route>
+              <Route path="pre-matriculas" element={<AdminPreMatriculas />} />
+              <Route path="afiliados" element={<AdminAfiliados />} />
+              <Route path="meu-afiliado" element={<AlunoAfiliado />} />
+              <Route path="turmas" element={<AdminTurmas />} />
+              <Route path="chamada" element={<AdminChamada />} />
+              <Route path="pedagogico/ocorrencias" element={<AdminOcorrencias />} />
+              <Route path="alunos" element={<AdminAlunos />} />
+              <Route path="alunos/:userId" element={<AdminAlunoEdit />} />
+              <Route path="financeiro" element={<AdminFinanceiro />} />
+              <Route path="relatorios/pagamentos" element={<AdminRelatorioPagamentos />} />
+              <Route path="usuarios" element={<AdminUsuarios />} />
+              <Route path="cargos" element={<AdminCargos />} />
+              <Route path="documentos-links" element={<AdminDocumentosLinks />} />
+              <Route path="mensagens" element={<AdminMensagens />} />
+              <Route path="suporte" element={<AdminSuporte />} />
+              <Route path="treinamentos" element={<AdminTreinamentos />} />
+              <Route path="escola-fisica" element={<AdminEscolaFisica />} />
+              <Route path="almoxarifado" element={<AdminAlmoxarifado />} />
+              <Route path="solicitacoes" element={<AdminSolicitacoes />} />
+              <Route path="documentos-internos" element={<AdminDocumentosInternos />} />
             </Route>
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Dashboard />} />
