@@ -194,7 +194,9 @@ const PoloLayoutInner = () => {
             </div>
           )}
         </header>
-        <main className="flex-1 min-w-0 overflow-x-hidden"><Outlet /></main>
+        <main className="flex-1 min-w-0 overflow-x-hidden">
+          <PoloRouteGuard pathname={pathname}><Outlet /></PoloRouteGuard>
+        </main>
       </div>
     </div>
   );
