@@ -3870,6 +3870,85 @@ export type Database = {
           },
         ]
       }
+      polo_regras: {
+        Row: {
+          account_id: string | null
+          ativo: boolean
+          categoria_id: string | null
+          course_id: string | null
+          created_at: string
+          custo_interno_cents: number
+          escopo: string
+          id: string
+          instituicao: string | null
+          observacoes: string | null
+          percentual: number
+          preco_minimo_cents: number
+          preco_sugerido_cents: number
+          tipo_regra: string
+          updated_at: string
+          valor_fixo_cents: number
+        }
+        Insert: {
+          account_id?: string | null
+          ativo?: boolean
+          categoria_id?: string | null
+          course_id?: string | null
+          created_at?: string
+          custo_interno_cents?: number
+          escopo?: string
+          id?: string
+          instituicao?: string | null
+          observacoes?: string | null
+          percentual?: number
+          preco_minimo_cents?: number
+          preco_sugerido_cents?: number
+          tipo_regra?: string
+          updated_at?: string
+          valor_fixo_cents?: number
+        }
+        Update: {
+          account_id?: string | null
+          ativo?: boolean
+          categoria_id?: string | null
+          course_id?: string | null
+          created_at?: string
+          custo_interno_cents?: number
+          escopo?: string
+          id?: string
+          instituicao?: string | null
+          observacoes?: string | null
+          percentual?: number
+          preco_minimo_cents?: number
+          preco_sugerido_cents?: number
+          tipo_regra?: string
+          updated_at?: string
+          valor_fixo_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "polo_regras_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "polo_regras_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "course_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "polo_regras_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           account_id: string
@@ -4669,7 +4748,37 @@ export type Database = {
         Args: { _corpo: string; _link: string; _titulo: string }
         Returns: undefined
       }
+      polo_preco_minimo: {
+        Args: { _account?: string; _course_id: string }
+        Returns: number
+      }
       polo_reenviar_pre_matricula: { Args: { _id: string }; Returns: Json }
+      polo_regras_visiveis: {
+        Args: never
+        Returns: {
+          categoria_id: string
+          categoria_nome: string
+          course_id: string
+          course_title: string
+          escopo: string
+          id: string
+          instituicao: string
+          observacoes: string
+          percentual: number
+          preco_minimo_cents: number
+          preco_sugerido_cents: number
+          tipo_regra: string
+          valor_fixo_cents: number
+        }[]
+      }
+      polo_resumo_comercial: {
+        Args: { _account?: string; _ym?: string }
+        Returns: {
+          elegivel_cents: number
+          recebido_cents: number
+          repasse_previsto_cents: number
+        }[]
+      }
       rede_equipe: {
         Args: { _account: string }
         Returns: {

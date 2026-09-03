@@ -57,6 +57,13 @@
       "when": 1788461206435,
       "tag": "0007_rede_pre_matricula_review_flow",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788462415630,
+      "tag": "0008_polo_regras_comerciais",
+      "breakpoints": true
     }
   ]
 }
