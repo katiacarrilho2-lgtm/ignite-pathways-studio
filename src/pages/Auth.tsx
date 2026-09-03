@@ -16,6 +16,15 @@ const toEmail = (u: string) => {
   return `${raw.replace(/\D/g, "").padStart(3, "0")}@multplick.local`;
 };
 
+const ROOT_ACCOUNT_ID = "00000000-0000-0000-0000-000000000001";
+
+/** Destino após o login: Matriz vai para /admin, Polo/Licenciado vai para /polo. */
+const destinationFor = async (userId: string) => {
+  const { data } = await supabase.from("profiles").select("account_id").eq("user_id", userId).maybeSingle();
+  const account = (data as any)?.account_id ?? ROOT_ACCOUNT_ID;
+  return account && account !== ROOT_ACCOUNT_ID ? "/polo" : "/admin";
+};
+
 const Auth = () => {
   const nav = useNavigate();
   const { user } = useAuth();
@@ -23,18 +32,27 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => { if (user) nav("/admin"); }, [user, nav]);
+  useEffect(() => {
+    if (!user) return;
+    let alive = true;
+    destinationFor(user.id).then((to) => { if (alive) nav(to, { replace: true }); });
+    return () => { alive = false; };
+  }, [user, nav]);
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanPassword = password.trim();
     if (!username.trim() || !cleanPassword) return;
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: toEmail(username), password: cleanPassword });
+    const { data, error } = await supabase.auth.signInWithPassword({ email: toEmail(username), password: cleanPassword });
+    if (error || !data.user) {
+      setBusy(false);
+      return toast.error("Usuário ou senha inválidos");
+    }
+    const to = await destinationFor(data.user.id);
     setBusy(false);
-    if (error) return toast.error("Usuário ou senha inválidos");
     toast.success("Bem-vindo de volta!");
-    nav("/admin");
+    nav(to, { replace: true });
   };
 
   return (
