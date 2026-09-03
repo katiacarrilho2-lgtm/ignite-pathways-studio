@@ -669,11 +669,11 @@ const Inner = () => {
                 <td className="p-3">
                   <Select value={a.status} onValueChange={v=>updateStatus(a.id, v)}>
                     <SelectTrigger className={`h-7 text-xs w-32 ${statusColor[a.status] ?? ""}`}><SelectValue /></SelectTrigger>
-                    <SelectContent>{STATUS.map(s => <SelectItem key={s.v} value={s.v}>{s.label}</SelectItem>)}</SelectContent>
+                    <SelectContent>{STATUS.filter(s => !isPolo || s.v !== "matriculado").map(s => <SelectItem key={s.v} value={s.v}>{s.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </td>
                 <td className="p-3 text-right whitespace-nowrap">
-                  {isPending(a) && a.course_id && (
+                  {!isPolo && isPending(a) && a.course_id && (
                     <Button size="sm" variant="hero" onClick={() => openMatricular(a)} className="mr-1">
                       <UserPlus className="size-4" /> Matricular
                     </Button>
