@@ -14,8 +14,35 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_context: {
+        Row: {
+          account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_context_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_tasks: {
         Row: {
+          account_id: string | null
           created_at: string
           created_by: string | null
           done: boolean
@@ -30,6 +57,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           created_by?: string | null
           done?: boolean
@@ -44,6 +72,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           created_by?: string | null
           done?: boolean
@@ -196,6 +225,7 @@ export type Database = {
       }
       affiliate_referrals: {
         Row: {
+          account_id: string | null
           affiliate_id: string
           commission_cents: number
           comprovante_nome: string | null
@@ -213,6 +243,7 @@ export type Database = {
           valor_cents: number
         }
         Insert: {
+          account_id?: string | null
           affiliate_id: string
           commission_cents?: number
           comprovante_nome?: string | null
@@ -230,6 +261,7 @@ export type Database = {
           valor_cents?: number
         }
         Update: {
+          account_id?: string | null
           affiliate_id?: string
           commission_cents?: number
           comprovante_nome?: string | null
@@ -258,6 +290,7 @@ export type Database = {
       }
       affiliates: {
         Row: {
+          account_id: string | null
           code: string
           commission_pct: number
           created_at: string
@@ -269,6 +302,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           code: string
           commission_pct?: number
           created_at?: string
@@ -280,6 +314,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           code?: string
           commission_pct?: number
           created_at?: string
@@ -294,6 +329,7 @@ export type Database = {
       }
       agenda_events: {
         Row: {
+          account_id: string | null
           created_at: string
           created_by: string | null
           department_id: string | null
@@ -308,6 +344,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           created_by?: string | null
           department_id?: string | null
@@ -322,6 +359,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           created_by?: string | null
           department_id?: string | null
@@ -347,6 +385,7 @@ export type Database = {
       }
       attendance: {
         Row: {
+          account_id: string | null
           created_at: string
           id: string
           observacao: string | null
@@ -357,6 +396,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           id?: string
           observacao?: string | null
@@ -367,6 +407,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           id?: string
           observacao?: string | null
@@ -471,6 +512,7 @@ export type Database = {
       }
       class_sessions: {
         Row: {
+          account_id: string | null
           classroom_id: string | null
           created_at: string
           created_by: string | null
@@ -482,6 +524,7 @@ export type Database = {
           turma_id: string
         }
         Insert: {
+          account_id?: string | null
           classroom_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -493,6 +536,7 @@ export type Database = {
           turma_id: string
         }
         Update: {
+          account_id?: string | null
           classroom_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -522,6 +566,7 @@ export type Database = {
       }
       classrooms: {
         Row: {
+          account_id: string | null
           capacidade: number
           created_at: string
           id: string
@@ -533,6 +578,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           capacidade?: number
           created_at?: string
           id?: string
@@ -544,6 +590,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           capacidade?: number
           created_at?: string
           id?: string
@@ -1617,6 +1664,7 @@ export type Database = {
       }
       crm_goals: {
         Row: {
+          account_id: string | null
           escopo: Database["public"]["Enums"]["crm_goal_scope"]
           id: string
           updated_at: string
@@ -1624,6 +1672,7 @@ export type Database = {
           valor_cents: number
         }
         Insert: {
+          account_id?: string | null
           escopo: Database["public"]["Enums"]["crm_goal_scope"]
           id?: string
           updated_at?: string
@@ -1631,6 +1680,7 @@ export type Database = {
           valor_cents?: number
         }
         Update: {
+          account_id?: string | null
           escopo?: Database["public"]["Enums"]["crm_goal_scope"]
           id?: string
           updated_at?: string
@@ -1862,6 +1912,7 @@ export type Database = {
       }
       doc_links: {
         Row: {
+          account_id: string | null
           active: boolean
           categoria: string | null
           created_at: string
@@ -1876,6 +1927,7 @@ export type Database = {
           visible_to: string
         }
         Insert: {
+          account_id?: string | null
           active?: boolean
           categoria?: string | null
           created_at?: string
@@ -1890,6 +1942,7 @@ export type Database = {
           visible_to?: string
         }
         Update: {
+          account_id?: string | null
           active?: boolean
           categoria?: string | null
           created_at?: string
@@ -1952,6 +2005,7 @@ export type Database = {
       }
       enrollment_applications: {
         Row: {
+          account_id: string | null
           birth_date: string | null
           cep: string | null
           city: string | null
@@ -1990,6 +2044,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           birth_date?: string | null
           cep?: string | null
           city?: string | null
@@ -2028,6 +2083,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           birth_date?: string | null
           cep?: string | null
           city?: string | null
@@ -2405,6 +2461,7 @@ export type Database = {
       }
       internal_documents: {
         Row: {
+          account_id: string | null
           categoria: string
           created_at: string
           created_by: string | null
@@ -2419,6 +2476,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           categoria?: string
           created_at?: string
           created_by?: string | null
@@ -2433,6 +2491,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           categoria?: string
           created_at?: string
           created_by?: string | null
@@ -2570,6 +2629,7 @@ export type Database = {
       }
       internal_requests: {
         Row: {
+          account_id: string | null
           created_at: string
           descricao: string | null
           from_department_id: string | null
@@ -2585,6 +2645,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           descricao?: string | null
           from_department_id?: string | null
@@ -2600,6 +2661,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           descricao?: string | null
           from_department_id?: string | null
@@ -2633,6 +2695,7 @@ export type Database = {
       }
       inventory_items: {
         Row: {
+          account_id: string | null
           ativo: boolean
           categoria: string | null
           created_at: string
@@ -2648,6 +2711,7 @@ export type Database = {
           valor_unit_cents: number
         }
         Insert: {
+          account_id?: string | null
           ativo?: boolean
           categoria?: string | null
           created_at?: string
@@ -2663,6 +2727,7 @@ export type Database = {
           valor_unit_cents?: number
         }
         Update: {
+          account_id?: string | null
           ativo?: boolean
           categoria?: string | null
           created_at?: string
@@ -2681,6 +2746,7 @@ export type Database = {
       }
       inventory_movements: {
         Row: {
+          account_id: string | null
           created_at: string
           data: string
           documento: string | null
@@ -2694,6 +2760,7 @@ export type Database = {
           tipo: string
         }
         Insert: {
+          account_id?: string | null
           created_at?: string
           data?: string
           documento?: string | null
@@ -2707,6 +2774,7 @@ export type Database = {
           tipo: string
         }
         Update: {
+          account_id?: string | null
           created_at?: string
           data?: string
           documento?: string | null
@@ -2839,6 +2907,7 @@ export type Database = {
       }
       leads_bank: {
         Row: {
+          account_id: string | null
           cidade: string | null
           created_at: string
           created_by: string | null
@@ -2858,6 +2927,7 @@ export type Database = {
           whatsapp: string | null
         }
         Insert: {
+          account_id?: string | null
           cidade?: string | null
           created_at?: string
           created_by?: string | null
@@ -2877,6 +2947,7 @@ export type Database = {
           whatsapp?: string | null
         }
         Update: {
+          account_id?: string | null
           cidade?: string | null
           created_at?: string
           created_by?: string | null
@@ -3010,6 +3081,7 @@ export type Database = {
       }
       maintenance_requests: {
         Row: {
+          account_id: string | null
           classroom_id: string | null
           created_at: string
           created_by: string | null
@@ -3027,6 +3099,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           classroom_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -3044,6 +3117,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           classroom_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -3487,6 +3561,7 @@ export type Database = {
       }
       notifications: {
         Row: {
+          account_id: string | null
           corpo: string | null
           created_at: string
           department_id: string | null
@@ -3498,6 +3573,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           corpo?: string | null
           created_at?: string
           department_id?: string | null
@@ -3509,6 +3585,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           corpo?: string | null
           created_at?: string
           department_id?: string | null
@@ -3564,6 +3641,7 @@ export type Database = {
       }
       patrimonio: {
         Row: {
+          account_id: string | null
           categoria: string | null
           classroom_id: string | null
           codigo: string | null
@@ -3581,6 +3659,7 @@ export type Database = {
           valor_cents: number
         }
         Insert: {
+          account_id?: string | null
           categoria?: string | null
           classroom_id?: string | null
           codigo?: string | null
@@ -3598,6 +3677,7 @@ export type Database = {
           valor_cents?: number
         }
         Update: {
+          account_id?: string | null
           categoria?: string | null
           classroom_id?: string | null
           codigo?: string | null
@@ -3626,6 +3706,7 @@ export type Database = {
       }
       pedagogic_occurrences: {
         Row: {
+          account_id: string | null
           autor_id: string | null
           created_at: string
           descricao: string | null
@@ -3639,6 +3720,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          account_id?: string | null
           autor_id?: string | null
           created_at?: string
           descricao?: string | null
@@ -3652,6 +3734,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          account_id?: string | null
           autor_id?: string | null
           created_at?: string
           descricao?: string | null
@@ -3726,6 +3809,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_id: string
           ativo: boolean
           avatar_url: string | null
           cargo: string | null
@@ -3739,6 +3823,7 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          account_id?: string
           ativo?: boolean
           avatar_url?: string | null
           cargo?: string | null
@@ -3752,6 +3837,7 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          account_id?: string
           ativo?: boolean
           avatar_url?: string | null
           cargo?: string | null
@@ -4085,6 +4171,7 @@ export type Database = {
       }
       student_profiles: {
         Row: {
+          account_id: string | null
           ano_formacao: string | null
           bairro: string | null
           birth_date: string | null
@@ -4127,6 +4214,7 @@ export type Database = {
           vendedor: string | null
         }
         Insert: {
+          account_id?: string | null
           ano_formacao?: string | null
           bairro?: string | null
           birth_date?: string | null
@@ -4169,6 +4257,7 @@ export type Database = {
           vendedor?: string | null
         }
         Update: {
+          account_id?: string | null
           ano_formacao?: string | null
           bairro?: string | null
           birth_date?: string | null
@@ -4214,6 +4303,7 @@ export type Database = {
       }
       support_tickets: {
         Row: {
+          account_id: string | null
           assunto: string
           categoria: string | null
           created_at: string
@@ -4228,6 +4318,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string | null
           assunto: string
           categoria?: string | null
           created_at?: string
@@ -4242,6 +4333,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string | null
           assunto?: string
           categoria?: string | null
           created_at?: string
@@ -4422,6 +4514,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      account_can_write: { Args: { _account: string }; Returns: boolean }
+      account_root_id: { Args: never; Returns: string }
+      account_visible: { Args: { _account: string }; Returns: boolean }
       add_xp: {
         Args: { delta_coins?: number; delta_xp: number }
         Returns: {
@@ -4443,6 +4538,7 @@ export type Database = {
         }
       }
       crm_can_manage_all: { Args: { _uid: string }; Returns: boolean }
+      current_account_id: { Args: never; Returns: string }
       has_permission: {
         Args: {
           _permission: Database["public"]["Enums"]["app_permission"]
@@ -4466,6 +4562,7 @@ export type Database = {
         Returns: boolean
       }
       is_master: { Args: { _user_id: string }; Returns: boolean }
+      is_network_master: { Args: { _uid?: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       lead_bank_get_crm_statuses: {
         Args: { _lead_ids: string[] }
@@ -4504,6 +4601,7 @@ export type Database = {
         Args: { _contrato_id: string }
         Returns: undefined
       }
+      user_home_account_id: { Args: { _uid?: string }; Returns: string }
     }
     Enums: {
       app_permission:
