@@ -26,7 +26,7 @@ type Result = {
 };
 
 export const useCommercialAccounts = (): Result => {
-  const { user, isSuperAdmin, roles } = useAuth();
+  const { user, isSuperAdmin } = useAuth();
   const [accounts, setAccounts] = useState<CommercialAccount[]>([]);
   const [homeAccountId, setHomeAccountId] = useState<string | null>(null);
   const [activeAccountId, setActive] = useState<string | null>(null);
