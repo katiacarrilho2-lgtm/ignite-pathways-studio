@@ -758,7 +758,7 @@ const Inner = () => {
                   <Button size="sm" variant="outline" onClick={() => { setOpen(false); openContract(viewing); }}>
                     <FileSignature className="size-4" /> Gerar contrato
                   </Button>
-                  {isPending(viewing) && viewing.course_id && (
+                  {!isPolo && isPending(viewing) && viewing.course_id && (
                     <Button size="sm" variant="hero" onClick={() => { setOpen(false); openMatricular(viewing); }}>
                       <UserPlus className="size-4" /> Matricular agora
                     </Button>
