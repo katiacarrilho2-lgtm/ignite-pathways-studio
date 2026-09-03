@@ -159,7 +159,9 @@ const AdminLayoutInner = () => {
           <UrgencyCenter />
           <NotificationBell />
         </div>
+        <AccountContextBanner />
         <Outlet />
+
 
       </main>
       <CrmUrgentAlerts />
