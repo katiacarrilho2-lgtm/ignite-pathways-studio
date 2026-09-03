@@ -71,6 +71,29 @@ const groups: Group[] = [
   },
 ];
 
+/** Permissão exigida por rota do Portal do Polo — protege o acesso por URL direta. */
+const ROUTE_PERMS: { path: string; mod: Permission }[] = groups
+  .flatMap((g) => g.items)
+  .filter((i) => !!i.mod)
+  .map((i) => ({ path: i.to, mod: i.mod as Permission }))
+  .sort((a, b) => b.path.length - a.path.length);
+
+const PoloRouteGuard = ({ pathname, children }: { pathname: string; children: React.ReactNode }) => {
+  const { hasPermission } = useAuth();
+  const match = ROUTE_PERMS.find((r) => pathname === r.path || pathname.startsWith(r.path + "/"));
+  if (match && !hasPermission(match.mod)) {
+    return (
+      <div className="min-h-[60vh] grid place-items-center p-6 text-center">
+        <div className="max-w-md space-y-2">
+          <h1 className="text-2xl font-bold text-primary">Acesso restrito</h1>
+          <p className="text-muted-foreground">Seu cargo não tem permissão para este módulo do Portal do Polo.</p>
+        </div>
+      </div>
+    );
+  }
+  return <>{children}</>;
+};
+
 const PoloLayoutInner = () => {
   const { user, loading, isStaff, isSuperAdmin, hasPermission, signOut, username } = useAuth();
   const { activeAccount, activeAccountId, homeAccountId, loading: loadingAccounts, setActiveAccountId } =
