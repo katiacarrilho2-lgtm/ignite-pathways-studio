@@ -194,6 +194,9 @@ const App = () => (
               <Route path="corporativo/contratos" element={<AdminCorpContratos />} />
               <Route path="corporativo/contratos/:id" element={<AdminCorpContratoEditor />} />
               <Route path="corporativo/configuracoes" element={<AdminCompanySettings />} />
+              <Route path="licenciados" element={<RequireNetworkMaster><AdminLicenciados /></RequireNetworkMaster>} />
+              <Route path="licenciados/:id" element={<RequireNetworkMaster><AdminLicenciadoDetalhe /></RequireNetworkMaster>} />
+
               <Route path="imagens" element={<AdminImagens />} />
               <Route path="alunos" element={<AdminAlunos />} />
               <Route path="alunos/:userId" element={<AdminAlunoEdit />} />
