@@ -108,7 +108,8 @@ export default function AdminLicenciados() {
     setLoading(true);
     const { data, error } = await supabase.from("contas_comerciais").select("*").order("nome");
     if (error) toast({ title: "Erro ao carregar unidades", description: error.message, variant: "destructive" });
-    setUnits((data ?? []) as any);
+    // A Matriz (ROOT) não é uma unidade da Rede e nunca aparece nesta lista.
+    setUnits(((data ?? []) as any[]).filter((u) => u.id !== ROOT_ACCOUNT_ID && u.tipo_da_conta !== "matriz") as any);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
@@ -132,14 +133,14 @@ export default function AdminLicenciados() {
   }, [units, q, fTipo, fStatus, fUf, fCidade]);
 
   const kpis = useMemo(() => {
-    const polos = units.filter((u) => u.tipo_da_conta !== "matriz");
+    const polos = units;
     const tot = (f: (u: Unidade) => boolean) => polos.filter(f).length;
     const sem = polos.filter((u) => {
       const s = statsFor(u.id);
       return s.leads === 0 && s.preMatriculas === 0 && s.matriculas === 0;
     }).length;
     const soma = (k: "usuarios" | "leads" | "preMatriculas" | "matriculas") =>
-      units.reduce((acc, u) => acc + statsFor(u.id)[k], 0);
+      polos.reduce((acc, u) => acc + statsFor(u.id)[k], 0);
     return {
       unidades: polos.length,
       licenciados: tot((u) => u.tipo_da_conta === "licenciado"),
