@@ -103,7 +103,7 @@ const AdminLayoutInner = () => {
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {navItems.filter(i => {
           // Itens restritos ao master (não aparecem nem para quem tem permissões amplas)
-          const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios", "/admin/auditoria"];
+          const masterOnly = ["/admin/connect", "/admin/cargos", "/admin/usuarios", "/admin/auditoria", "/admin/licenciados"];
           if (masterOnly.includes(i.to) && !isMaster) return false;
           // Dashboard geral: só master e admin
           if (i.to === "/admin" && !canSeeDashboard) return false;
