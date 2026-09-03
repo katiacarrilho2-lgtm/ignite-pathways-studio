@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminTasksWidget from "@/components/admin/AdminTasksWidget";
 import { useAuth } from "@/hooks/useAuth";
 import { usePortalBase } from "@/lib/portal";
+import useCommercialAccounts from "@/hooks/useCommercialAccounts";
 import FinanceWidget from "@/components/admin/FinanceWidget";
 
 const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -20,9 +21,14 @@ type Kpi = { key: string; label: string; value: string | number; icon: any; to: 
 export default function Dashboard() {
   const { isMaster, roles } = useAuth();
   const base = usePortalBase();
+  const isPolo = base === "/polo";
+  const { activeAccountId, loading: loadingAccounts } = useCommercialAccounts();
   const canSee = isMaster || roles.includes("admin");
   const [loading, setLoading] = useState(true);
   const [k, setK] = useState<Record<string, number>>({});
+
+  /** No Portal do Polo todas as consultas ficam presas ao account_id da unidade. */
+  const scoped = (q: any) => (isPolo && activeAccountId ? q.eq("account_id", activeAccountId) : q);
 
   const load = async () => {
     setLoading(true);
@@ -38,15 +44,15 @@ export default function Dashboard() {
     const [
       novosLeads, semResposta, matriculas, pagas, vencidas, turmasHoje, presencas, propostas, empresas,
     ] = await Promise.all([
-      cnt(supabase.from("crm_leads").select("id", { count: "exact", head: true }).gte("created_at", startIso).lt("created_at", endIso)),
-      cnt(supabase.from("crm_leads").select("id", { count: "exact", head: true }).in("estagio", ["novo", "lead"]).eq("atendimentos", 0)),
-      cnt(supabase.from("enrollments").select("id", { count: "exact", head: true }).gte("enrolled_at", startIso).lt("enrolled_at", endIso)),
-      supabase.from("installments").select("valor_cents, valor_final_cents").gte("paid_at", startIso).lt("paid_at", endIso).then(({ data }) => data ?? [], () => []),
-      cnt(supabase.from("installments").select("id", { count: "exact", head: true }).neq("status", "pago").lt("vencimento", today)),
-      cnt(supabase.from("turmas").select("id", { count: "exact", head: true }).lte("data_inicio", today).gte("data_fim", today)),
+      cnt(scoped(supabase.from("crm_leads").select("id", { count: "exact", head: true })).gte("created_at", startIso).lt("created_at", endIso)),
+      cnt(scoped(supabase.from("crm_leads").select("id", { count: "exact", head: true })).in("estagio", ["novo", "lead"]).eq("atendimentos", 0)),
+      cnt(scoped(supabase.from("enrollments").select("id", { count: "exact", head: true })).gte("enrolled_at", startIso).lt("enrolled_at", endIso)),
+      scoped(supabase.from("installments").select("valor_cents, valor_final_cents")).gte("paid_at", startIso).lt("paid_at", endIso).then(({ data }: any) => data ?? [], () => []),
+      cnt(scoped(supabase.from("installments").select("id", { count: "exact", head: true })).neq("status", "pago").lt("vencimento", today)),
+      cnt(scoped(supabase.from("turmas").select("id", { count: "exact", head: true })).lte("data_inicio", today).gte("data_fim", today)),
       supabase.from("lesson_progress").select("user_id").gte("updated_at", startIso).lt("updated_at", endIso).then(({ data }) => data ?? [], () => []),
-      cnt(supabase.from("enrollment_applications").select("id", { count: "exact", head: true }).not("status", "in", "(matriculado,cancelado,recusado)")),
-      cnt(supabase.from("crm_appointments").select("id", { count: "exact", head: true }).eq("done", false).gte("scheduled_at", startIso).lt("scheduled_at", endIso)),
+      cnt(scoped(supabase.from("enrollment_applications").select("id", { count: "exact", head: true })).not("status", "in", "(matriculado,cancelado,recusado)")),
+      cnt(scoped(supabase.from("crm_appointments").select("id", { count: "exact", head: true })).eq("done", false).gte("scheduled_at", startIso).lt("scheduled_at", endIso)),
     ]);
 
     const recebimentos = (pagas as any[]).reduce((s, p) => s + (p.valor_final_cents ?? p.valor_cents ?? 0), 0);
@@ -56,9 +62,9 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { if (canSee) load(); }, [canSee]);
+  useEffect(() => { if (canSee && !loadingAccounts) load(); }, [canSee, loadingAccounts, activeAccountId, isPolo]);
 
-  const kpis: Kpi[] = [
+  const allKpis: Kpi[] = [
     { key: "novosLeads", label: "Novos leads", value: k.novosLeads ?? 0, icon: UserPlus, to: `${base}/crm`, tone: "text-primary bg-primary/10" },
     { key: "semResposta", label: "Leads sem resposta", value: k.semResposta ?? 0, icon: MessageSquareWarning, to: `${base}/crm`, tone: "text-amber-600 bg-amber-500/10" },
     { key: "matriculas", label: "Matrículas", value: k.matriculas ?? 0, icon: GraduationCap, to: `${base}/alunos`, tone: "text-emerald-600 bg-emerald-500/10" },
@@ -69,6 +75,9 @@ export default function Dashboard() {
     { key: "propostas", label: "Propostas abertas", value: k.propostas ?? 0, icon: ClipboardList, to: `${base}/pre-matriculas`, tone: "text-violet-600 bg-violet-500/10" },
     { key: "empresas", label: "Empresas para retornar", value: k.empresas ?? 0, icon: Building2, to: `${base}/crm/agenda`, tone: "text-orange-600 bg-orange-500/10" },
   ];
+
+  // KPIs corporativos são exclusivos da Matriz.
+  const kpis = isPolo ? allKpis.filter((kpi) => kpi.key !== "empresas") : allKpis;
 
   if (!canSee) return (
     <div className="min-h-[60vh] grid place-items-center p-6 text-center">
