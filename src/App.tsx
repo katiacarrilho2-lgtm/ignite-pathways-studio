@@ -37,6 +37,8 @@ import AdminAndamento from "./pages/admin/AdminAndamento.tsx";
 import AdminCorporativo from "./pages/admin/AdminCorporativo.tsx";
 import AdminLicenciados from "./pages/admin/AdminLicenciados.tsx";
 import AdminLicenciadoDetalhe from "./pages/admin/AdminLicenciadoDetalhe.tsx";
+import AdminRedeMatriculas from "./pages/admin/AdminRedeMatriculas.tsx";
+import AdminRedeSuporte from "./pages/admin/AdminRedeSuporte.tsx";
 import RequireNetworkMaster from "./components/admin/RequireNetworkMaster.tsx";
 
 import CorpCrm from "./pages/admin/corp/CorpCrm";
