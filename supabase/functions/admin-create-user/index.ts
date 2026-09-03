@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
       foto_url: avatar_url || null,
     }, { onConflict: "user_id" });
 
-    return json({ username, user_id: created.user.id, bootstrap: isBootstrap });
+    return json({ username, user_id: created.user.id, bootstrap: isBootstrap, account_id: targetAccountId });
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
   }
