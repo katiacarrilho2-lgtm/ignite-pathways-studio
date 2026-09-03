@@ -1,12 +1,13 @@
 # Roadmap — Rede Multplick
 
-## Etapa 1 — Fundação multi-conta (EM ANDAMENTO)
-- [ ] `account_id` em `profiles` + tabelas dos módulos do Polo (aditivo, backfill para conta ROOT)
-- [ ] Funções `current_account_id()`, `is_network_master()`, `account_visible()`, `account_can_write()`
-- [ ] Policies RESTRICTIVE de isolamento por conta
-- [ ] Contexto de "Visualizar Polo" validado no backend + auditoria em `audit_logs`
-- [ ] `useCommercialAccounts` real (substituir shim)
-- [ ] Testes de isolamento com Polo A / Polo B / Master e remoção das fixtures
+## Etapa 1 — Fundação multi-conta (CONCLUÍDA)
+- [x] `account_id` em `profiles` + tabelas dos módulos do Polo (aditivo, backfill para conta ROOT)
+- [x] Funções `current_account_id()`, `is_network_master()`, `account_visible()`, `account_can_write()`
+- [x] Policies RESTRICTIVE de isolamento por conta (30 tabelas)
+- [x] Contexto de "Visualizar Polo" validado no backend + auditoria em `audit_logs`
+- [x] `useCommercialAccounts` real (substituir shim)
+- [x] Testes de isolamento com Polo A / Polo B / Master e remoção das fixtures
+- Pendente para a Etapa 2/3: edge functions (`admin-create-user`) definirem o `account_id` da unidade ao criar usuários do Polo
 
 ## Aguardando autorização do usuário
 - Etapa 2 — Cadastro de Unidades + Painel Master `/admin/licenciados`
