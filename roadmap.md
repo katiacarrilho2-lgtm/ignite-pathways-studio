@@ -40,4 +40,11 @@
 - `AdminLayout`: usuário de unidade não-matriz é redirecionado do `/admin` para o equivalente `/polo`; módulos exclusivos da Matriz mostram "Acesso negado".
 - `RequirePermission` reconhece caminhos `/polo`; abas de CRM/Leads e links do Dashboard usam base dinâmica.
 - Testado com unidade fixture + Playwright: 20 rotas do portal carregam, master global cai em `/admin`, fixtures removidas.
-- Pendente (Etapas 4+): financeiro de licenciados, InfinitePay, manuais.
+- Pendente (Etapas 5+): financeiro de licenciados, InfinitePay, manuais.
+
+## Etapa 4 — Fluxo de pré-matrículas da Rede + alertas (concluída)
+- Migração `0007_rede_pre_matricula_review_flow.sql`: colunas `network_review_*`/`network_submitted_at`, triggers de guarda e notificação, RPCs `rede_fila_pre_matriculas`, `rede_review_pre_matricula`, `polo_reenviar_pre_matricula`.
+- Fila "aguardando análise" + ações (assumir/aprovar/correção/recusar/matricular) em `/admin/licenciados/matriculas`.
+- `/polo/pre-matriculas` mostra status da análise, mensagem de correção e botão de reenvio.
+- Alertas reaproveitam `UrgencyCenter` (Matriz) e `NotificationBell` (Polo). Aprovar não matricula.
+- Matricular reaproveita o fluxo da Matriz (troca de contexto para o Polo + `/admin/pre-matriculas`).

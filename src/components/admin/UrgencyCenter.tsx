@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { AlarmClock, Check, Clock, Flame, ListChecks, CalendarClock, Inbox, LifeBuoy } from "lucide-react";
+import { AlarmClock, Check, Clock, Flame, ListChecks, CalendarClock, Inbox, LifeBuoy, GraduationCap } from "lucide-react";
 
-type Kind = "lead" | "tarefa" | "agenda" | "solicitacao" | "suporte";
+type Kind = "lead" | "tarefa" | "agenda" | "solicitacao" | "suporte" | "rede";
 
 type Item = {
   id: string;
@@ -27,6 +27,7 @@ const KIND_META: Record<Kind, { label: string; icon: typeof Flame }> = {
   agenda: { label: "Agenda de hoje", icon: CalendarClock },
   solicitacao: { label: "Solicitações internas", icon: Inbox },
   suporte: { label: "Chamados de suporte", icon: LifeBuoy },
+  rede: { label: "Pré-matrículas da Rede", icon: GraduationCap },
 };
 
 const todayIso = () => {
@@ -69,12 +70,14 @@ export default function UrgencyCenter() {
       ? supabase.from("crm_appointments").select("id, title, scheduled_at, notes, done").eq("done", false).gte("scheduled_at", dayStart.toISOString()).lte("scheduled_at", dayEnd.toISOString())
       : supabase.from("crm_appointments").select("id, title, scheduled_at, notes, done").eq("done", false).gte("scheduled_at", dayStart.toISOString()).lte("scheduled_at", dayEnd.toISOString()).eq("owner_id", user.id);
 
-    const [leads, tasks, appts, reqs, tickets] = await Promise.all([
+    const [leads, tasks, appts, reqs, tickets, rede] = await Promise.all([
       qLeads,
       qTasks,
       qAppts,
       supabase.from("internal_requests").select("id, numero, titulo, prioridade, status, prazo").not("status", "in", '("concluida","cancelada","fechada")').order("created_at", { ascending: true }),
       supabase.from("support_tickets").select("id, assunto, prioridade, status, created_at").not("status", "in", '("fechado","resolvido")').order("created_at", { ascending: true }),
+      // Fila da Rede: a função só retorna linhas para o Master da Rede.
+      supabase.rpc("rede_fila_pre_matriculas"),
     ]);
 
     const list: Item[] = [];
@@ -111,6 +114,16 @@ export default function UrgencyCenter() {
       link: "/admin/suporte",
     }));
 
+    (rede.data ?? [])
+      .filter((r: any) => ["aguardando_analise", "correcao_solicitada"].includes(r.network_review_status))
+      .forEach((r: any) => list.push({
+        id: `rede:${r.id}`, kind: "rede",
+        title: `NOVA PRÉ-MATRÍCULA DA REDE — ${r.polo}`,
+        subtitle: `${r.full_name} · ${r.course_title}`,
+        link: `/admin/licenciados/matriculas?ficha=${r.id}`,
+        late: r.network_review_status === "aguardando_analise",
+      }));
+
     setItems(list);
   }, [user, canSeeAll]);
 
@@ -127,6 +140,7 @@ export default function UrgencyCenter() {
       .on("postgres_changes", { event: "*", schema: "public", table: "crm_appointments" }, run)
       .on("postgres_changes", { event: "*", schema: "public", table: "internal_requests" }, run)
       .on("postgres_changes", { event: "*", schema: "public", table: "support_tickets" }, run)
+      .on("postgres_changes", { event: "*", schema: "public", table: "enrollment_applications" }, run)
       .subscribe();
     const t = setInterval(run, 5 * 60 * 1000);
     return () => { supabase.removeChannel(ch); clearInterval(t); };

@@ -29,6 +29,9 @@ type App = {
   seller_id: string | null;
   paid_at: string | null;
   paid_amount_cents: number | null;
+  network_review_status?: string | null;
+  network_review_message?: string | null;
+  network_reviewed_at?: string | null;
 };
 
 const STATUS = [
@@ -45,6 +48,16 @@ const statusColor: Record<string, string> = {
   em_contato: "bg-amber-100 text-amber-800",
   matriculado: "bg-emerald-100 text-emerald-800",
   cancelado: "bg-muted text-muted-foreground",
+};
+
+/** Etapa 4 — análise da Rede (Polo -> Matriz). */
+export const NET_STATUS: Record<string, { label: string; cls: string }> = {
+  aguardando_analise: { label: "AGUARDANDO ANÁLISE DA MULTPLICK", cls: "bg-amber-100 text-amber-900" },
+  em_analise: { label: "EM ANÁLISE", cls: "bg-blue-100 text-blue-900" },
+  correcao_solicitada: { label: "CORREÇÃO SOLICITADA", cls: "bg-rose-100 text-rose-900" },
+  aprovada: { label: "APROVADA", cls: "bg-emerald-100 text-emerald-900" },
+  recusada: { label: "RECUSADA", cls: "bg-muted text-muted-foreground" },
+  matriculada: { label: "MATRICULADA", cls: "bg-primary/15 text-primary" },
 };
 
 const payLabel = (v: string | null) => v ? ({
@@ -210,6 +223,16 @@ const Inner = () => {
     toast.success("Status atualizado");
     load();
   };
+
+  /** Etapa 4 — o Polo corrige e devolve a ficha para a fila da Matriz. */
+  const reenviarAnalise = async (id: string) => {
+    const { error } = await supabase.rpc("polo_reenviar_pre_matricula", { _id: id });
+    if (error) return toast.error(error.message);
+    toast.success("Ficha reenviada para análise da Multplick");
+    setOpen(false);
+    load();
+  };
+
 
   const setSeller = async (id: string, seller_id: string | null) => {
     const { error } = await supabase.from("enrollment_applications").update({ seller_id }).eq("id", id);
@@ -671,6 +694,18 @@ const Inner = () => {
                     <SelectTrigger className={`h-7 text-xs w-32 ${statusColor[a.status] ?? ""}`}><SelectValue /></SelectTrigger>
                     <SelectContent>{STATUS.filter(s => !isPolo || s.v !== "matriculado").map(s => <SelectItem key={s.v} value={s.v}>{s.label}</SelectItem>)}</SelectContent>
                   </Select>
+                  {isPolo && a.network_review_status && (
+                    <div className="mt-1 space-y-1">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${NET_STATUS[a.network_review_status]?.cls ?? "bg-muted"}`}>
+                        {NET_STATUS[a.network_review_status]?.label ?? a.network_review_status}
+                      </span>
+                      {a.network_review_status === "correcao_solicitada" && (
+                        <Button size="sm" variant="outline" className="h-6 text-[10px] w-full" onClick={() => reenviarAnalise(a.id)}>
+                          Reenviar para análise
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </td>
                 <td className="p-3 text-right whitespace-nowrap">
                   {!isPolo && isPending(a) && a.course_id && (
@@ -703,11 +738,31 @@ const Inner = () => {
           {viewing && (
             <div className="space-y-5 text-sm">
               {isPolo ? (
-                <div className="rounded-xl border border-border bg-secondary/40 p-4">
+                <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-2">
                   <div className="font-semibold text-primary flex items-center gap-2">
                     <UserPlus className="size-4" /> Ficha comercial do Polo
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  {viewing.network_review_status && (
+                    <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${NET_STATUS[viewing.network_review_status]?.cls ?? "bg-muted"}`}>
+                      {NET_STATUS[viewing.network_review_status]?.label ?? viewing.network_review_status}
+                    </span>
+                  )}
+                  {viewing.network_review_status === "correcao_solicitada" && (
+                    <div className="rounded-lg border border-rose-300 bg-rose-50 p-3">
+                      <p className="text-xs font-semibold text-rose-900">Mensagem da Multplick</p>
+                      <p className="text-sm text-rose-900 whitespace-pre-wrap">{viewing.network_review_message}</p>
+                      <Button size="sm" className="mt-2" onClick={() => reenviarAnalise(viewing.id)}>
+                        Corrigi os dados — reenviar para análise
+                      </Button>
+                    </div>
+                  )}
+                  {viewing.network_review_status === "matriculada" && (
+                    <p className="text-xs text-emerald-800">
+                      Aluno matriculado pela Matriz: <b>{viewing.full_name}</b> · {viewing.course_title}
+                      {viewing.network_reviewed_at ? ` · ${new Date(viewing.network_reviewed_at).toLocaleDateString("pt-BR")}` : ""}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
                     A matrícula definitiva, a aprovação e a geração do acesso do aluno são feitas pela Matriz Multplick.
                   </p>
                 </div>

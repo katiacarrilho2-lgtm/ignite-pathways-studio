@@ -50,6 +50,13 @@
       "when": 1788459212371,
       "tag": "0006_matriz_rede_separation",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788461206435,
+      "tag": "0007_rede_pre_matricula_review_flow",
+      "breakpoints": true
     }
   ]
 }
