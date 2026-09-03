@@ -154,13 +154,16 @@ Deno.serve(async (req) => {
     }
 
     // Basic login profile used by admin lists and auth hooks
+    // account_id vem SEMPRE do backend (nunca do payload do cliente).
     await admin.from("profiles").upsert({
       user_id: created.user.id,
       username,
       display_name: full_name ?? `Usuário ${username}`,
       email: loginEmail,
       avatar_url: avatar_url || null,
+      account_id: targetAccountId,
     }, { onConflict: "user_id" });
+
 
     // Detailed student data lives in student_profiles in the restored schema
     await admin.from("student_profiles").upsert({
