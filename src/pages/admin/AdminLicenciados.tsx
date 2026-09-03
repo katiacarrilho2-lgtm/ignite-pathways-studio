@@ -48,18 +48,20 @@ export type Unidade = {
   criado_em: string | null;
 };
 
+/** Tipos que podem ser cadastrados na Rede. A Matriz é única e não é criada aqui. */
 export const TIPOS = [
   { value: "revendedor", label: "Revendedor Multplick", taxa: 0 },
   { value: "licenciado", label: "Licenciado / Polo Multplick", taxa: 20000 },
-  { value: "matriz", label: "Matriz Multplick", taxa: 0 },
 ];
+/** Rótulo inclui a Matriz apenas para exibição. */
+const TIPOS_LABEL = [...TIPOS, { value: "matriz", label: "Matriz Multplick", taxa: 0 }];
 export const STATUS = [
   { value: "em_implantacao", label: "Em implantação", cls: "bg-amber-100 text-amber-700" },
   { value: "ativo", label: "Ativo", cls: "bg-emerald-100 text-emerald-700" },
   { value: "inativo", label: "Inativo", cls: "bg-muted text-muted-foreground" },
   { value: "bloqueado", label: "Bloqueado", cls: "bg-destructive/10 text-destructive" },
 ];
-export const tipoLabel = (v?: string | null) => TIPOS.find((t) => t.value === v)?.label ?? (v ?? "—");
+export const tipoLabel = (v?: string | null) => TIPOS_LABEL.find((t) => t.value === v)?.label ?? (v ?? "—");
 export const statusInfo = (v?: string | null) => STATUS.find((s) => s.value === v) ?? { value: v ?? "", label: v ?? "—", cls: "bg-muted text-muted-foreground" };
 export const brl = (cents?: number | null) => ((cents ?? 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 export const dataBr = (v?: string | null) => (v ? new Date(v).toLocaleDateString("pt-BR") : "—");
@@ -67,8 +69,8 @@ export const dataBr = (v?: string | null) => (v ? new Date(v).toLocaleDateString
 const centrais = [
   { title: "Visão Geral da Rede", desc: "Resumo e desempenho das unidades Multplick.", icon: Network, ready: true },
   { title: "Unidades e Licenciados", desc: "Cadastro e administração dos Polos e Revendedores.", icon: Building2, ready: true },
-  { title: "Matrículas da Rede", desc: "Pré-matrículas e matrículas por unidade.", icon: GraduationCap, ready: true, to: "/admin/pre-matriculas" },
-  { title: "Suporte da Rede", desc: "Chamados abertos pelas unidades.", icon: LifeBuoy, ready: true, to: "/admin/suporte" },
+  { title: "Matrículas da Rede", desc: "Pré-matrículas e matrículas por unidade.", icon: GraduationCap, ready: true, to: "/admin/licenciados/matriculas" },
+  { title: "Suporte da Rede", desc: "Chamados abertos pelas unidades.", icon: LifeBuoy, ready: true, to: "/admin/licenciados/suporte" },
   { title: "Treinamentos", desc: "Capacitação de licenciados e equipes.", icon: Trophy, ready: true, to: "/admin/treinamentos" },
   { title: "Financeiro da Rede", desc: "Faturamento e repasses dos licenciados.", icon: DollarSign, ready: false },
   { title: "Fechamentos e NF", desc: "Fechamento mensal por unidade e notas fiscais.", icon: FileSpreadsheet, ready: false },
@@ -106,7 +108,8 @@ export default function AdminLicenciados() {
     setLoading(true);
     const { data, error } = await supabase.from("contas_comerciais").select("*").order("nome");
     if (error) toast({ title: "Erro ao carregar unidades", description: error.message, variant: "destructive" });
-    setUnits((data ?? []) as any);
+    // A Matriz (ROOT) não é uma unidade da Rede e nunca aparece nesta lista.
+    setUnits(((data ?? []) as any[]).filter((u) => u.id !== ROOT_ACCOUNT_ID && u.tipo_da_conta !== "matriz") as any);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
@@ -130,14 +133,14 @@ export default function AdminLicenciados() {
   }, [units, q, fTipo, fStatus, fUf, fCidade]);
 
   const kpis = useMemo(() => {
-    const polos = units.filter((u) => u.tipo_da_conta !== "matriz");
+    const polos = units;
     const tot = (f: (u: Unidade) => boolean) => polos.filter(f).length;
     const sem = polos.filter((u) => {
       const s = statsFor(u.id);
       return s.leads === 0 && s.preMatriculas === 0 && s.matriculas === 0;
     }).length;
     const soma = (k: "usuarios" | "leads" | "preMatriculas" | "matriculas") =>
-      units.reduce((acc, u) => acc + statsFor(u.id)[k], 0);
+      polos.reduce((acc, u) => acc + statsFor(u.id)[k], 0);
     return {
       unidades: polos.length,
       licenciados: tot((u) => u.tipo_da_conta === "licenciado"),

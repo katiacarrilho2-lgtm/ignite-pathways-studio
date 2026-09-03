@@ -24,14 +24,14 @@ export default function AdminLicenciadoDetalhe() {
     (async () => {
       const [{ data: unit }, { data: team }, { data: enr }, { data: apps }] = await Promise.all([
         supabase.from("contas_comerciais").select("*").eq("id", id).maybeSingle(),
-        supabase.from("profiles").select("user_id,display_name,username,cargo,ativo").eq("account_id", id).order("username"),
-        supabase.from("enrollments").select("id,status,enrolled_at,course_id").eq("account_id", id).order("enrolled_at", { ascending: false }).limit(20),
-        supabase.from("enrollment_applications").select("id,full_name,course_title,status,created_at").eq("account_id", id).order("created_at", { ascending: false }).limit(20),
+        supabase.rpc("rede_equipe", { _account: id }),
+        supabase.rpc("rede_matriculas", { _account: id }),
+        supabase.rpc("rede_pre_matriculas", { _account: id }),
       ]);
       setU((unit ?? null) as any);
-      setEquipe(team ?? []);
-      setMatriculas(enr ?? []);
-      setAtividade(apps ?? []);
+      setEquipe((team ?? []) as any);
+      setMatriculas(((enr ?? []) as any[]).slice(0, 20));
+      setAtividade(((apps ?? []) as any[]).slice(0, 20));
     })();
   }, [id]);
 
@@ -156,7 +156,7 @@ export default function AdminLicenciadoDetalhe() {
               {matriculas.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma matrícula nesta unidade.</p> : (
                 <ul className="space-y-2 text-sm">{matriculas.map((m) => (
                   <li key={m.id} className="flex justify-between gap-3 border-b border-border/50 pb-1.5">
-                    <span>Matrícula {m.id.slice(0, 8)}</span>
+                    <span>{m.aluno ?? "Aluno"} — {m.curso ?? "Curso"}</span>
                     <span className="text-muted-foreground">{m.status} · {dataBr(m.enrolled_at)}</span>
                   </li>))}
                 </ul>

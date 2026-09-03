@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
+import { usePortalBase } from "@/lib/portal";
 import { buildStudentContractPdf } from "@/lib/contracts/studentContractPdf";
 
 type App = {
@@ -54,6 +55,8 @@ const payLabel = (v: string | null) => v ? ({
 const Inner = () => {
   const { activeAccountId } = useCommercialAccounts();
   const navigate = useNavigate();
+  // No Portal do Polo a ficha é apenas comercial: efetivar matrícula é ação da Matriz.
+  const isPolo = usePortalBase() === "/polo";
   const [list, setList] = useState<App[]>([]);
   const [courses, setCourses] = useState<{ id: string; slug: string; title: string }[]>([]);
   const [q, setQ] = useState("");
@@ -194,6 +197,7 @@ const Inner = () => {
 
   const updateStatus = async (id: string, status: string) => {
     if (status === "matriculado") {
+      if (isPolo) return toast.error("A matrícula definitiva é feita pela Matriz Multplick.");
       const app = list.find(x => x.id === id);
       if (app) {
         if (!app.course_id) return toast.error("Ficha sem curso vinculado — vincule antes de matricular.");
@@ -665,11 +669,11 @@ const Inner = () => {
                 <td className="p-3">
                   <Select value={a.status} onValueChange={v=>updateStatus(a.id, v)}>
                     <SelectTrigger className={`h-7 text-xs w-32 ${statusColor[a.status] ?? ""}`}><SelectValue /></SelectTrigger>
-                    <SelectContent>{STATUS.map(s => <SelectItem key={s.v} value={s.v}>{s.label}</SelectItem>)}</SelectContent>
+                    <SelectContent>{STATUS.filter(s => !isPolo || s.v !== "matriculado").map(s => <SelectItem key={s.v} value={s.v}>{s.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </td>
                 <td className="p-3 text-right whitespace-nowrap">
-                  {isPending(a) && a.course_id && (
+                  {!isPolo && isPending(a) && a.course_id && (
                     <Button size="sm" variant="hero" onClick={() => openMatricular(a)} className="mr-1">
                       <UserPlus className="size-4" /> Matricular
                     </Button>
@@ -698,6 +702,16 @@ const Inner = () => {
           <DialogHeader><DialogTitle>Ficha de pré-matrícula</DialogTitle></DialogHeader>
           {viewing && (
             <div className="space-y-5 text-sm">
+              {isPolo ? (
+                <div className="rounded-xl border border-border bg-secondary/40 p-4">
+                  <div className="font-semibold text-primary flex items-center gap-2">
+                    <UserPlus className="size-4" /> Ficha comercial do Polo
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    A matrícula definitiva, a aprovação e a geração do acesso do aluno são feitas pela Matriz Multplick.
+                  </p>
+                </div>
+              ) : (
               <div className="rounded-xl border-2 border-primary/40 bg-primary/5 p-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <div className="font-semibold text-primary flex items-center gap-2">
@@ -722,6 +736,7 @@ const Inner = () => {
                   <UserPlus className="size-5" /> Matricular aluno agora
                 </Button>
               </div>
+              )}
               <Section title="Acompanhamento (admin)">
                 <div>
                   <Label className="text-xs">Data de entrada do aluno</Label>
@@ -743,7 +758,7 @@ const Inner = () => {
                   <Button size="sm" variant="outline" onClick={() => { setOpen(false); openContract(viewing); }}>
                     <FileSignature className="size-4" /> Gerar contrato
                   </Button>
-                  {isPending(viewing) && viewing.course_id && (
+                  {!isPolo && isPending(viewing) && viewing.course_id && (
                     <Button size="sm" variant="hero" onClick={() => { setOpen(false); openMatricular(viewing); }}>
                       <UserPlus className="size-4" /> Matricular agora
                     </Button>
