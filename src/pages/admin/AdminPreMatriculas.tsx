@@ -54,6 +54,8 @@ const payLabel = (v: string | null) => v ? ({
 const Inner = () => {
   const { activeAccountId } = useCommercialAccounts();
   const navigate = useNavigate();
+  // No Portal do Polo a ficha é apenas comercial: efetivar matrícula é ação da Matriz.
+  const isPolo = usePortalBase() === "/polo";
   const [list, setList] = useState<App[]>([]);
   const [courses, setCourses] = useState<{ id: string; slug: string; title: string }[]>([]);
   const [q, setQ] = useState("");
