@@ -738,11 +738,31 @@ const Inner = () => {
           {viewing && (
             <div className="space-y-5 text-sm">
               {isPolo ? (
-                <div className="rounded-xl border border-border bg-secondary/40 p-4">
+                <div className="rounded-xl border border-border bg-secondary/40 p-4 space-y-2">
                   <div className="font-semibold text-primary flex items-center gap-2">
                     <UserPlus className="size-4" /> Ficha comercial do Polo
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  {viewing.network_review_status && (
+                    <span className={`inline-block px-2 py-1 rounded text-xs font-bold ${NET_STATUS[viewing.network_review_status]?.cls ?? "bg-muted"}`}>
+                      {NET_STATUS[viewing.network_review_status]?.label ?? viewing.network_review_status}
+                    </span>
+                  )}
+                  {viewing.network_review_status === "correcao_solicitada" && (
+                    <div className="rounded-lg border border-rose-300 bg-rose-50 p-3">
+                      <p className="text-xs font-semibold text-rose-900">Mensagem da Multplick</p>
+                      <p className="text-sm text-rose-900 whitespace-pre-wrap">{viewing.network_review_message}</p>
+                      <Button size="sm" className="mt-2" onClick={() => reenviarAnalise(viewing.id)}>
+                        Corrigi os dados — reenviar para análise
+                      </Button>
+                    </div>
+                  )}
+                  {viewing.network_review_status === "matriculada" && (
+                    <p className="text-xs text-emerald-800">
+                      Aluno matriculado pela Matriz: <b>{viewing.full_name}</b> · {viewing.course_title}
+                      {viewing.network_reviewed_at ? ` · ${new Date(viewing.network_reviewed_at).toLocaleDateString("pt-BR")}` : ""}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
                     A matrícula definitiva, a aprovação e a geração do acesso do aluno são feitas pela Matriz Multplick.
                   </p>
                 </div>
