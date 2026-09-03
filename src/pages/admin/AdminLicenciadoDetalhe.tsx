@@ -156,7 +156,7 @@ export default function AdminLicenciadoDetalhe() {
               {matriculas.length === 0 ? <p className="text-sm text-muted-foreground">Nenhuma matrícula nesta unidade.</p> : (
                 <ul className="space-y-2 text-sm">{matriculas.map((m) => (
                   <li key={m.id} className="flex justify-between gap-3 border-b border-border/50 pb-1.5">
-                    <span>Matrícula {m.id.slice(0, 8)}</span>
+                    <span>{m.aluno ?? "Aluno"} — {m.curso ?? "Curso"}</span>
                     <span className="text-muted-foreground">{m.status} · {dataBr(m.enrolled_at)}</span>
                   </li>))}
                 </ul>
