@@ -62,9 +62,9 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  useEffect(() => { if (canSee) load(); }, [canSee]);
+  useEffect(() => { if (canSee && !loadingAccounts) load(); }, [canSee, loadingAccounts, activeAccountId, isPolo]);
 
-  const kpis: Kpi[] = [
+  const allKpis: Kpi[] = [
     { key: "novosLeads", label: "Novos leads", value: k.novosLeads ?? 0, icon: UserPlus, to: `${base}/crm`, tone: "text-primary bg-primary/10" },
     { key: "semResposta", label: "Leads sem resposta", value: k.semResposta ?? 0, icon: MessageSquareWarning, to: `${base}/crm`, tone: "text-amber-600 bg-amber-500/10" },
     { key: "matriculas", label: "Matrículas", value: k.matriculas ?? 0, icon: GraduationCap, to: `${base}/alunos`, tone: "text-emerald-600 bg-emerald-500/10" },
