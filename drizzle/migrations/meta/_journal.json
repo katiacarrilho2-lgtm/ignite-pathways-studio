@@ -64,6 +64,13 @@
       "when": 1788462415630,
       "tag": "0008_polo_regras_comerciais",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788487798369,
+      "tag": "0009_rede_criativos_visibilidade",
+      "breakpoints": true
     }
   ]
 }
