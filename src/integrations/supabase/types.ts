@@ -1591,12 +1591,15 @@ export type Database = {
           has_teacher_manual: boolean
           id: string
           image_url: string | null
+          is_treinamento: boolean
           live_label: string | null
           live_url: string | null
           long_description: string | null
           passing_score: number
           price_cents: number | null
           published: boolean
+          rede_account_id: string | null
+          rede_publico: string
           slug: string
           sort_order: number
           teacher_manual_image_url: string | null
@@ -1616,12 +1619,15 @@ export type Database = {
           has_teacher_manual?: boolean
           id?: string
           image_url?: string | null
+          is_treinamento?: boolean
           live_label?: string | null
           live_url?: string | null
           long_description?: string | null
           passing_score?: number
           price_cents?: number | null
           published?: boolean
+          rede_account_id?: string | null
+          rede_publico?: string
           slug: string
           sort_order?: number
           teacher_manual_image_url?: string | null
@@ -1641,12 +1647,15 @@ export type Database = {
           has_teacher_manual?: boolean
           id?: string
           image_url?: string | null
+          is_treinamento?: boolean
           live_label?: string | null
           live_url?: string | null
           long_description?: string | null
           passing_score?: number
           price_cents?: number | null
           published?: boolean
+          rede_account_id?: string | null
+          rede_publico?: string
           slug?: string
           sort_order?: number
           teacher_manual_image_url?: string | null
@@ -1659,6 +1668,13 @@ export type Database = {
             columns: ["categoria_id"]
             isOneToOne: false
             referencedRelation: "course_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_rede_account_id_fkey"
+            columns: ["rede_account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
             referencedColumns: ["id"]
           },
         ]
@@ -3288,6 +3304,7 @@ export type Database = {
       mkt_assets: {
         Row: {
           campaign_id: string | null
+          copy_texto: string | null
           created_at: string
           created_by: string | null
           file_path: string | null
@@ -3299,6 +3316,9 @@ export type Database = {
           observacoes: string | null
           original_name: string | null
           pasta: string
+          rede_account_id: string | null
+          rede_publico: string
+          rede_visivel: boolean
           size_bytes: number | null
           tags: string[]
           tipo: string
@@ -3307,6 +3327,7 @@ export type Database = {
         }
         Insert: {
           campaign_id?: string | null
+          copy_texto?: string | null
           created_at?: string
           created_by?: string | null
           file_path?: string | null
@@ -3318,6 +3339,9 @@ export type Database = {
           observacoes?: string | null
           original_name?: string | null
           pasta?: string
+          rede_account_id?: string | null
+          rede_publico?: string
+          rede_visivel?: boolean
           size_bytes?: number | null
           tags?: string[]
           tipo?: string
@@ -3326,6 +3350,7 @@ export type Database = {
         }
         Update: {
           campaign_id?: string | null
+          copy_texto?: string | null
           created_at?: string
           created_by?: string | null
           file_path?: string | null
@@ -3337,6 +3362,9 @@ export type Database = {
           observacoes?: string | null
           original_name?: string | null
           pasta?: string
+          rede_account_id?: string | null
+          rede_publico?: string
+          rede_visivel?: boolean
           size_bytes?: number | null
           tags?: string[]
           tipo?: string
@@ -3356,6 +3384,13 @@ export type Database = {
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "mkt_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mkt_assets_rede_account_id_fkey"
+            columns: ["rede_account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
             referencedColumns: ["id"]
           },
         ]
@@ -4704,6 +4739,7 @@ export type Database = {
         Returns: boolean
       }
       is_master: { Args: { _user_id: string }; Returns: boolean }
+      is_matriz_staff: { Args: { _uid: string }; Returns: boolean }
       is_network_master: { Args: { _uid?: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       lead_bank_get_crm_statuses: {
@@ -4733,6 +4769,14 @@ export type Database = {
       lead_bank_send_to_crm: {
         Args: { _lead_bank_id: string; _owner_id: string }
         Returns: Json
+      }
+      mkt_asset_liberado: {
+        Args: { _asset_id: string; _uid: string }
+        Returns: boolean
+      }
+      mkt_path_liberado: {
+        Args: { _path: string; _uid: string }
+        Returns: boolean
       }
       next_username: { Args: never; Returns: string }
       notify_account_users: {
@@ -4839,6 +4883,7 @@ export type Database = {
           status: string
         }[]
       }
+      rede_publico_do_usuario: { Args: { _uid: string }; Returns: string }
       rede_review_pre_matricula: {
         Args: { _action: string; _id: string; _message?: string }
         Returns: Json
