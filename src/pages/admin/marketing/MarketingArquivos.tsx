@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import {
@@ -36,7 +38,20 @@ type Asset = {
   observacoes: string | null;
   created_by: string | null;
   created_at: string;
+  rede_visivel: boolean;
+  rede_publico: string;
+  rede_account_id: string | null;
+  copy_texto: string | null;
 };
+
+type Unidade = { id: string; nome: string };
+
+const PUBLICOS = [
+  { id: "todos", label: "Todos da Rede" },
+  { id: "licenciados", label: "Licenciados" },
+  { id: "revendedores", label: "Revendedores" },
+  { id: "polo", label: "Polo específico" },
+];
 
 type UploadItem = { name: string; size: number; progress: number; status: "aguardando" | "enviando" | "ok" | "erro"; error?: string };
 
@@ -99,15 +114,19 @@ export default function MarketingArquivos() {
   const [renameAsset, setRenameAsset] = useState<Asset | null>(null);
   const [moveAsset, setMoveAsset] = useState<Asset | null>(null);
   const [moveDest, setMoveDest] = useState<string>("");
+  const [unidades, setUnidades] = useState<Unidade[]>([]);
+  const [redeAsset, setRedeAsset] = useState<Asset | null>(null);
   const [viewer, setViewer] = useState<Asset | null>(null);
   const [viewerUrl, setViewerUrl] = useState<string>("");
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [{ data: f }, { data: a }] = await Promise.all([
+    const [{ data: f }, { data: a }, { data: u }] = await Promise.all([
       supabase.from("mkt_folders").select("*").order("sort_order").order("name"),
       supabase.from("mkt_assets").select("*").order("created_at", { ascending: false }),
+      supabase.from("contas_comerciais").select("id,nome").neq("tipo_da_conta", "matriz").order("nome"),
     ]);
+    setUnidades((u ?? []) as Unidade[]);
     const rows = ((a ?? []) as any[]).map((r) => ({ ...r, tags: r.tags ?? [] })) as Asset[];
     setFolders((f ?? []) as Folder[]);
     setAssets(rows);
@@ -289,6 +308,22 @@ export default function MarketingArquivos() {
     load();
   }
 
+  async function salvarRede() {
+    if (!redeAsset) return;
+    if (redeAsset.rede_visivel && redeAsset.rede_publico === "polo" && !redeAsset.rede_account_id)
+      return toast.error("Escolha o polo específico");
+    const { error } = await supabase.from("mkt_assets").update({
+      rede_visivel: redeAsset.rede_visivel,
+      rede_publico: redeAsset.rede_publico,
+      rede_account_id: redeAsset.rede_publico === "polo" ? redeAsset.rede_account_id : null,
+      copy_texto: redeAsset.copy_texto?.trim() || null,
+    }).eq("id", redeAsset.id);
+    if (error) return toast.error(error.message);
+    setRedeAsset(null);
+    toast.success("Visibilidade da Rede atualizada");
+    load();
+  }
+
   async function salvarMove() {
     if (!moveAsset || !moveDest) return;
     const dest = folders.find((f) => f.id === moveDest);
@@ -321,6 +356,7 @@ export default function MarketingArquivos() {
             <span onClick={(e) => { e.stopPropagation(); abrirViewer(a); }} className="rounded-md bg-background/90 p-1.5" title="Visualizar"><Eye className="size-4" /></span>
             <span onClick={(e) => { e.stopPropagation(); baixar(a); }} className="rounded-md bg-background/90 p-1.5" title="Baixar"><Download className="size-4" /></span>
             <span onClick={(e) => { e.stopPropagation(); setMoveAsset(a); setMoveDest(a.folder_id ?? ""); }} className="rounded-md bg-background/90 p-1.5" title="Mover"><FolderInput className="size-4" /></span>
+            <span onClick={(e) => { e.stopPropagation(); setRedeAsset({ ...a }); }} className="rounded-md bg-background/90 p-1.5" title="Visibilidade na Rede"><Share2 className="size-4" /></span>
             <span onClick={(e) => { e.stopPropagation(); setRenameAsset({ ...a }); }} className="rounded-md bg-background/90 p-1.5" title="Renomear"><Pencil className="size-4" /></span>
             <span onClick={(e) => { e.stopPropagation(); setConfirmAsset(a); }} className="rounded-md bg-background/90 p-1.5 text-destructive" title="Excluir"><Trash2 className="size-4" /></span>
           </span>
@@ -335,6 +371,7 @@ export default function MarketingArquivos() {
         </div>
         <div className="flex items-center gap-1.5 flex-wrap">
           <Badge variant="secondary" className="text-[10px]">{a.pasta}</Badge>
+          {a.rede_visivel && <Badge className="text-[10px]">Rede</Badge>}
           <span className="text-[10px] text-muted-foreground">{humanSize(a.size_bytes)}</span>
         </div>
         <p className="text-[10px] text-muted-foreground truncate">
@@ -522,6 +559,54 @@ export default function MarketingArquivos() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setRenameAsset(null)}>Cancelar</Button>
             <Button onClick={salvarRename}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Visibilidade na Rede */}
+      <Dialog open={!!redeAsset} onOpenChange={(o) => !o && setRedeAsset(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Disponibilizar para a Rede Multplick</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between rounded-md border border-border p-3">
+              <div>
+                <p className="text-sm font-medium">Disponível para a Rede</p>
+                <p className="text-xs text-muted-foreground">Quando desligado, o material fica interno da Matriz.</p>
+              </div>
+              <Switch checked={!!redeAsset?.rede_visivel}
+                onCheckedChange={(v) => setRedeAsset((s) => s ? { ...s, rede_visivel: v } : s)} />
+            </div>
+            {redeAsset?.rede_visivel && (
+              <>
+                <div className="space-y-1.5">
+                  <Label>Público</Label>
+                  <Select value={redeAsset.rede_publico}
+                    onValueChange={(v) => setRedeAsset((s) => s ? { ...s, rede_publico: v } : s)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{PUBLICOS.map((p) => <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                {redeAsset.rede_publico === "polo" && (
+                  <div className="space-y-1.5">
+                    <Label>Polo</Label>
+                    <Select value={redeAsset.rede_account_id ?? ""}
+                      onValueChange={(v) => setRedeAsset((s) => s ? { ...s, rede_account_id: v } : s)}>
+                      <SelectTrigger><SelectValue placeholder="Escolha a unidade" /></SelectTrigger>
+                      <SelectContent>{unidades.map((u) => <SelectItem key={u.id} value={u.id}>{u.nome}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  <Label>Copy / texto sugerido (opcional)</Label>
+                  <Textarea rows={4} value={redeAsset.copy_texto ?? ""}
+                    onChange={(e) => setRedeAsset((s) => s ? { ...s, copy_texto: e.target.value } : s)} />
+                </div>
+              </>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRedeAsset(null)}>Cancelar</Button>
+            <Button onClick={salvarRede}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
