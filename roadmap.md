@@ -50,3 +50,5 @@
 - Matricular reaproveita o fluxo da Matriz (troca de contexto para o Polo + `/admin/pre-matriculas`).
 
 - [x] Etapa 5A — Regras comerciais (polo_regras) + visão comercial do Polo (recebido/elegível/repasse previsto). Etapa 6 (fechamento, NF, pagamento dia 15, InfinitePay) NÃO iniciada.
+
+- [x] Bugfix: redirecionamento de login por account_id (Polo -> /polo), bloqueio de /admin para Polo e Dashboard do Polo escopado por conta.
