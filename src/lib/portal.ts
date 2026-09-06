@@ -14,7 +14,7 @@ export const POLO_ALLOWED_PATHS = [
   "", "agenda", "crm", "leads", "pre-matriculas", "afiliados", "meu-afiliado",
   "turmas", "chamada", "pedagogico/ocorrencias", "alunos",
   "financeiro", "relatorios/pagamentos", "usuarios", "cargos",
-  "documentos-links", "mensagens", "suporte", "treinamentos",
+  "criativos", "documentos-links", "mensagens", "suporte", "treinamentos",
   "escola-fisica", "almoxarifado", "solicitacoes", "documentos-internos",
 ];
 
