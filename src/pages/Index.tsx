@@ -84,33 +84,27 @@ const Index = () => {
             <span
               className="inline-flex items-center gap-2 rounded-full border border-primary-glow/30 bg-primary-glow/5 backdrop-blur px-4 py-1.5 text-[10px] font-semibold tracking-[0.3em] uppercase text-primary-glow mb-8 animate-fade-up opacity-0 [animation-fill-mode:forwards] [animation-delay:0ms]"
             >
-              <Sparkles className="size-3.5" /> Solução corporativa de capacitação
+              <Sparkles className="size-3.5" /> {home.hero_badge}
             </span>
             <h1 className="text-2xl md:text-[2.35rem] font-semibold leading-[1.1] tracking-tight text-left animate-fade-up opacity-0 [animation-fill-mode:forwards] [animation-delay:120ms]">
-              A solução completa em
+              {home.hero_title_1}
               <br />
               <span className="bg-gradient-to-r from-primary-glow to-[hsl(195_90%_65%)] bg-clip-text text-transparent font-bold">
-                formação profissional
+                {home.hero_title_highlight}
               </span>
               <br />
-              para empresas e alunos.
+              {home.hero_title_2}
             </h1>
-            <p className="mt-5 text-sm md:text-[0.95rem] text-primary-foreground/75 max-w-md leading-relaxed animate-fade-up opacity-0 [animation-fill-mode:forwards] [animation-delay:260ms]">
-              Cursos técnicos, graduações,
-              <br />
-              pós-graduações, EJA, NRs e treinamentos
-              <br />
-              in company com valores acessíveis e
-              <br />
-              atendimento especializado em todo o Brasil.
+            <p className="mt-5 text-sm md:text-[0.95rem] text-primary-foreground/75 max-w-md leading-relaxed whitespace-pre-line animate-fade-up opacity-0 [animation-fill-mode:forwards] [animation-delay:260ms]">
+              {home.hero_subtitle}
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3 animate-fade-up opacity-0 [animation-fill-mode:forwards] [animation-delay:380ms]">
               <Button asChild size="lg" variant="hero" className="h-12 px-7 text-sm">
-                <Link to="/empresas">Solicitar Convênio <ArrowRight className="size-4" /></Link>
+                <Link to={home.hero_cta1_href}>{home.hero_cta1_label} <ArrowRight className="size-4" /></Link>
               </Button>
               <Button asChild size="lg" variant="silver" className="h-12 px-7 text-sm">
-                <Link to="/cursos">Ver Catálogo</Link>
+                <Link to={home.hero_cta2_href}>{home.hero_cta2_label}</Link>
               </Button>
             </div>
 
