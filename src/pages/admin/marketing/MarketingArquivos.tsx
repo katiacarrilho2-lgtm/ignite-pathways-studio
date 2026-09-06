@@ -17,7 +17,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
   Loader2, Upload, Trash2, Download, Folder, FolderPlus, Search, Pencil, Star, Eye,
-  MoreVertical, FileText, FileVideo, FileImage, File as FileIcon, ArrowLeft, Link2, FolderInput, CheckCircle2, XCircle,
+  Share2, MoreVertical, FileText, FileVideo, FileImage, File as FileIcon, ArrowLeft, Link2, FolderInput, CheckCircle2, XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 

@@ -4,7 +4,7 @@ import {
   LayoutDashboard, CalendarDays, Kanban, Inbox, ClipboardList, Share2, Users2,
   CalendarCheck, AlertTriangle, DollarSign, FileBarChart, Users, Link as LinkIcon,
   MessageSquare, LifeBuoy, Trophy, Building2, Boxes, Inbox as InboxIcon, FolderLock,
-  Menu, LogOut, ExternalLink, Eye, X,
+  Menu, LogOut, ExternalLink, Eye, X, Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -57,6 +57,7 @@ const groups: Group[] = [
       { to: "/polo/documentos-links", label: "Links de Documentos", icon: LinkIcon, mod: "mod_documentos_links" },
       { to: "/polo/mensagens", label: "Mensagens", icon: MessageSquare, mod: "mod_mensagens" },
       { to: "/polo/suporte", label: "Suporte", icon: LifeBuoy, mod: "mod_suporte" },
+      { to: "/polo/criativos", label: "Criativos", icon: ImageIcon },
       { to: "/polo/treinamentos", label: "Treinamentos", icon: Trophy, mod: "mod_treinamentos" },
     ],
   },
