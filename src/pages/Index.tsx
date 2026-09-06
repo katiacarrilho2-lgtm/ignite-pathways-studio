@@ -196,21 +196,24 @@ const Index = () => {
       <section className="py-24 bg-background">
         <div className="container">
           <SectionHeader
-            eyebrow="Por que Multplick"
-            title="Solução completa em formação profissional"
-            subtitle="Conectamos empresas e alunos a uma estrutura educacional robusta, com método prático e acompanhamento real."
+            eyebrow={home.diff_eyebrow}
+            title={home.diff_title}
+            subtitle={home.diff_subtitle}
             center
           />
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {differentials.map((d) => (
+            {differentials.map((d) => {
+              const Icon = ICONS[d.icon] ?? HardHat;
+              return (
               <div key={d.title} className="group p-8 rounded-2xl bg-card border border-border/60 shadow-card-soft hover:shadow-elegant hover:-translate-y-1 transition-smooth">
                 <div className="size-12 rounded-xl bg-primary-gradient text-primary-foreground grid place-items-center mb-5 group-hover:scale-110 transition-smooth">
-                  <d.icon className="size-6" />
+                  <Icon className="size-6" />
                 </div>
                 <h3 className="font-bold text-lg text-primary mb-2">{d.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{d.text}</p>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
