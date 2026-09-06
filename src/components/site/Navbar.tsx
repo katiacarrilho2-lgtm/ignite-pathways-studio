@@ -1,7 +1,8 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Menu, X, GraduationCap } from "lucide-react";
-import logo from "@/assets/multplick-logo.png";
+import defaultLogo from "@/assets/multplick-logo.png";
+import { useSiteIdentity } from "./SiteTheme";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -24,6 +25,8 @@ export const Navbar = () => {
   const { pathname } = useLocation();
   const { user, isStaff } = useAuth();
   const areaHref = user ? (isStaff ? "/admin" : "/aluno") : "/aluno/login";
+  const logo = useSiteIdentity().logo_url || defaultLogo;
+
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);

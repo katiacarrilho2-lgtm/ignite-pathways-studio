@@ -71,6 +71,20 @@
       "when": 1788487798369,
       "tag": "0009_rede_criativos_visibilidade",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788714903935,
+      "tag": "0010_create_site_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788714946110,
+      "tag": "0011_site_settings_draft_privacy",
+      "breakpoints": true
     }
   ]
 }

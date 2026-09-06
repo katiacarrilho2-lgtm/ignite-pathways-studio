@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -33,7 +33,7 @@ import AdminTurmas from "./pages/admin/AdminTurmas.tsx";
 import AdminCursoBuilder from "./pages/admin/AdminCursoBuilder.tsx";
 import AdminCursoPreview from "./pages/admin/AdminCursoPreview.tsx";
 import AdminCursoIA from "./pages/admin/AdminCursoIA.tsx";
-import AdminAndamento from "./pages/admin/AdminAndamento.tsx";
+import AdminSiteConfig from "./pages/admin/AdminSiteConfig.tsx";
 import AdminCorporativo from "./pages/admin/AdminCorporativo.tsx";
 import AdminLicenciados from "./pages/admin/AdminLicenciados.tsx";
 import AdminLicenciadoDetalhe from "./pages/admin/AdminLicenciadoDetalhe.tsx";
@@ -231,7 +231,8 @@ const App = () => (
               <Route path="documentos-links" element={<AdminDocumentosLinks />} />
               <Route path="cursos/:courseId/conteudo" element={<AdminCursoBuilder />} />
               <Route path="cursos/:courseId/preview" element={<AdminCursoPreview />} />
-              <Route path="andamento" element={<AdminAndamento />} />
+              <Route path="site" element={<AdminSiteConfig />} />
+              <Route path="andamento" element={<Navigate to="/admin/site" replace />} />
               <Route path="corporativo" element={<AdminCorporativo />} />
               <Route path="corporativo/crm" element={<CorpCrm />} />
               <Route path="corporativo/propostas" element={<AdminCorpPropostas />} />

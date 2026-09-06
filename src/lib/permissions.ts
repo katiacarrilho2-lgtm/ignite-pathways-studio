@@ -42,7 +42,7 @@ export const PERMISSION_GROUPS: PermGroup[] = [
       { id: "mod_cursos", label: "Cursos" },
       { id: "mod_cursos_ia", label: "Gerar Curso com IA" },
       { id: "mod_categorias", label: "Categorias" },
-      { id: "mod_andamento", label: "Andamento das turmas" },
+      { id: "mod_andamento", label: "Configurações do site" },
       { id: "mod_treinamentos", label: "Treinamentos internos" },
       { id: "manage_courses", label: "Ação: gerenciar cursos" },
     ],

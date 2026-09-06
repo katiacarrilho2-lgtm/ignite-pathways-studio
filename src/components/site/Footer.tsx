@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, ShieldCheck } from "lucide-react";
-import logo from "@/assets/multplick-logo.png";
+import defaultLogo from "@/assets/multplick-logo.png";
+import { useSiteIdentity } from "./SiteTheme";
 
 export const Footer = () => (
   <footer className="bg-primary text-primary-foreground mt-24">
     <div className="container py-16 grid gap-10 md:grid-cols-4">
       <div className="space-y-4">
         <div className="bg-white rounded-lg p-4 inline-block shadow-elegant">
-          <img src={logo} alt="Multplick" className="h-14 w-auto" />
+          <img src={useSiteIdentity().logo_url || defaultLogo} alt="Multplick" className="h-14 w-auto" />
         </div>
         <p className="text-sm text-primary-foreground/80 max-w-xs">
           Formação profissional com soluções reais para empresas e alunos.
