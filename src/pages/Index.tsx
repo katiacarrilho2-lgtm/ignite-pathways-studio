@@ -12,30 +12,23 @@ import { PromoCarousel } from "@/components/site/PromoCarousel";
 import { PartnersSection } from "@/components/site/PartnersSection";
 import { EjaConejapBanner } from "@/components/site/EjaConejapBanner";
 
-const stats = [
-  { end: 10000, suffix: "+", label: "Alunos formados" },
-  { end: 200, suffix: "+", label: "Empresas atendidas" },
-  { end: 500, suffix: "+", label: "Treinamentos realizados" },
-  { end: 0, label: "Atendimento nacional", custom: "BR" },
-];
-
-const differentials = [
-  { icon: HardHat, title: "Treinamento in loco", text: "Nossos professores vão até sua empresa e atuam dentro da operação até o fim do treinamento." },
-  { icon: ShieldCheck, title: "Normas Regulamentadoras", text: "Capacitações em NR-10, NR-33, NR-35 e demais NRs com certificação reconhecida." },
-  { icon: GraduationCap, title: "Parcerias acadêmicas", text: "Faculdades, escolas técnicas, graduação, pós-graduação e EJA com mensalidades acessíveis." },
-  { icon: Building2, title: "Convênios empresariais", text: "Descontos exclusivos e turmas customizadas para colaboradores e seus dependentes." },
-];
+const ICONS: Record<string, typeof HardHat> = {
+  HardHat, ShieldCheck, GraduationCap, Building2, Award, Users, Briefcase, Sparkles,
+};
 
 const Index = () => {
   const { courses: featuredAll } = useCourses({ featuredOnly: true, limit: 6 });
   const { courses: anyCourses } = useCourses({ limit: 6 });
   const featured = featuredAll.length ? featuredAll : anyCourses;
+  const { value: home } = useSiteSection<HomeSettings>(SECTION_HOME, HOME_DEFAULTS);
+  const stats = home.stats ?? HOME_DEFAULTS.stats;
+  const differentials = home.differentials ?? HOME_DEFAULTS.differentials;
   return (
     <>
       {/* Hero */}
       <section className="relative min-h-[92vh] flex items-center overflow-hidden">
         <img
-          src={hero}
+          src={home.hero_image_url || hero}
           alt="Treinamento industrial Multplick com profissionais usando EPI dentro de uma planta industrial"
           width={1920}
           height={1080}
