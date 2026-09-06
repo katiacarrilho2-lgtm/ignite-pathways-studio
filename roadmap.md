@@ -52,3 +52,12 @@
 - [x] Etapa 5A — Regras comerciais (polo_regras) + visão comercial do Polo (recebido/elegível/repasse previsto). Etapa 6 (fechamento, NF, pagamento dia 15, InfinitePay) NÃO iniciada.
 
 - [x] Bugfix: redirecionamento de login por account_id (Polo -> /polo), bloqueio de /admin para Polo e Dashboard do Polo escopado por conta.
+
+## Etapa 7 — Criativos da Rede (concluída)
+- Migração `0009_rede_criativos_visibilidade.sql`: `mkt_assets.rede_visivel/rede_publico/rede_account_id/copy_texto`, helpers `is_matriz_staff`, `rede_publico_do_usuario`, `mkt_asset_liberado`, `mkt_path_liberado`; RLS de mkt_assets/mkt_folders e storage `marketing-files` (Matriz administra, Polo só lê o liberado).
+- `MarketingArquivos.tsx`: diálogo "Disponibilizar para a Rede" (sim/não, público, polo específico, copy).
+- `/polo/criativos` (`src/pages/polo/PoloCriativos.tsx`): somente leitura — visualizar, baixar, copiar copy.
+- Pendente: módulo Treinamentos ainda é stub; colunas `courses.is_treinamento/rede_publico/rede_account_id` já criadas para o público-alvo quando o módulo for reativado.
+
+## Pendente (aguardando autorização)
+- [ ] Central de Configurações do site (substituir "Andamento"): identidade visual, fontes, hero, banners, textos, seções da home, menu, rodapé, biblioteca de mídia, rascunho/publicar.
