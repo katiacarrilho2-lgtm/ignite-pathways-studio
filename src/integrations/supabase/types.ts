@@ -4287,6 +4287,33 @@ export type Database = {
           },
         ]
       }
+      site_settings: {
+        Row: {
+          draft: Json
+          published: Json
+          published_at: string | null
+          section: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          draft?: Json
+          published?: Json
+          published_at?: string | null
+          section: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          draft?: Json
+          published?: Json
+          published_at?: string | null
+          section?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       student_documents: {
         Row: {
           created_at: string

@@ -61,3 +61,4 @@
 
 ## Pendente (aguardando autorização)
 - [ ] Central de Configurações do site (substituir "Andamento"): identidade visual, fontes, hero, banners, textos, seções da home, menu, rodapé, biblioteca de mídia, rascunho/publicar.
+- Configurações do site: Bloco 1 (identidade) e Bloco 2 (página inicial) concluídos. Próximo: Bloco 3 (textos das páginas, menu e rodapé) e Bloco 4 (mídia/publicação).

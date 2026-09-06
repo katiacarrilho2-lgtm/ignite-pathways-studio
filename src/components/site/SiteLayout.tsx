@@ -3,9 +3,11 @@ import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { WhatsAppFAB } from "./WhatsAppFAB";
 import { Chatbot } from "./Chatbot";
+import { SiteTheme } from "./SiteTheme";
 
 export const SiteLayout = () => (
   <div className="min-h-screen flex flex-col">
+    <SiteTheme />
     <Navbar />
     <main className="flex-1 pt-20">
       <Outlet />
