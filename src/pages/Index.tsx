@@ -11,6 +11,8 @@ import { BrazilMap } from "@/components/site/BrazilMap";
 import { PromoCarousel } from "@/components/site/PromoCarousel";
 import { PartnersSection } from "@/components/site/PartnersSection";
 import { EjaConejapBanner } from "@/components/site/EjaConejapBanner";
+import { useSiteSection } from "@/hooks/useSiteSection";
+import { HOME_DEFAULTS, HomeSettings, SECTION_HOME } from "@/lib/siteSettings";
 
 const ICONS: Record<string, typeof HardHat> = {
   HardHat, ShieldCheck, GraduationCap, Building2, Award, Users, Briefcase, Sparkles,
