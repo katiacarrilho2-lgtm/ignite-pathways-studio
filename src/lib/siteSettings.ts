@@ -109,3 +109,76 @@ export const fetchSection = async <T,>(section: string, fallback: T, mode: "publ
   if (!raw || typeof raw !== "object" || !Object.keys(raw).length) return fallback;
   return { ...fallback, ...(raw as object) } as T;
 };
+
+/* ---------------------------------------------------------------- Home ---- */
+
+export const SECTION_HOME = "home";
+
+export type StatItem = { end: number; suffix: string; label: string; custom?: string };
+export type DiffItem = { icon: string; title: string; text: string };
+
+export type HomeSettings = {
+  hero_image_url: string;
+  hero_badge: string;
+  hero_title_1: string;
+  hero_title_highlight: string;
+  hero_title_2: string;
+  hero_subtitle: string;
+  hero_cta1_label: string;
+  hero_cta1_href: string;
+  hero_cta2_label: string;
+  hero_cta2_href: string;
+  stats: StatItem[];
+  diff_eyebrow: string;
+  diff_title: string;
+  diff_subtitle: string;
+  differentials: DiffItem[];
+  show_sistec: boolean;
+  show_eja: boolean;
+  show_carrossel: boolean;
+  show_destaques: boolean;
+  show_incompany: boolean;
+  show_cta: boolean;
+  show_mapa: boolean;
+  show_parceiros: boolean;
+};
+
+export const HOME_DEFAULTS: HomeSettings = {
+  hero_image_url: "",
+  hero_badge: "Solução corporativa de capacitação",
+  hero_title_1: "A solução completa em",
+  hero_title_highlight: "formação profissional",
+  hero_title_2: "para empresas e alunos.",
+  hero_subtitle:
+    "Cursos técnicos, graduações,\npós-graduações, EJA, NRs e treinamentos\nin company com valores acessíveis e\natendimento especializado em todo o Brasil.",
+  hero_cta1_label: "Solicitar Convênio",
+  hero_cta1_href: "/empresas",
+  hero_cta2_label: "Ver Catálogo",
+  hero_cta2_href: "/cursos",
+  stats: [
+    { end: 10000, suffix: "+", label: "Alunos formados" },
+    { end: 200, suffix: "+", label: "Empresas atendidas" },
+    { end: 500, suffix: "+", label: "Treinamentos realizados" },
+    { end: 0, suffix: "", label: "Atendimento nacional", custom: "BR" },
+  ],
+  diff_eyebrow: "Por que Multplick",
+  diff_title: "Solução completa em formação profissional",
+  diff_subtitle:
+    "Conectamos empresas e alunos a uma estrutura educacional robusta, com método prático e acompanhamento real.",
+  differentials: [
+    { icon: "HardHat", title: "Treinamento in loco", text: "Nossos professores vão até sua empresa e atuam dentro da operação até o fim do treinamento." },
+    { icon: "ShieldCheck", title: "Normas Regulamentadoras", text: "Capacitações em NR-10, NR-33, NR-35 e demais NRs com certificação reconhecida." },
+    { icon: "GraduationCap", title: "Parcerias acadêmicas", text: "Faculdades, escolas técnicas, graduação, pós-graduação e EJA com mensalidades acessíveis." },
+    { icon: "Building2", title: "Convênios empresariais", text: "Descontos exclusivos e turmas customizadas para colaboradores e seus dependentes." },
+  ],
+  show_sistec: true,
+  show_eja: true,
+  show_carrossel: true,
+  show_destaques: true,
+  show_incompany: true,
+  show_cta: true,
+  show_mapa: true,
+  show_parceiros: true,
+};
+
+export const DIFF_ICONS = ["HardHat", "ShieldCheck", "GraduationCap", "Building2", "Award", "Users", "Briefcase", "Sparkles"];
