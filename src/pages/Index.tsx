@@ -213,6 +213,7 @@ const Index = () => {
       </section>
 
       {/* SISTEC validation banner */}
+      {home.show_sistec && (
       <section className="py-12 bg-background">
         <div className="container">
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary to-[hsl(215_70%_18%)] text-primary-foreground p-8 md:p-12 shadow-elegant">
@@ -248,14 +249,16 @@ const Index = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* EJA · Conejap banner */}
-      <EjaConejapBanner />
+      {home.show_eja && <EjaConejapBanner />}
 
       {/* Promotional carousel */}
-      <PromoCarousel />
+      {home.show_carrossel && <PromoCarousel />}
 
       {/* Featured courses */}
+      {home.show_destaques && (
       <section className="py-24 bg-secondary/40">
         <div className="container">
           <div className="flex items-end justify-between flex-wrap gap-6 mb-12">
@@ -269,8 +272,10 @@ const Index = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* In company CTA */}
+      {home.show_incompany && (
       <section className="py-24 bg-background">
         <div className="container grid lg:grid-cols-2 gap-12 items-center">
           <div className="relative">
@@ -305,8 +310,10 @@ const Index = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA strip */}
+      {home.show_cta && (
       <section className="py-20 bg-hero-gradient text-primary-foreground">
         <div className="container text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-balance">Pronto para multiplicar resultados?</h2>
@@ -321,8 +328,10 @@ const Index = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Brazil presence map */}
+      {home.show_mapa && (
       <section className="py-24 bg-[hsl(220_70%_8%)] text-primary-foreground overflow-hidden">
         <div className="container">
           <div className="mb-12 text-center mx-auto max-w-2xl">
@@ -333,9 +342,10 @@ const Index = () => {
           <BrazilMap />
         </div>
       </section>
+      )}
 
       {/* Partners */}
-      <PartnersSection />
+      {home.show_parceiros && <PartnersSection />}
     </>
   );
 };
