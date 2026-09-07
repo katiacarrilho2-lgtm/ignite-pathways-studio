@@ -392,7 +392,16 @@ export const CONTATO_DEFAULTS: PageSettings = {
   hero_title: "Vamos conversar?",
   hero_description: "Tire suas dúvidas, solicite informações de cursos ou fale com nossa equipe corporativa.",
   blocks: [
-    { id: "cont_form", kind: "slot", visible: true, slot: "form", slot_label: "Formulário de contato + cartões", items: [] },
+    { id: "cont_form", kind: "slot", visible: true, slot: "form", slot_label: "Formulário de contato", items: [] },
+    {
+      id: "cont_cards", kind: "contacts", visible: true, bg: "none",
+      items: [
+        { icon: "Phone", title: "Telefone", text: "(18) 99684-1902", href: "tel:+5518996841902" },
+        { icon: "MessageCircle", title: "WhatsApp", text: "(18) 99684-1902", href: "https://wa.me/5518996841902" },
+        { icon: "Mail", title: "E-mail", text: "contato@multplick.com.br" },
+        { icon: "MapPin", title: "Endereço", text: "Atendimento nacional" },
+      ],
+    },
     {
       id: "cont_mapa", kind: "map", visible: true, bg: "none",
       body: "https://www.openstreetmap.org/export/embed.html?bbox=-46.7,-23.7,-46.5,-23.5&layer=mapnik",
