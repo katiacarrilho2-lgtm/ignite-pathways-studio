@@ -1,3 +1,6 @@
+import { SiteBlocks } from "@/components/site/SiteBlocks";
+import { useSiteSection } from "@/hooks/useSiteSection";
+import { PAGE_SECTIONS, COMPETENCIA_DEFAULTS, PageSettings } from "@/lib/siteSettings";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -181,6 +184,7 @@ const planosRegular = [
 ];
 
 const CursoPorCompetencia = () => {
+  const { value: site } = useSiteSection<PageSettings>(PAGE_SECTIONS.competencia, COMPETENCIA_DEFAULTS);
   const waMsg = "Olá! Tenho interesse na certificação Técnico por Competência. Pode me ajudar?";
   const [planoTab, setPlanoTab] = useState<"competencia" | "regular">("competencia");
 

@@ -1,3 +1,6 @@
+import { SiteBlocks } from "@/components/site/SiteBlocks";
+import { useSiteSection } from "@/hooks/useSiteSection";
+import { PAGE_SECTIONS, REGULAR_DEFAULTS, PageSettings } from "@/lib/siteSettings";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -175,6 +178,7 @@ const faqs = [
 ];
 
 const CursoRegular = () => {
+  const { value: site } = useSiteSection<PageSettings>(PAGE_SECTIONS.regular, REGULAR_DEFAULTS);
   const waMsg = "Olá! Tenho interesse no Técnico Regular. Pode me ajudar?";
 
   return (

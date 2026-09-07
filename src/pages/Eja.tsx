@@ -89,6 +89,7 @@ const faqs = [
 ];
 
 const Eja = () => {
+  const { value: site } = useSiteSection<PageSettings>(PAGE_SECTIONS.eja, EJA_DEFAULTS);
   const waMsg = "Olá! Tenho interesse no EJA (Ensino Fundamental / Médio) da Multplick. Pode me ajudar?";
 
   // Cupom promocional válido apenas no dia — expira à meia-noite
