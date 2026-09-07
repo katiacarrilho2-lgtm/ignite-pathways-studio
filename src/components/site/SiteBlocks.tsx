@@ -27,6 +27,21 @@ const Wrap = ({ block, children }: { block: PageBlock; children: ReactNode }) =>
     <section className="py-20 container">{children}</section>
   );
 
+const WithImage = ({ block, children }: { block: PageBlock; children: ReactNode }) =>
+  block.image_url ? (
+    <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <img
+        src={block.image_url}
+        alt={block.title || "Multplick"}
+        loading="lazy"
+        className={`rounded-2xl shadow-elegant w-full ${block.image_right ? "lg:order-2" : ""}`}
+      />
+      <div>{children}</div>
+    </div>
+  ) : (
+    <div className="max-w-3xl">{children}</div>
+  );
+
 const gridCols = (n: number) =>
   n <= 2 ? "md:grid-cols-2" : n === 3 ? "md:grid-cols-3" : "md:grid-cols-2 lg:grid-cols-4";
 
@@ -89,8 +104,9 @@ const BlockView = ({ block, slots }: { block: PageBlock; slots?: Record<string, 
     case "list":
       return (
         <Wrap block={b}>
+          <WithImage block={b}>
           {header}
-          <div className="space-y-5 max-w-3xl">
+          <div className="space-y-5">
             {b.items.map((it, i) => (
               <div key={i} className="flex gap-4 p-5 rounded-xl bg-card border border-border/60 shadow-card-soft">
                 <div className="size-12 shrink-0 rounded-xl bg-primary-gradient text-primary-foreground grid place-items-center">
@@ -103,14 +119,16 @@ const BlockView = ({ block, slots }: { block: PageBlock; slots?: Record<string, 
               </div>
             ))}
           </div>
+          </WithImage>
         </Wrap>
       );
 
     case "steps":
       return (
         <Wrap block={b}>
+          <WithImage block={b}>
           {header}
-          <ol className="space-y-5 max-w-3xl">
+          <ol className="space-y-5">
             {b.items.map((it, i) => (
               <li key={i} className="flex gap-4">
                 <div className="size-12 shrink-0 rounded-xl bg-primary-gradient text-primary-foreground grid place-items-center font-bold">{i + 1}</div>
@@ -123,6 +141,7 @@ const BlockView = ({ block, slots }: { block: PageBlock; slots?: Record<string, 
               </li>
             ))}
           </ol>
+          </WithImage>
         </Wrap>
       );
 
