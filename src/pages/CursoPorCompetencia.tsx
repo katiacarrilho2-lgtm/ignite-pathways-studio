@@ -200,18 +200,17 @@ const CursoPorCompetencia = () => {
             className="text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full"
             style={{ backgroundColor: `${MAGENTA}22`, color: "#F8BBD9" }}
           >
-            Certificação em até 48h
+            {site.hero_eyebrow}
           </span>
           <h1 className="mt-4 text-4xl md:text-6xl font-bold text-balance animate-fade-up">
-            Técnico por Competência
+            {site.hero_title}
           </h1>
           <p className="mt-5 text-lg text-white/85 max-w-2xl mx-auto">
-            Valide sua experiência profissional e receba o diploma técnico com validade nacional — sem
-            precisar cursar do zero o que você já domina.
+            {site.hero_description}
           </p>
         </div>
       </section>
-
+      <SiteBlocks blocks={site.blocks} slots={{ conteudo: (<>
       {/* Faixa institucional da certificadora — Faculdade LA */}
       <section className="container -mt-6 mb-12">
         <div
@@ -667,6 +666,7 @@ const CursoPorCompetencia = () => {
           revendedor autorizado do Grupo LA Educação.
         </p>
       </section>
+      </>) }} />
     </>
   );
 };

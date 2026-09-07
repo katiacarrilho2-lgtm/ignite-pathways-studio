@@ -193,17 +193,17 @@ const CursoRegular = () => {
             className="text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full"
             style={{ backgroundColor: `${MAGENTA}22`, color: "#F8BBD9" }}
           >
-            Ensino Técnico Regular
+            {site.hero_eyebrow}
           </span>
           <h1 className="mt-4 text-4xl md:text-6xl font-bold text-balance animate-fade-up">
-            Técnico Regular & Tecnólogo
+            {site.hero_title}
           </h1>
           <p className="mt-5 text-lg text-white/85 max-w-2xl mx-auto">
-            Cursos técnicos completos, do zero ao diploma — válidos em todo o Brasil e cadastrados no
-            SISTEC-MEC.
+            {site.hero_description}
           </p>
         </div>
       </section>
+      <SiteBlocks blocks={site.blocks} slots={{ conteudo: (<>
       {/* Faixa institucional da certificadora — Faculdade LA */}
       <section className="container -mt-6 mb-12">
         <div
@@ -546,6 +546,7 @@ const CursoRegular = () => {
           revendedor autorizado do Grupo LA Educação.
         </p>
       </section>
+      </>) }} />
     </>
   );
 };
