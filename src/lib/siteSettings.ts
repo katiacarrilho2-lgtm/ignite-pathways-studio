@@ -417,10 +417,47 @@ export const CONTATO_CARDS_DEFAULT: BlockItem[] = [
   { icon: "MapPin", title: "Endereço", text: "Atendimento nacional" },
 ];
 
+const contentSlot = (id: string, label: string): PageBlock => ({
+  id, kind: "slot", visible: true, slot: "conteudo", slot_label: label, items: [],
+});
+
+export const CURSOS_DEFAULTS: PageSettings = {
+  hero_eyebrow: "Catálogo Completo",
+  hero_title: "Cursos para alunos e empresas",
+  hero_description: "Da formação técnica à pós-graduação, das NRs aos treinamentos in company.",
+  blocks: [contentSlot("cur_conteudo", "Lista de cursos e filtros (automático)")],
+};
+
+export const REGULAR_DEFAULTS: PageSettings = {
+  hero_eyebrow: "Ensino Técnico Regular",
+  hero_title: "Técnico Regular & Tecnólogo",
+  hero_description: "Cursos técnicos completos, do zero ao diploma — válidos em todo o Brasil e cadastrados no SISTEC-MEC.",
+  blocks: [contentSlot("reg_conteudo", "Conteúdo atual da página (certificadora, áreas, planos, FAQ)")],
+};
+
+export const COMPETENCIA_DEFAULTS: PageSettings = {
+  hero_eyebrow: "Certificação em até 48h",
+  hero_title: "Técnico por Competência",
+  hero_description: "Valide sua experiência profissional e receba o diploma técnico com validade nacional — sem precisar cursar do zero o que você já domina.",
+  blocks: [contentSlot("comp_conteudo", "Conteúdo atual da página (certificadora, áreas, planos, FAQ)")],
+};
+
+export const EJA_DEFAULTS: PageSettings = {
+  hero_eyebrow: "EJA · Educação de Jovens e Adultos",
+  hero_title: "Conclua o Ensino Fundamental ou Médio com validade nacional",
+  hero_description: "Programa 100% EAD, com certificado reconhecido nos termos da Lei nº 9.394/96 (LDB) — aceito em concursos, faculdades e empresas de todo o Brasil.",
+  blocks: [contentSlot("eja_conteudo", "Conteúdo atual da página (parceria, planos, FAQ)")],
+};
+
 export const PAGE_DEFAULTS: Record<PageKey, PageSettings> = {
   sobre: SOBRE_DEFAULTS,
   empresas: EMPRESAS_DEFAULTS,
   incompany: INCOMPANY_DEFAULTS,
   licenciado: LICENCIADO_DEFAULTS,
   contato: CONTATO_DEFAULTS,
+  cursos: CURSOS_DEFAULTS,
+  regular: REGULAR_DEFAULTS,
+  competencia: COMPETENCIA_DEFAULTS,
+  eja: EJA_DEFAULTS,
 };
+
