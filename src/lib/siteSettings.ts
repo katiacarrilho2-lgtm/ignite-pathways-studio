@@ -266,6 +266,10 @@ export const PAGE_SECTIONS = {
   incompany: "pagina_incompany",
   licenciado: "pagina_licenciado",
   contato: "pagina_contato",
+  cursos: "pagina_cursos",
+  regular: "pagina_regular",
+  competencia: "pagina_competencia",
+  eja: "pagina_eja",
 } as const;
 
 export type PageKey = keyof typeof PAGE_SECTIONS;
@@ -276,6 +280,10 @@ export const PAGE_LABELS: Record<PageKey, string> = {
   incompany: "In Company",
   licenciado: "Seja Licenciado",
   contato: "Contato",
+  cursos: "Cursos",
+  regular: "Técnico Regular",
+  competencia: "Técnico por Competência",
+  eja: "EJA",
 };
 
 export const SOBRE_DEFAULTS: PageSettings = {
