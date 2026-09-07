@@ -16,7 +16,14 @@ import {
   IDENTITY_DEFAULTS, IdentitySettings, SECTION_IDENTITY, FONT_OPTIONS,
   HOME_DEFAULTS, HomeSettings, SECTION_HOME, DIFF_ICONS,
   applyIdentity, hexToHsl, hslToHex,
+  PAGE_SECTIONS, PAGE_LABELS, PAGE_DEFAULTS, PageKey, PageSettings,
 } from "@/lib/siteSettings";
+import { PageBlocksEditor } from "@/components/admin/PageBlocksEditor";
+
+const PAGE_PATHS: Record<PageKey, string> = {
+  sobre: "/sobre", empresas: "/empresas", incompany: "/in-company",
+  licenciado: "/licenciado", contato: "/contato",
+};
 
 type SectionState<T> = { draft: T; published: T };
 
@@ -24,6 +31,11 @@ const Inner = () => {
   const [tab, setTab] = useState("identidade");
   const [ident, setIdent] = useState<SectionState<IdentitySettings>>({ draft: IDENTITY_DEFAULTS, published: IDENTITY_DEFAULTS });
   const [home, setHome] = useState<SectionState<HomeSettings>>({ draft: HOME_DEFAULTS, published: HOME_DEFAULTS });
+  const [page, setPage] = useState<PageKey>("sobre");
+  const [pages, setPages] = useState<Record<PageKey, SectionState<PageSettings>>>(() =>
+    Object.fromEntries(
+      (Object.keys(PAGE_DEFAULTS) as PageKey[]).map((k) => [k, { draft: PAGE_DEFAULTS[k], published: PAGE_DEFAULTS[k] }])
+    ) as Record<PageKey, SectionState<PageSettings>>);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
@@ -37,13 +49,18 @@ const Inner = () => {
     };
     setIdent(pick(SECTION_IDENTITY, IDENTITY_DEFAULTS));
     setHome(pick(SECTION_HOME, HOME_DEFAULTS));
+    setPages(Object.fromEntries(
+      (Object.keys(PAGE_DEFAULTS) as PageKey[]).map((k) => [k, pick(PAGE_SECTIONS[k], PAGE_DEFAULTS[k])])
+    ) as Record<PageKey, SectionState<PageSettings>>);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
 
   const current = tab === "home"
     ? { section: SECTION_HOME, draft: home.draft as any, published: home.published as any }
-    : { section: SECTION_IDENTITY, draft: ident.draft as any, published: ident.published as any };
+    : tab === "paginas"
+      ? { section: PAGE_SECTIONS[page], draft: pages[page].draft as any, published: pages[page].published as any }
+      : { section: SECTION_IDENTITY, draft: ident.draft as any, published: ident.published as any };
 
   const save = async (alsoPublish: boolean) => {
     setBusy(true);
@@ -53,8 +70,9 @@ const Inner = () => {
     setBusy(false);
     if (error) return toast.error(error.message);
     if (alsoPublish) {
-      if (current.section === SECTION_IDENTITY) { setIdent((s) => ({ ...s, published: s.draft })); applyIdentity(ident.draft); }
-      else setHome((s) => ({ ...s, published: s.draft }));
+      if (tab === "identidade") { setIdent((s) => ({ ...s, published: s.draft })); applyIdentity(ident.draft); }
+      else if (tab === "home") setHome((s) => ({ ...s, published: s.draft }));
+      else setPages((s) => ({ ...s, [page]: { ...s[page], published: s[page].draft } }));
       toast.success("Publicado no site.");
     } else {
       toast.success("Rascunho salvo. Use “Ver rascunho” para conferir.");
@@ -62,8 +80,9 @@ const Inner = () => {
   };
 
   const restore = () => {
-    if (current.section === SECTION_IDENTITY) setIdent((s) => ({ ...s, draft: s.published }));
-    else setHome((s) => ({ ...s, draft: s.published }));
+    if (tab === "identidade") setIdent((s) => ({ ...s, draft: s.published }));
+    else if (tab === "home") setHome((s) => ({ ...s, draft: s.published }));
+    else setPages((s) => ({ ...s, [page]: { ...s[page], draft: s[page].published } }));
     toast.success("Voltou para a versão publicada.");
   };
 
@@ -83,7 +102,8 @@ const Inner = () => {
 
   if (loading) return <div className="p-8 text-muted-foreground">Carregando…</div>;
 
-  const editable = tab === "identidade" || tab === "home";
+  const editable = tab === "identidade" || tab === "home" || tab === "paginas";
+  const previewPath = tab === "paginas" ? PAGE_PATHS[page] : "/";
 
   return (
     <div className="p-8 space-y-6">
@@ -93,7 +113,7 @@ const Inner = () => {
           <p className="text-muted-foreground">Edite o site público da Multplick. Nada muda para o visitante até você publicar.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => window.open("/?preview=1", "_blank")}><Eye className="size-4" /> Ver rascunho</Button>
+          <Button variant="outline" onClick={() => window.open(`${previewPath}?preview=1`, "_blank")}><Eye className="size-4" /> Ver rascunho</Button>
           <Button variant="outline" onClick={restore} disabled={busy || !editable}><RotateCcw className="size-4" /> Descartar alterações</Button>
           <Button variant="outline" onClick={() => save(false)} disabled={busy || !editable}><Save className="size-4" /> Salvar rascunho</Button>
           <Button variant="hero" onClick={() => save(true)} disabled={busy || !editable}><Rocket className="size-4" /> Publicar</Button>
@@ -312,7 +332,25 @@ const Inner = () => {
           </Card>
         </TabsContent>
 
-        {["paginas", "menu", "contato", "midia"].map((t) => (
+        <TabsContent value="paginas" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader><CardTitle>Escolha a página</CardTitle></CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              {(Object.keys(PAGE_LABELS) as PageKey[]).map((k) => (
+                <Button key={k} variant={page === k ? "hero" : "outline"} size="sm" onClick={() => setPage(k)}>
+                  {PAGE_LABELS[k]}
+                </Button>
+              ))}
+            </CardContent>
+          </Card>
+          <PageBlocksEditor
+            value={pages[page].draft}
+            onChange={(v) => setPages((s) => ({ ...s, [page]: { ...s[page], draft: v } }))}
+            onUpload={upload}
+          />
+        </TabsContent>
+
+        {["menu", "contato", "midia"].map((t) => (
           <TabsContent key={t} value={t} className="mt-6">
             <Card>
               <CardContent className="py-10 text-center text-muted-foreground">
