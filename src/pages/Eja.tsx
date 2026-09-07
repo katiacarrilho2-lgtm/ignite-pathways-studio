@@ -1,4 +1,7 @@
 import { PageHero } from "@/components/site/PageHero";
+import { SiteBlocks } from "@/components/site/SiteBlocks";
+import { useSiteSection } from "@/hooks/useSiteSection";
+import { PAGE_SECTIONS, EJA_DEFAULTS, PageSettings } from "@/lib/siteSettings";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -86,6 +89,7 @@ const faqs = [
 ];
 
 const Eja = () => {
+  const { value: site } = useSiteSection<PageSettings>(PAGE_SECTIONS.eja, EJA_DEFAULTS);
   const waMsg = "Olá! Tenho interesse no EJA (Ensino Fundamental / Médio) da Multplick. Pode me ajudar?";
 
   // Cupom promocional válido apenas no dia — expira à meia-noite
@@ -123,11 +127,8 @@ const Eja = () => {
 
   return (
     <>
-      <PageHero
-        eyebrow="EJA · Educação de Jovens e Adultos"
-        title="Conclua o Ensino Fundamental ou Médio com validade nacional"
-        description="Programa 100% EAD, com certificado reconhecido nos termos da Lei nº 9.394/96 (LDB) — aceito em concursos, faculdades e empresas de todo o Brasil."
-      />
+      <PageHero eyebrow={site.hero_eyebrow} title={site.hero_title} description={site.hero_description} />
+      <SiteBlocks blocks={site.blocks} slots={{ conteudo: (<>
 
       {/* Faixa de parceria institucional (dourada) */}
       <section className="container -mt-6 mb-12">
@@ -541,6 +542,7 @@ const Eja = () => {
           </div>
         </div>
       </section>
+      </>) }} />
     </>
   );
 };

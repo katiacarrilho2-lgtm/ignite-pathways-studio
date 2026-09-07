@@ -1,6 +1,9 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageHero } from "@/components/site/PageHero";
+import { SiteBlocks } from "@/components/site/SiteBlocks";
+import { useSiteSection } from "@/hooks/useSiteSection";
+import { PAGE_SECTIONS, CURSOS_DEFAULTS, PageSettings } from "@/lib/siteSettings";
 import { CourseCard } from "@/components/site/CourseCard";
 import { useCourses } from "@/hooks/useCourses";
 import { Button } from "@/components/ui/button";
@@ -16,6 +19,7 @@ const Cursos = () => {
   const [filter, setFilter] = useState<string>("Todos");
   const [query, setQuery] = useState("");
   const { courses, loading } = useCourses();
+  const { value: site } = useSiteSection<PageSettings>(PAGE_SECTIONS.cursos, CURSOS_DEFAULTS);
   const [dbCats, setDbCats] = useState<DbCategory[]>([]);
 
   useEffect(() => {
@@ -51,7 +55,8 @@ const Cursos = () => {
 
   return (
     <>
-      <PageHero eyebrow="Catálogo Completo" title="Cursos para alunos e empresas" description="Da formação técnica à pós-graduação, das NRs aos treinamentos in company." />
+      <PageHero eyebrow={site.hero_eyebrow} title={site.hero_title} description={site.hero_description} />
+      <SiteBlocks blocks={site.blocks} slots={{ conteudo: (
       <section className="py-12 container">
         {/* Search */}
         <div className="mb-8 max-w-xl mx-auto">
@@ -141,6 +146,7 @@ const Cursos = () => {
           </div>
         )}
       </section>
+      ) }} />
     </>
   );
 };

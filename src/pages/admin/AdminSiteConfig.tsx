@@ -23,6 +23,7 @@ import { PageBlocksEditor } from "@/components/admin/PageBlocksEditor";
 const PAGE_PATHS: Record<PageKey, string> = {
   sobre: "/sobre", empresas: "/empresas", incompany: "/in-company",
   licenciado: "/licenciado", contato: "/contato",
+  cursos: "/cursos", regular: "/curso-regular", competencia: "/curso-por-competencia", eja: "/eja",
 };
 
 type SectionState<T> = { draft: T; published: T };
