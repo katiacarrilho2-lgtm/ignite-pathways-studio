@@ -220,6 +220,8 @@ All colors MUST be HSL.
 
   .dark {
     --background: 220 50% 6%;
+    --gold: 43 74% 58%;
+    --gold-foreground: 220 50% 6%;
     --foreground: 210 40% 98%;
     --card: 220 45% 10%;
     --card-foreground: 210 40% 98%;
