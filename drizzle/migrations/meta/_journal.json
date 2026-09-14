@@ -85,6 +85,13 @@
       "when": 1788714946110,
       "tag": "0011_site_settings_draft_privacy",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789395648275,
+      "tag": "0012_cursos_livres_base",
+      "breakpoints": true
     }
   ]
 }
