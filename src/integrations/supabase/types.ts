@@ -3638,6 +3638,7 @@ export type Database = {
           enrollment_id: string | null
           id: string
           nome: string
+          numero_pedido: string | null
           observacoes: string | null
           origem: string | null
           paid_at: string | null
@@ -3661,6 +3662,7 @@ export type Database = {
           enrollment_id?: string | null
           id?: string
           nome: string
+          numero_pedido?: string | null
           observacoes?: string | null
           origem?: string | null
           paid_at?: string | null
@@ -3684,6 +3686,7 @@ export type Database = {
           enrollment_id?: string | null
           id?: string
           nome?: string
+          numero_pedido?: string | null
           observacoes?: string | null
           origem?: string | null
           paid_at?: string | null
@@ -5374,6 +5377,9 @@ export type Database = {
         Args: { _lead_bank_id: string; _owner_id: string }
         Returns: Json
       }
+      livre_cpf_em_uso: { Args: { _cpf: string }; Returns: boolean }
+      livre_criar_pedido: { Args: { _course_id: string }; Returns: Json }
+      livre_preco_vigente: { Args: { _course_id: string }; Returns: number }
       mkt_asset_liberado: {
         Args: { _asset_id: string; _uid: string }
         Returns: boolean

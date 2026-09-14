@@ -89,6 +89,8 @@ import AdminTreinamentos from "./pages/admin/AdminTreinamentos.tsx";
 import AdminCertificacao from "./pages/admin/AdminCertificacao.tsx";
 import AdminDocumentosLinks from "./pages/admin/AdminDocumentosLinks.tsx";
 import Checkout from "./pages/Checkout.tsx";
+import CertifiqueSuaExperiencia from "./pages/CertifiqueSuaExperiencia.tsx";
+import CertifiqueCurso from "./pages/CertifiqueCurso.tsx";
 import Matricula from "./pages/Matricula.tsx";
 import Prova from "./pages/Prova.tsx";
 import DocumentosUpload from "./pages/DocumentosUpload.tsx";
@@ -98,6 +100,7 @@ import AlunoAfiliado from "./pages/aluno/Afiliado.tsx";
 import AlunoTreinamentos from "./pages/aluno/Treinamentos.tsx";
 import AlunoTreinamentoPlayer from "./pages/aluno/TreinamentoPlayer.tsx";
 import AlunoDocumentos from "./pages/aluno/Documentos.tsx";
+import AlunoMinhasCompras from "./pages/aluno/MinhasCompras.tsx";
 import CrmLayout from "./pages/admin/crm/CrmLayout.tsx";
 import CrmKanban from "./pages/admin/crm/CrmKanban.tsx";
 import CrmAgenda from "./pages/admin/crm/CrmAgenda.tsx";
@@ -151,6 +154,8 @@ const App = () => (
               <Route path="/pagamento/sucesso" element={<PagamentoRetorno status="sucesso" />} />
               <Route path="/pagamento/falha" element={<PagamentoRetorno status="falha" />} />
               <Route path="/pagamento/pendente" element={<PagamentoRetorno status="pendente" />} />
+              <Route path="/certifique-sua-experiencia" element={<CertifiqueSuaExperiencia />} />
+              <Route path="/certifique-sua-experiencia/:slug" element={<CertifiqueCurso />} />
               <Route path="/checkout/:slug" element={<Checkout />} />
               <Route path="/matricula/:slug" element={<Matricula />} />
             </Route>
@@ -167,6 +172,7 @@ const App = () => (
               <Route path="mensagens" element={<AlunoMensagens />} />
               <Route path="suporte" element={<AlunoSuporte />} />
               <Route path="financeiro" element={<AlunoFinanceiro />} />
+              <Route path="compras" element={<AlunoMinhasCompras />} />
               <Route path="afiliado" element={<AlunoAfiliado />} />
               <Route path="treinamentos" element={<AlunoTreinamentos />} />
               <Route path="treinamentos/:slug" element={<AlunoTreinamentoPlayer />} />

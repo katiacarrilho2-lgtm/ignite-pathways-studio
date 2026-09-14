@@ -1,7 +1,7 @@
 import { Link, NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Award, User, LogOut, ExternalLink, GraduationCap, MessageSquare, LifeBuoy, DollarSign, Share2, Menu, Trophy, FolderOpen } from "lucide-react";
+import { BookOpen, Award, User, LogOut, ExternalLink, GraduationCap, MessageSquare, LifeBuoy, DollarSign, Share2, Menu, Trophy, FolderOpen, ShoppingBag } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useEffect, useState } from "react";
 import logo from "@/assets/multplick-logo.png";
@@ -13,6 +13,7 @@ const items = [
   { to: "/aluno/treinamentos", label: "Treinamentos", icon: Trophy },
   { to: "/aluno/certificados", label: "Certificados", icon: Award },
   { to: "/aluno/financeiro", label: "Financeiro", icon: DollarSign },
+  { to: "/aluno/compras", label: "Minhas Compras", icon: ShoppingBag },
   { to: "/aluno/documentos", label: "Documentos", icon: FolderOpen },
   { to: "/aluno/mensagens", label: "Mensagens", icon: MessageSquare },
   { to: "/aluno/suporte", label: "Suporte", icon: LifeBuoy },
