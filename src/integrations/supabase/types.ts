@@ -460,47 +460,143 @@ export type Database = {
         }
         Relationships: []
       }
+      certificate_settings: {
+        Row: {
+          account_id: string
+          assinatura_url: string | null
+          cidade: string | null
+          cnpj: string | null
+          created_at: string
+          empresa: string
+          id: string
+          logo_url: string | null
+          responsavel_cargo: string | null
+          responsavel_nome: string | null
+          singleton: boolean
+          texto_padrao: string | null
+          uf: string | null
+          updated_at: string
+          validacao_base_url: string | null
+        }
+        Insert: {
+          account_id?: string
+          assinatura_url?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          empresa?: string
+          id?: string
+          logo_url?: string | null
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          singleton?: boolean
+          texto_padrao?: string | null
+          uf?: string | null
+          updated_at?: string
+          validacao_base_url?: string | null
+        }
+        Update: {
+          account_id?: string
+          assinatura_url?: string | null
+          cidade?: string | null
+          cnpj?: string | null
+          created_at?: string
+          empresa?: string
+          id?: string
+          logo_url?: string | null
+          responsavel_cargo?: string | null
+          responsavel_nome?: string | null
+          singleton?: boolean
+          texto_padrao?: string | null
+          uf?: string | null
+          updated_at?: string
+          validacao_base_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_settings_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
+          account_id: string | null
+          attempt_id: string | null
+          cancelado_em: string | null
+          cancelado_por: string | null
           carga_horaria: string | null
+          carga_horaria_horas: number | null
+          codigo_validacao: string | null
           course_id: string
           created_at: string
           emitido_em: string
           emitido_por: string | null
           id: string
+          motivo_cancelamento: string | null
           nota_final: number | null
           numero: string
           observacoes: string | null
+          status: string
+          tipo: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          account_id?: string | null
+          attempt_id?: string | null
+          cancelado_em?: string | null
+          cancelado_por?: string | null
           carga_horaria?: string | null
+          carga_horaria_horas?: number | null
+          codigo_validacao?: string | null
           course_id: string
           created_at?: string
           emitido_em?: string
           emitido_por?: string | null
           id?: string
+          motivo_cancelamento?: string | null
           nota_final?: number | null
           numero: string
           observacoes?: string | null
+          status?: string
+          tipo?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          account_id?: string | null
+          attempt_id?: string | null
+          cancelado_em?: string | null
+          cancelado_por?: string | null
           carga_horaria?: string | null
+          carga_horaria_horas?: number | null
+          codigo_validacao?: string | null
           course_id?: string
           created_at?: string
           emitido_em?: string
           emitido_por?: string | null
           id?: string
+          motivo_cancelamento?: string | null
           nota_final?: number | null
           numero?: string
           observacoes?: string | null
+          status?: string
+          tipo?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "certificates_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "certificates_course_id_fkey"
             columns: ["course_id"]
@@ -1580,12 +1676,15 @@ export type Database = {
       courses: {
         Row: {
           active: boolean
+          carga_horaria_horas: number | null
           categoria_id: string | null
           category: string
           coursebox_embed_url: string | null
           created_at: string
           description: string | null
           duration: string | null
+          emite_certificado_automatico: boolean
+          exige_avaliacao: boolean
           external_url: string | null
           featured: boolean
           has_teacher_manual: boolean
@@ -1603,17 +1702,22 @@ export type Database = {
           slug: string
           sort_order: number
           teacher_manual_image_url: string | null
+          tipo_curso: string
           title: string
           updated_at: string
+          venda_livre: boolean
         }
         Insert: {
           active?: boolean
+          carga_horaria_horas?: number | null
           categoria_id?: string | null
           category: string
           coursebox_embed_url?: string | null
           created_at?: string
           description?: string | null
           duration?: string | null
+          emite_certificado_automatico?: boolean
+          exige_avaliacao?: boolean
           external_url?: string | null
           featured?: boolean
           has_teacher_manual?: boolean
@@ -1631,17 +1735,22 @@ export type Database = {
           slug: string
           sort_order?: number
           teacher_manual_image_url?: string | null
+          tipo_curso?: string
           title: string
           updated_at?: string
+          venda_livre?: boolean
         }
         Update: {
           active?: boolean
+          carga_horaria_horas?: number | null
           categoria_id?: string | null
           category?: string
           coursebox_embed_url?: string | null
           created_at?: string
           description?: string | null
           duration?: string | null
+          emite_certificado_automatico?: boolean
+          exige_avaliacao?: boolean
           external_url?: string | null
           featured?: boolean
           has_teacher_manual?: boolean
@@ -1659,8 +1768,10 @@ export type Database = {
           slug?: string
           sort_order?: number
           teacher_manual_image_url?: string | null
+          tipo_curso?: string
           title?: string
           updated_at?: string
+          venda_livre?: boolean
         }
         Relationships: [
           {
@@ -2357,6 +2468,275 @@ export type Database = {
           },
           {
             foreignKeyName: "enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_attempt_answers: {
+        Row: {
+          account_id: string
+          attempt_id: string
+          correta: boolean | null
+          id: string
+          ordem: number
+          question_id: string | null
+          respondido_em: string
+          resposta_index: number | null
+        }
+        Insert: {
+          account_id?: string
+          attempt_id: string
+          correta?: boolean | null
+          id?: string
+          ordem?: number
+          question_id?: string | null
+          respondido_em?: string
+          resposta_index?: number | null
+        }
+        Update: {
+          account_id?: string
+          attempt_id?: string
+          correta?: boolean | null
+          id?: string
+          ordem?: number
+          question_id?: string | null
+          respondido_em?: string
+          resposta_index?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_attempt_answers_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_attempt_answers_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "exam_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_attempt_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "exam_questions_bank"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_attempts: {
+        Row: {
+          account_id: string
+          acertos: number | null
+          aprovado: boolean | null
+          course_id: string
+          created_at: string
+          enrollment_id: string | null
+          finalizado_em: string | null
+          id: string
+          iniciado_em: string
+          nota: number | null
+          questoes: Json
+          status: string
+          tentativa: number
+          total_questoes: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string
+          acertos?: number | null
+          aprovado?: boolean | null
+          course_id: string
+          created_at?: string
+          enrollment_id?: string | null
+          finalizado_em?: string | null
+          id?: string
+          iniciado_em?: string
+          nota?: number | null
+          questoes?: Json
+          status?: string
+          tentativa?: number
+          total_questoes?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          acertos?: number | null
+          aprovado?: boolean | null
+          course_id?: string
+          created_at?: string
+          enrollment_id?: string | null
+          finalizado_em?: string | null
+          id?: string
+          iniciado_em?: string
+          nota?: number | null
+          questoes?: Json
+          status?: string
+          tentativa?: number
+          total_questoes?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_attempts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_attempts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_attempts_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_configs: {
+        Row: {
+          account_id: string
+          ativo: boolean
+          course_id: string
+          created_at: string
+          embaralhar_alternativas: boolean
+          embaralhar_questoes: boolean
+          id: string
+          instrucoes: string | null
+          libera_certificado: boolean
+          nota_minima: number
+          qtd_questoes: number
+          tempo_minutos: number | null
+          tentativas_permitidas: number
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string
+          ativo?: boolean
+          course_id: string
+          created_at?: string
+          embaralhar_alternativas?: boolean
+          embaralhar_questoes?: boolean
+          id?: string
+          instrucoes?: string | null
+          libera_certificado?: boolean
+          nota_minima?: number
+          qtd_questoes?: number
+          tempo_minutos?: number | null
+          tentativas_permitidas?: number
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          ativo?: boolean
+          course_id?: string
+          created_at?: string
+          embaralhar_alternativas?: boolean
+          embaralhar_questoes?: boolean
+          id?: string
+          instrucoes?: string | null
+          libera_certificado?: boolean
+          nota_minima?: number
+          qtd_questoes?: number
+          tempo_minutos?: number | null
+          tentativas_permitidas?: number
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_configs_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_configs_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: true
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_questions_bank: {
+        Row: {
+          account_id: string
+          alternativas: Json
+          ativo: boolean
+          correta_index: number
+          course_id: string | null
+          created_at: string
+          created_by: string | null
+          dificuldade: string
+          enunciado: string
+          explicacao: string | null
+          id: string
+          tema: string | null
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string
+          alternativas?: Json
+          ativo?: boolean
+          correta_index?: number
+          course_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          dificuldade?: string
+          enunciado: string
+          explicacao?: string | null
+          id?: string
+          tema?: string | null
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          alternativas?: Json
+          ativo?: boolean
+          correta_index?: number
+          course_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          dificuldade?: string
+          enunciado?: string
+          explicacao?: string | null
+          id?: string
+          tema?: string | null
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_questions_bank_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_questions_bank_course_id_fkey"
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
@@ -3154,6 +3534,170 @@ export type Database = {
             columns: ["lesson_id"]
             isOneToOne: false
             referencedRelation: "course_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      livre_order_payments: {
+        Row: {
+          account_id: string
+          created_at: string
+          external_id: string | null
+          id: string
+          metodo: string | null
+          order_id: string
+          paid_at: string | null
+          preference_id: string | null
+          provider: string
+          raw: Json | null
+          status: string
+          updated_at: string
+          valor_cents: number
+        }
+        Insert: {
+          account_id?: string
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          metodo?: string | null
+          order_id: string
+          paid_at?: string | null
+          preference_id?: string | null
+          provider?: string
+          raw?: Json | null
+          status?: string
+          updated_at?: string
+          valor_cents?: number
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          metodo?: string | null
+          order_id?: string
+          paid_at?: string | null
+          preference_id?: string | null
+          provider?: string
+          raw?: Json | null
+          status?: string
+          updated_at?: string
+          valor_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "livre_order_payments_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "livre_order_payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "livre_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      livre_orders: {
+        Row: {
+          account_id: string
+          affiliate_id: string | null
+          course_id: string | null
+          cpf: string | null
+          created_at: string
+          cupom: string | null
+          desconto_cents: number
+          email: string
+          enrollment_id: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          origem: string | null
+          paid_at: string | null
+          seller_id: string | null
+          status: string
+          telefone: string | null
+          updated_at: string
+          user_id: string | null
+          valor_cents: number
+          valor_final_cents: number
+        }
+        Insert: {
+          account_id?: string
+          affiliate_id?: string | null
+          course_id?: string | null
+          cpf?: string | null
+          created_at?: string
+          cupom?: string | null
+          desconto_cents?: number
+          email: string
+          enrollment_id?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          origem?: string | null
+          paid_at?: string | null
+          seller_id?: string | null
+          status?: string
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valor_cents?: number
+          valor_final_cents?: number
+        }
+        Update: {
+          account_id?: string
+          affiliate_id?: string | null
+          course_id?: string | null
+          cpf?: string | null
+          created_at?: string
+          cupom?: string | null
+          desconto_cents?: number
+          email?: string
+          enrollment_id?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          origem?: string | null
+          paid_at?: string | null
+          seller_id?: string | null
+          status?: string
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valor_cents?: number
+          valor_final_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "livre_orders_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "contas_comerciais"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "livre_orders_affiliate_id_fkey"
+            columns: ["affiliate_id"]
+            isOneToOne: false
+            referencedRelation: "affiliates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "livre_orders_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "livre_orders_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "enrollments"
             referencedColumns: ["id"]
           },
         ]
@@ -4743,6 +5287,15 @@ export type Database = {
       }
       crm_can_manage_all: { Args: { _uid: string }; Returns: boolean }
       current_account_id: { Args: never; Returns: string }
+      exam_questoes_da_tentativa: {
+        Args: { _attempt_id: string }
+        Returns: {
+          alternativas: Json
+          enunciado: string
+          ordem: number
+          question_id: string
+        }[]
+      }
       has_permission: {
         Args: {
           _permission: Database["public"]["Enums"]["app_permission"]
