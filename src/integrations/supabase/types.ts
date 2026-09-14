@@ -1679,6 +1679,8 @@ export type Database = {
           carga_horaria_horas: number | null
           categoria_id: string | null
           category: string
+          certificado_texto_custom: string | null
+          certificado_texto_modo: string
           coursebox_embed_url: string | null
           created_at: string
           description: string | null
@@ -1695,7 +1697,11 @@ export type Database = {
           live_url: string | null
           long_description: string | null
           passing_score: number
+          preco_promocional_cents: number | null
           price_cents: number | null
+          promocao_ativa: boolean
+          promocao_fim: string | null
+          promocao_inicio: string | null
           published: boolean
           rede_account_id: string | null
           rede_publico: string
@@ -1712,6 +1718,8 @@ export type Database = {
           carga_horaria_horas?: number | null
           categoria_id?: string | null
           category: string
+          certificado_texto_custom?: string | null
+          certificado_texto_modo?: string
           coursebox_embed_url?: string | null
           created_at?: string
           description?: string | null
@@ -1728,7 +1736,11 @@ export type Database = {
           live_url?: string | null
           long_description?: string | null
           passing_score?: number
+          preco_promocional_cents?: number | null
           price_cents?: number | null
+          promocao_ativa?: boolean
+          promocao_fim?: string | null
+          promocao_inicio?: string | null
           published?: boolean
           rede_account_id?: string | null
           rede_publico?: string
@@ -1745,6 +1757,8 @@ export type Database = {
           carga_horaria_horas?: number | null
           categoria_id?: string | null
           category?: string
+          certificado_texto_custom?: string | null
+          certificado_texto_modo?: string
           coursebox_embed_url?: string | null
           created_at?: string
           description?: string | null
@@ -1761,7 +1775,11 @@ export type Database = {
           live_url?: string | null
           long_description?: string | null
           passing_score?: number
+          preco_promocional_cents?: number | null
           price_cents?: number | null
+          promocao_ativa?: boolean
+          promocao_fim?: string | null
+          promocao_inicio?: string | null
           published?: boolean
           rede_account_id?: string | null
           rede_publico?: string
@@ -2619,7 +2637,9 @@ export type Database = {
           embaralhar_questoes: boolean
           id: string
           instrucoes: string | null
+          intervalo_nova_tentativa_horas: number | null
           libera_certificado: boolean
+          mostrar_respostas: boolean
           nota_minima: number
           qtd_questoes: number
           tempo_minutos: number | null
@@ -2636,7 +2656,9 @@ export type Database = {
           embaralhar_questoes?: boolean
           id?: string
           instrucoes?: string | null
+          intervalo_nova_tentativa_horas?: number | null
           libera_certificado?: boolean
+          mostrar_respostas?: boolean
           nota_minima?: number
           qtd_questoes?: number
           tempo_minutos?: number | null
@@ -2653,7 +2675,9 @@ export type Database = {
           embaralhar_questoes?: boolean
           id?: string
           instrucoes?: string | null
+          intervalo_nova_tentativa_horas?: number | null
           libera_certificado?: boolean
+          mostrar_respostas?: boolean
           nota_minima?: number
           qtd_questoes?: number
           tempo_minutos?: number | null
