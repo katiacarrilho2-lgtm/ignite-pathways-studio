@@ -154,6 +154,8 @@ const App = () => (
               <Route path="/pagamento/sucesso" element={<PagamentoRetorno status="sucesso" />} />
               <Route path="/pagamento/falha" element={<PagamentoRetorno status="falha" />} />
               <Route path="/pagamento/pendente" element={<PagamentoRetorno status="pendente" />} />
+              <Route path="/certifique-sua-experiencia" element={<CertifiqueSuaExperiencia />} />
+              <Route path="/certifique-sua-experiencia/:slug" element={<CertifiqueCurso />} />
               <Route path="/checkout/:slug" element={<Checkout />} />
               <Route path="/matricula/:slug" element={<Matricula />} />
             </Route>
