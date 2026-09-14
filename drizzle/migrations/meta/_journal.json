@@ -99,6 +99,13 @@
       "when": 1789395684177,
       "tag": "0013_revoke_exec_audit_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1789398502381,
+      "tag": "0014_cursos_livres_admin_campos",
+      "breakpoints": true
     }
   ]
 }
