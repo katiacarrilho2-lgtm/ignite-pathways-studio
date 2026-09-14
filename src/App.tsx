@@ -172,6 +172,7 @@ const App = () => (
               <Route path="mensagens" element={<AlunoMensagens />} />
               <Route path="suporte" element={<AlunoSuporte />} />
               <Route path="financeiro" element={<AlunoFinanceiro />} />
+              <Route path="compras" element={<AlunoMinhasCompras />} />
               <Route path="afiliado" element={<AlunoAfiliado />} />
               <Route path="treinamentos" element={<AlunoTreinamentos />} />
               <Route path="treinamentos/:slug" element={<AlunoTreinamentoPlayer />} />

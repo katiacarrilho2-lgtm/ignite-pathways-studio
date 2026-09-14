@@ -13,6 +13,7 @@ const items = [
   { to: "/aluno/treinamentos", label: "Treinamentos", icon: Trophy },
   { to: "/aluno/certificados", label: "Certificados", icon: Award },
   { to: "/aluno/financeiro", label: "Financeiro", icon: DollarSign },
+  { to: "/aluno/compras", label: "Minhas Compras", icon: ShoppingBag },
   { to: "/aluno/documentos", label: "Documentos", icon: FolderOpen },
   { to: "/aluno/mensagens", label: "Mensagens", icon: MessageSquare },
   { to: "/aluno/suporte", label: "Suporte", icon: LifeBuoy },
