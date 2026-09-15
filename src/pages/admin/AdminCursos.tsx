@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Pencil, Trash2, Upload, Star, Layers, Sparkles, Download, Search, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Star, Layers, Sparkles, Download, Search, X, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { Link } from "react-router-dom";
