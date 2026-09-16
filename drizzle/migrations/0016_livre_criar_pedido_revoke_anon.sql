@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.livre_criar_pedido(uuid) FROM anon;
