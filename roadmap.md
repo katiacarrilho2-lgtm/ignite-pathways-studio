@@ -62,3 +62,10 @@
 ## Pendente (aguardando autorização)
 - [ ] Central de Configurações do site (substituir "Andamento"): identidade visual, fontes, hero, banners, textos, seções da home, menu, rodapé, biblioteca de mídia, rascunho/publicar.
 - Configurações do site: Bloco 1 (identidade) e Bloco 2 (página inicial) concluídos. Próximo: Bloco 3 (textos das páginas, menu e rodapé) e Bloco 4 (mídia/publicação).
+
+## Cursos Livres — Etapa 3 (concluída)
+- Migrações `0015_livre_pedidos_numero_e_rpc.sql` (numero_pedido MPL-AAAA-000000, `livre_preco_vigente`, `livre_cpf_em_uso`, `livre_criar_pedido`) e `0016_livre_criar_pedido_revoke_anon.sql`.
+- 3 cursos livres piloto criados (inativos, R$ 59,90, venda/certificação desativadas).
+- Páginas `/certifique-sua-experiencia`, `/certifique-sua-experiencia/:slug`, `/checkout/:slug` (cadastro/login + pedido pendente) e `/aluno/compras`.
+- Pré-visualização da sede: botão em Cursos → `?preview=1`.
+- [ ] Etapa 4 (Mercado Pago + liberação automática) — aguardando autorização.
