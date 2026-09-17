@@ -120,6 +120,13 @@
       "when": 1789571978838,
       "tag": "0016_livre_criar_pedido_revoke_anon",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1789655256730,
+      "tag": "0017_livre_pagamento_confirmacao",
+      "breakpoints": true
     }
   ]
 }
