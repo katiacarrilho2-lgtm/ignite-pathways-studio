@@ -5380,6 +5380,19 @@ export type Database = {
       livre_cpf_em_uso: { Args: { _cpf: string }; Returns: boolean }
       livre_criar_pedido: { Args: { _course_id: string }; Returns: Json }
       livre_preco_vigente: { Args: { _course_id: string }; Returns: number }
+      livre_registrar_pagamento: {
+        Args: {
+          _external_id: string
+          _metodo?: string
+          _order_id: string
+          _preference_id?: string
+          _provider: string
+          _raw?: Json
+          _status: string
+          _valor_cents: number
+        }
+        Returns: Json
+      }
       mkt_asset_liberado: {
         Args: { _asset_id: string; _uid: string }
         Returns: boolean
