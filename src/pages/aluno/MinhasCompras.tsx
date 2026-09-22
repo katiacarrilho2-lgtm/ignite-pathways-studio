@@ -116,11 +116,18 @@ const MinhasCompras = () => {
                       ? "Seu acesso foi liberado automaticamente e sua avaliação já está disponível."
                       : "Seu acesso ao curso foi liberado automaticamente."}
                   </p>
-                  <Button asChild className="mt-3 h-11 w-full sm:w-auto" variant="hero">
-                    <Link to={r.courses?.exige_avaliacao ? `/aluno/avaliacoes?pedido=${r.id}` : `/aluno/cursos`}>
-                      {r.courses?.exige_avaliacao ? "INICIAR AVALIAÇÃO" : "ACESSAR CURSO"}
-                    </Link>
-                  </Button>
+                  {r.courses?.exige_avaliacao ? (
+                    <Button className="mt-3 h-11 w-full sm:w-auto" variant="hero" disabled>
+                      INICIAR AVALIAÇÃO
+                    </Button>
+                  ) : (
+                    <Button asChild className="mt-3 h-11 w-full sm:w-auto" variant="hero">
+                      <Link to="/aluno">ACESSAR MEU PAINEL</Link>
+                    </Button>
+                  )}
+                  {r.courses?.exige_avaliacao && (
+                    <p className="mt-2 text-xs text-muted-foreground">A tela da avaliação entra no ar na próxima etapa.</p>
+                  )}
                 </div>
               )}
 
