@@ -286,7 +286,7 @@ const Checkout = () => {
             {busy ? <Loader2 className="size-5 animate-spin" /> : "CONTINUAR PARA PAGAMENTO"}
           </Button>
           <p className="mt-3 flex items-center justify-center gap-2 text-center text-xs text-muted-foreground">
-            <Info className="size-4" /> Pagamento será habilitado na próxima etapa. Agora seu pedido fica registrado como aguardando pagamento.
+            <Info className="size-4" /> Você será levado ao ambiente seguro do Mercado Pago. O acesso é liberado automaticamente após a confirmação.
           </p>
           <button type="button" onClick={() => nav(`/certifique-sua-experiencia/${course.slug}${preview ? "?preview=1" : ""}`)} className="mx-auto mt-4 block text-sm text-muted-foreground underline">
             Voltar ao curso
