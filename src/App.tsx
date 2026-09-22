@@ -20,6 +20,7 @@ import PagamentoRetorno from "./pages/PagamentoRetorno.tsx";
 import Auth from "./pages/Auth.tsx";
 import Dashboard from "./pages/admin/Dashboard.tsx";
 import AdminCursos from "./pages/admin/AdminCursos.tsx";
+import AdminBancoQuestoes from "./pages/admin/AdminBancoQuestoes.tsx";
 import AdminUsuarios from "./pages/admin/AdminUsuarios.tsx";
 import AdminCargos from "./pages/admin/AdminCargos.tsx";
 import LeadsLayout from "./pages/admin/leads/LeadsLayout.tsx";
@@ -101,6 +102,7 @@ import AlunoTreinamentos from "./pages/aluno/Treinamentos.tsx";
 import AlunoTreinamentoPlayer from "./pages/aluno/TreinamentoPlayer.tsx";
 import AlunoDocumentos from "./pages/aluno/Documentos.tsx";
 import AlunoMinhasCompras from "./pages/aluno/MinhasCompras.tsx";
+import AlunoAvaliacao from "./pages/aluno/Avaliacao.tsx";
 import CrmLayout from "./pages/admin/crm/CrmLayout.tsx";
 import CrmKanban from "./pages/admin/crm/CrmKanban.tsx";
 import CrmAgenda from "./pages/admin/crm/CrmAgenda.tsx";
@@ -173,6 +175,7 @@ const App = () => (
               <Route path="suporte" element={<AlunoSuporte />} />
               <Route path="financeiro" element={<AlunoFinanceiro />} />
               <Route path="compras" element={<AlunoMinhasCompras />} />
+              <Route path="avaliacao/:courseId" element={<AlunoAvaliacao />} />
               <Route path="afiliado" element={<AlunoAfiliado />} />
               <Route path="treinamentos" element={<AlunoTreinamentos />} />
               <Route path="treinamentos/:slug" element={<AlunoTreinamentoPlayer />} />
@@ -219,6 +222,7 @@ const App = () => (
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="cursos" element={<AdminCursos />} />
+              <Route path="questoes" element={<AdminBancoQuestoes />} />
               <Route path="cursos/ia" element={<AdminCursoIA />} />
               <Route path="categorias" element={<AdminCategorias />} />
               <Route path="parceiros" element={<AdminParceiros />} />

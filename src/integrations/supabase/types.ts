@@ -2500,6 +2500,7 @@ export type Database = {
           correta: boolean | null
           id: string
           ordem: number
+          ordem_alternativas: Json | null
           question_id: string | null
           respondido_em: string
           resposta_index: number | null
@@ -2510,6 +2511,7 @@ export type Database = {
           correta?: boolean | null
           id?: string
           ordem?: number
+          ordem_alternativas?: Json | null
           question_id?: string | null
           respondido_em?: string
           resposta_index?: number | null
@@ -2520,6 +2522,7 @@ export type Database = {
           correta?: boolean | null
           id?: string
           ordem?: number
+          ordem_alternativas?: Json | null
           question_id?: string | null
           respondido_em?: string
           resposta_index?: number | null
@@ -5314,6 +5317,8 @@ export type Database = {
       }
       crm_can_manage_all: { Args: { _uid: string }; Returns: boolean }
       current_account_id: { Args: never; Returns: string }
+      exam_finalizar: { Args: { _attempt_id: string }; Returns: Json }
+      exam_iniciar_tentativa: { Args: { _course_id: string }; Returns: string }
       exam_questoes_da_tentativa: {
         Args: { _attempt_id: string }
         Returns: {
@@ -5323,6 +5328,12 @@ export type Database = {
           question_id: string
         }[]
       }
+      exam_responder: {
+        Args: { _attempt_id: string; _pos: number; _question_id: string }
+        Returns: boolean
+      }
+      exam_status_curso: { Args: { _course_id: string }; Returns: Json }
+      exam_tentativa: { Args: { _attempt_id: string }; Returns: Json }
       has_permission: {
         Args: {
           _permission: Database["public"]["Enums"]["app_permission"]

@@ -76,4 +76,9 @@
 - `create-payment` e `mp-webhook` antigos intactos.
 - Frontend: Checkout leva ao Mercado Pago; `/aluno/compras` com PAGAR AGORA, retorno com atualização automática e aviso de pagamento confirmado.
 - Pendente: cadastrar MERCADO_PAGO_ACCESS_TOKEN (e opcionalmente MERCADO_PAGO_WEBHOOK_SECRET) e testar uma compra real em modo teste.
-- [ ] Etapa 5 (banco de questões + prova online + correção automática) — aguardando autorização.
+## Cursos Livres — Etapa 5 (concluída)
+- Migração `0018_exam_online_etapa5.sql`: coluna `exam_attempt_answers.ordem_alternativas`, índice `(course_id, ativo)` no banco de questões e RPCs SECURITY DEFINER `exam_status_curso`, `exam_iniciar_tentativa`, `exam_tentativa`, `exam_responder`, `exam_finalizar` (execute só para `authenticated`).
+- Correção 100% no servidor; gabarito nunca vai ao navegador durante a prova; alternativas embaralhadas por tentativa (posição exibida → índice original no servidor).
+- Admin: `/admin/questoes` (`AdminBancoQuestoes.tsx`) — criar/editar/duplicar/ativar/excluir, filtros por curso, situação e busca; item no menu com `mod_cursos`.
+- Aluno: `/aluno/avaliacao/:courseId` (`Avaliacao.tsx`) — uma questão por vez, progresso, cronômetro, retomada, resultado com nota e nova tentativa; `MinhasCompras` agora leva à prova.
+- [ ] Etapa 6 (certificado PDF + QR Code + validação pública) — aguardando autorização.

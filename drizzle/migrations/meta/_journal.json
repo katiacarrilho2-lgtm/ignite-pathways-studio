@@ -127,6 +127,13 @@
       "when": 1789655256730,
       "tag": "0017_livre_pagamento_confirmacao",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790120085337,
+      "tag": "0018_exam_online_etapa5",
+      "breakpoints": true
     }
   ]
 }
