@@ -69,3 +69,11 @@
 - Páginas `/certifique-sua-experiencia`, `/certifique-sua-experiencia/:slug`, `/checkout/:slug` (cadastro/login + pedido pendente) e `/aluno/compras`.
 - Pré-visualização da sede: botão em Cursos → `?preview=1`.
 - [ ] Etapa 4 (Mercado Pago + liberação automática) — aguardando autorização.
+
+## Cursos Livres — Etapa 4 (concluída)
+- Migração `0017_livre_pagamento_confirmacao.sql`: índice único (provider, external_id) e RPC `livre_registrar_pagamento` (SECURITY DEFINER, só service_role) — confere valor, libera matrícula uma única vez, trata estorno (pedido reembolsado + matrícula suspensa) e grava auditoria.
+- Edge functions novas: `livre-create-payment` (valor lido do pedido no servidor) e `livre-mp-webhook` (verify_jwt=false, valida assinatura quando há segredo, consulta o pagamento na API oficial, idempotente).
+- `create-payment` e `mp-webhook` antigos intactos.
+- Frontend: Checkout leva ao Mercado Pago; `/aluno/compras` com PAGAR AGORA, retorno com atualização automática e aviso de pagamento confirmado.
+- Pendente: cadastrar MERCADO_PAGO_ACCESS_TOKEN (e opcionalmente MERCADO_PAGO_WEBHOOK_SECRET) e testar uma compra real em modo teste.
+- [ ] Etapa 5 (banco de questões + prova online + correção automática) — aguardando autorização.
