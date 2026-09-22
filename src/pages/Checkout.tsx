@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { fetchLivreCourseBySlug, LivreCourse, setPageMeta } from "@/lib/livre";
+import { fetchLivreCourseBySlug, iniciarPagamentoLivre, LivreCourse, setPageMeta } from "@/lib/livre";
 import { formatBRL, precoVigenteCents } from "@/lib/cursoLivre";
 import { hideCpf, isValidCpf, maskCpf, onlyDigits } from "@/lib/cpf";
 
@@ -47,7 +47,8 @@ const Checkout = () => {
   const [form, setForm] = useState({ full_name: "", cpf: "", birth_date: "", phone: "", cidade: "", estado: "" });
 
   // pedido
-  const [order, setOrder] = useState<{ numero_pedido: string; valor_final_cents: number } | null>(null);
+  const [order, setOrder] = useState<{ id?: string; order_id?: string; numero_pedido: string; valor_final_cents: number } | null>(null);
+  const [pagamentoErro, setPagamentoErro] = useState<string | null>(null);
   const creating = useRef(false);
 
   useEffect(() => { setPageMeta("Finalizar inscrição | Multplick Formação Profissional", "Revise os dados da sua inscrição na Multplick Formação Profissional."); }, []);
@@ -146,11 +147,22 @@ const Checkout = () => {
     creating.current = true;
     setBusy(true);
     const { data, error } = await supabase.rpc("livre_criar_pedido", { _course_id: course.id });
+    if (error) {
+      setBusy(false);
+      creating.current = false;
+      return toast.error(error.message);
+    }
+    const res = data as unknown as { id?: string; order_id?: string; numero_pedido: string; valor_final_cents: number };
+    setOrder(res);
+
+    const orderId = res.id ?? res.order_id;
+    if (orderId) {
+      const pg = await iniciarPagamentoLivre(orderId);
+      if (pg.url) { window.location.href = pg.url; return; }
+      setPagamentoErro(pg.error ?? null);
+    }
     setBusy(false);
     creating.current = false;
-    if (error) return toast.error(error.message);
-    const res = data as unknown as { numero_pedido: string; valor_final_cents: number };
-    setOrder(res);
     toast.success("Pedido registrado.");
   };
 
