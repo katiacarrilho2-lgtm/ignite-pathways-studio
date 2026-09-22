@@ -29,6 +29,7 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/connect", label: "Multplick Connect", icon: MessagesSquare, perm: "manage_leads", mod: "mod_connect" },
   { to: "/admin/cursos", label: "Cursos", icon: GraduationCap, perm: "manage_courses", mod: "mod_cursos" },
   { to: "/admin/cursos/ia", label: "Gerar Curso IA", icon: Sparkles, perm: "manage_courses", mod: "mod_cursos_ia" },
+  { to: "/admin/questoes", label: "Banco de Questões", icon: HelpCircle, perm: "manage_courses", mod: "mod_cursos" },
   { to: "/admin/corporativo", label: "Corporativo", icon: Briefcase, perm: "manage_courses", mod: "mod_corporativo" },
   { to: "/admin/licenciados", label: "Rede Multplick", icon: Network, perm: "manage_users" },
 
