@@ -193,9 +193,25 @@ const Checkout = () => {
           <p className="mt-2 flex justify-between"><span className="text-muted-foreground">Situação</span><span className="font-medium">Aguardando pagamento</span></p>
         </div>
         <p className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-3 text-sm text-muted-foreground">
-          <Info className="size-4" /> Pagamento será habilitado na próxima etapa.
+          <Info className="size-4" /> {pagamentoErro ?? "Estamos abrindo o ambiente de pagamento…"}
         </p>
-        <Button asChild variant="hero" className="mt-6 w-full"><Link to="/aluno/compras">Ver minhas compras</Link></Button>
+        <Button
+          variant="hero"
+          className="mt-6 w-full"
+          disabled={busy}
+          onClick={async () => {
+            const id = order.id ?? order.order_id;
+            if (!id) return;
+            setBusy(true);
+            const pg = await iniciarPagamentoLivre(id);
+            setBusy(false);
+            if (pg.url) window.location.href = pg.url;
+            else { setPagamentoErro(pg.error ?? null); toast.error(pg.error ?? "Pagamento indisponível."); }
+          }}
+        >
+          {busy ? <Loader2 className="size-4 animate-spin" /> : "PAGAR AGORA"}
+        </Button>
+        <Button asChild variant="outline" className="mt-3 w-full"><Link to="/aluno/compras">Ver minhas compras</Link></Button>
       </div>
     );
   }
