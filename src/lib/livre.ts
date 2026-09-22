@@ -49,6 +49,22 @@ export const fetchLivreCourseBySlug = async (slug: string, preview: boolean): Pr
   return c;
 };
 
+/**
+ * Inicia o pagamento de um pedido no Mercado Pago.
+ * O valor é sempre lido do pedido no servidor — o navegador só informa qual pedido pagar.
+ */
+export const iniciarPagamentoLivre = async (orderId: string): Promise<{ url?: string; error?: string }> => {
+  const { data, error } = await supabase.functions.invoke("livre-create-payment", { body: { order_id: orderId } });
+  if (error) {
+    const msg = (data as { error?: string } | null)?.error;
+    return { error: msg ?? "Não foi possível abrir o pagamento agora. Tente novamente em instantes." };
+  }
+  const res = data as { init_point?: string; sandbox_init_point?: string; error?: string };
+  if (res?.error) return { error: res.error };
+  const url = res?.init_point ?? res?.sandbox_init_point;
+  return url ? { url } : { error: "Pagamento indisponível no momento." };
+};
+
 /** Define título e descrição da página (SEO/compartilhamento). */
 export const setPageMeta = (title: string, description: string) => {
   document.title = title;
