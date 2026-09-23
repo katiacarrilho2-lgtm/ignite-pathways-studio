@@ -21,6 +21,7 @@ import Auth from "./pages/Auth.tsx";
 import Dashboard from "./pages/admin/Dashboard.tsx";
 import AdminCursos from "./pages/admin/AdminCursos.tsx";
 import AdminBancoQuestoes from "./pages/admin/AdminBancoQuestoes.tsx";
+import AdminCursosLivres from "./pages/admin/AdminCursosLivres.tsx";
 import AdminUsuarios from "./pages/admin/AdminUsuarios.tsx";
 import AdminCargos from "./pages/admin/AdminCargos.tsx";
 import LeadsLayout from "./pages/admin/leads/LeadsLayout.tsx";
@@ -226,6 +227,7 @@ const App = () => (
               <Route index element={<Dashboard />} />
               <Route path="cursos" element={<AdminCursos />} />
               <Route path="questoes" element={<AdminBancoQuestoes />} />
+              <Route path="cursos-livres" element={<AdminCursosLivres />} />
               <Route path="cursos/ia" element={<AdminCursoIA />} />
               <Route path="categorias" element={<AdminCategorias />} />
               <Route path="parceiros" element={<AdminParceiros />} />
