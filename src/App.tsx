@@ -54,6 +54,7 @@ import AlunoLogin from "./pages/aluno/Login.tsx";
 import AlunoDashboard from "./pages/aluno/Dashboard.tsx";
 import AlunoPerfil from "./pages/aluno/Perfil.tsx";
 import AlunoCertificados from "./pages/aluno/Certificados.tsx";
+import ValidarCertificado from "./pages/ValidarCertificado.tsx";
 import AlunoCursoPlayer from "./pages/aluno/CursoPlayer.tsx";
 import AlunoCertificado from "./pages/aluno/Certificado.tsx";
 import AlunoMensagens from "./pages/aluno/Mensagens.tsx";
@@ -158,6 +159,8 @@ const App = () => (
               <Route path="/pagamento/pendente" element={<PagamentoRetorno status="pendente" />} />
               <Route path="/certifique-sua-experiencia" element={<CertifiqueSuaExperiencia />} />
               <Route path="/certifique-sua-experiencia/:slug" element={<CertifiqueCurso />} />
+              <Route path="/validar-certificado" element={<ValidarCertificado />} />
+              <Route path="/validar-certificado/:codigo" element={<ValidarCertificado />} />
               <Route path="/checkout/:slug" element={<Checkout />} />
               <Route path="/matricula/:slug" element={<Matricula />} />
             </Route>

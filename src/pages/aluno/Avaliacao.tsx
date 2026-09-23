@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock, Loader2, XCircle } from "lucide-react";
 import { toast } from "sonner";
+import { baixarCertificadoPdf } from "@/lib/certificadoPdf";
 
 type Questao = {
   question_id: string;
@@ -101,6 +102,23 @@ const Avaliacao = () => {
     return Math.max(0, Math.floor((new Date(tent.expira_em).getTime() - agora) / 1000));
   }, [tent?.expira_em, tent?.status, agora]);
 
+  const [baixandoCert, setBaixandoCert] = useState(false);
+  const baixarCertificado = async (attemptId: string) => {
+    setBaixandoCert(true);
+    const { data } = await supabase
+      .from("certificates")
+      .select("numero,codigo_validacao,emitido_em,status,nota_final,carga_horaria_horas,snapshot")
+      .eq("attempt_id", attemptId)
+      .maybeSingle();
+    if (!data) {
+      toast.info("O certificado deste curso ainda não está habilitado.");
+    } else {
+      try { await baixarCertificadoPdf(data as any); }
+      catch { toast.error("Não foi possível gerar o PDF agora."); }
+    }
+    setBaixandoCert(false);
+  };
+
   const finalizar = useCallback(async () => {
     if (!tent) return;
     setAcao(true);
@@ -146,7 +164,9 @@ const Avaliacao = () => {
           </p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
             {aprovado ? (
-              <Button variant="hero" className="h-11" disabled>BAIXAR CERTIFICADO</Button>
+              <Button variant="hero" className="h-11" disabled={baixandoCert} onClick={() => baixarCertificado(tent.attempt_id)}>
+                BAIXAR CERTIFICADO
+              </Button>
             ) : (
               <Button variant="hero" className="h-11" onClick={() => { setTent(null); carregarStatus(); }}>
                 FAZER NOVA TENTATIVA
@@ -154,7 +174,7 @@ const Avaliacao = () => {
             )}
             <Button asChild variant="outline" className="h-11"><Link to="/aluno/compras">Voltar</Link></Button>
           </div>
-          {aprovado && <p className="mt-3 text-xs text-muted-foreground">A emissão do certificado entra no ar na próxima etapa.</p>}
+          {aprovado && <p className="mt-3 text-xs text-muted-foreground">O certificado também fica disponível em “Certificados”, na sua área do aluno.</p>}
         </div>
 
         {tent.mostrar_respostas && (

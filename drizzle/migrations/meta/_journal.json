@@ -134,6 +134,20 @@
       "when": 1790120085337,
       "tag": "0018_exam_online_etapa5",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1790169815648,
+      "tag": "0019_certificados_emissao_validacao",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1790169845934,
+      "tag": "0020_exam_finalizar_emite_certificado",
+      "breakpoints": true
     }
   ]
 }

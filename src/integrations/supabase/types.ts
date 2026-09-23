@@ -540,6 +540,9 @@ export type Database = {
           nota_final: number | null
           numero: string
           observacoes: string | null
+          reativado_em: string | null
+          reativado_por: string | null
+          snapshot: Json | null
           status: string
           tipo: string
           updated_at: string
@@ -562,6 +565,9 @@ export type Database = {
           nota_final?: number | null
           numero: string
           observacoes?: string | null
+          reativado_em?: string | null
+          reativado_por?: string | null
+          snapshot?: Json | null
           status?: string
           tipo?: string
           updated_at?: string
@@ -584,6 +590,9 @@ export type Database = {
           nota_final?: number | null
           numero?: string
           observacoes?: string | null
+          reativado_em?: string | null
+          reativado_por?: string | null
+          snapshot?: Json | null
           status?: string
           tipo?: string
           updated_at?: string
@@ -5315,6 +5324,17 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      certificado_cancelar: {
+        Args: { _id: string; _motivo: string }
+        Returns: undefined
+      }
+      certificado_emitir_por_tentativa: {
+        Args: { _attempt_id: string }
+        Returns: string
+      }
+      certificado_proximo_numero: { Args: never; Returns: string }
+      certificado_reativar: { Args: { _id: string }; Returns: undefined }
+      certificado_validar: { Args: { _codigo: string }; Returns: Json }
       crm_can_manage_all: { Args: { _uid: string }; Returns: boolean }
       current_account_id: { Args: never; Returns: string }
       exam_finalizar: { Args: { _attempt_id: string }; Returns: Json }
