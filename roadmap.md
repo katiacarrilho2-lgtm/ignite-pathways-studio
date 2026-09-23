@@ -81,4 +81,10 @@
 - Correção 100% no servidor; gabarito nunca vai ao navegador durante a prova; alternativas embaralhadas por tentativa (posição exibida → índice original no servidor).
 - Admin: `/admin/questoes` (`AdminBancoQuestoes.tsx`) — criar/editar/duplicar/ativar/excluir, filtros por curso, situação e busca; item no menu com `mod_cursos`.
 - Aluno: `/aluno/avaliacao/:courseId` (`Avaliacao.tsx`) — uma questão por vez, progresso, cronômetro, retomada, resultado com nota e nova tentativa; `MinhasCompras` agora leva à prova.
-- [ ] Etapa 6 (certificado PDF + QR Code + validação pública) — aguardando autorização.
+## Cursos Livres — Etapa 6 (concluída)
+- Migrações `0019_certificados_emissao_validacao.sql` (snapshot congelado, índice único por tentativa, RPCs `certificado_proximo_numero`, `certificado_emitir_por_tentativa`, `certificado_validar` (pública), `certificado_cancelar`, `certificado_reativar`) e `0020_exam_finalizar_emite_certificado.sql`.
+- Emissão 100% no servidor ao aprovar na prova, apenas quando o curso tem certificado automático e a prova libera certificado; numeração MPL-ANO-000000; idempotente por tentativa.
+- PDF A4 paisagem em `src/lib/certificadoPdf.ts` (logo, assinatura gráfica ou digitalizada, QR Code, carga horária só quando aplicável, marca CANCELADO).
+- Página pública `/validar-certificado/:codigo` (CPF mascarado) e área do aluno `/aluno/certificados` com download.
+- Admin `/admin/certificacao`: busca, filtro por status, download do PDF, cancelar/reativar com auditoria e aba de Configurações do certificado (inclui upload da assinatura).
+- [ ] Etapa 7 (painel de gestão consolidado + testes ponta a ponta) — aguardando autorização.
