@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ROOT_ACCOUNT_ID } from "@/lib/multiAccount";
@@ -32,6 +32,8 @@ export const useCommercialAccounts = (): Result => {
   const [activeAccountId, setActive] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const loadedOnce = useRef(false);
+
   const load = useCallback(async () => {
     if (!user) {
       setAccounts([]);
@@ -40,7 +42,9 @@ export const useCommercialAccounts = (): Result => {
       setLoading(false);
       return;
     }
-    setLoading(true);
+    // Só mostra "carregando" na primeira vez. Recargas em segundo plano
+    // não podem apagar a tela nem fechar o que o usuário abriu.
+    if (!loadedOnce.current) setLoading(true);
     const [{ data: prof }, { data: ctx }, { data: rows }] = await Promise.all([
       supabase.from("profiles").select("account_id").eq("user_id", user.id).maybeSingle(),
       supabase.from("account_context").select("account_id").eq("user_id", user.id).maybeSingle(),
@@ -58,6 +62,7 @@ export const useCommercialAccounts = (): Result => {
         status: r.status ?? null,
       })),
     );
+    loadedOnce.current = true;
     setLoading(false);
   }, [user]);
 

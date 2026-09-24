@@ -41,13 +41,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [permissions, setPermissions] = useState<Permission[]>([]);
   const [username, setUsername] = useState<string | null>(null);
 
+  // Mantém a MESMA referência de `user` quando é o mesmo usuário (ex.: renovação
+  // de token ao voltar de outra aba). Assim nada na tela é remontado e o que o
+  // usuário tinha aberto (ficha, diálogo, formulário) continua aberto.
+  const applyUser = (next: User | null) =>
+    setUser((prev) => (prev && next && prev.id === next.id ? prev : next));
+
   useEffect(() => {
+    const loadedFor = { current: null as string | null };
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
-      setUser(s?.user ?? null);
+      applyUser(s?.user ?? null);
       if (s?.user) {
-        setTimeout(() => loadAccess(s.user.id), 0);
+        if (loadedFor.current !== s.user.id) {
+          loadedFor.current = s.user.id;
+          setTimeout(() => loadAccess(s.user.id), 0);
+        }
       } else {
+        loadedFor.current = null;
         setRoles([]);
         setPermissions([]);
         setUsername(null);
@@ -55,8 +66,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
-      setUser(data.session?.user ?? null);
-      if (data.session?.user) loadAccess(data.session.user.id);
+      applyUser(data.session?.user ?? null);
+      if (data.session?.user && loadedFor.current !== data.session.user.id) {
+        loadedFor.current = data.session.user.id;
+        loadAccess(data.session.user.id);
+      }
       setLoading(false);
     });
     return () => sub.subscription.unsubscribe();
