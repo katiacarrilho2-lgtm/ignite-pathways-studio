@@ -162,6 +162,13 @@
       "when": 1790272346684,
       "tag": "0022_loja_settings_publico",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1790272844207,
+      "tag": "0023_loja_lead_owner",
+      "breakpoints": true
     }
   ]
 }
