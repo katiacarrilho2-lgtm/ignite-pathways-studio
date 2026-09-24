@@ -14,6 +14,8 @@ import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
 import { usePortalBase } from "@/lib/portal";
 import { buildStudentContractPdf } from "@/lib/contracts/studentContractPdf";
+import CustomFieldsManager, { type CustomField } from "@/components/admin/CustomFieldsManager";
+
 
 type App = {
   id: string; created_at: string; status: string; course_id: string | null; course_title: string;
