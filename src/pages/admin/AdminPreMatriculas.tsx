@@ -605,10 +605,8 @@ const Inner = () => {
             <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione um curso para gerar o link..." /></SelectTrigger>
             <SelectContent>{courses.map(c => <SelectItem key={c.id} value={c.slug}>{c.title}</SelectItem>)}</SelectContent>
           </Select>
-          <Button size="sm" onClick={() => setFormLink(" ")}>
-            + Criar novo link
-          </Button>
         </div>
+
         {formLink && (
           <div className="space-y-2 max-w-2xl">
             <Textarea
