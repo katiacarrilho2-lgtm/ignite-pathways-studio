@@ -148,6 +148,13 @@
       "when": 1790169845934,
       "tag": "0020_exam_finalizar_emite_certificado",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1790272290029,
+      "tag": "0021_loja_online_multplick",
+      "breakpoints": true
     }
   ]
 }
