@@ -949,7 +949,7 @@ const Inner = () => {
                       key={cf.id}
                       label={cf.label}
                       value={(viewing.custom_data as any)?.[cf.field_key] ?? ""}
-                      onSave={(val) => saveCustomValue(viewing, cf.field_key, val)}
+                      onSave={(val) => { void saveCustomValue(viewing, cf.field_key, val); }}
                     />
                   ))}
                 </Section>
