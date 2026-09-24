@@ -652,9 +652,12 @@ const Inner = () => {
             })}
         </div>
         {comboSlugs.length >= 2 && (
-          <p className="text-[11px] text-muted-foreground">
-            Curso principal (rótulo do link): <strong>{courses.find(c => c.slug === comboSlugs[0])?.title}</strong>. Os demais aparecem na ficha como parte do combo.
-          </p>
+          <>
+            <p className="text-[11px] text-muted-foreground">
+              Curso principal (rótulo do link): <strong>{courses.find(c => c.slug === comboSlugs[0])?.title}</strong>. Os demais aparecem na ficha como parte do combo. Você pode editar o link abaixo antes de copiar.
+            </p>
+            <Input value={comboLinkValue} onChange={e => setComboLinkEdited(e.target.value)} className="text-xs max-w-2xl" />
+          </>
         )}
       </div>
 
