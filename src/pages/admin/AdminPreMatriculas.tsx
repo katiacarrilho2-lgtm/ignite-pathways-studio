@@ -14,7 +14,11 @@ import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
 import { usePortalBase } from "@/lib/portal";
 import { buildStudentContractPdf } from "@/lib/contracts/studentContractPdf";
-import CustomFieldsManager, { type CustomField } from "@/components/admin/CustomFieldsManager";
+const GUARDIAN_FIELDS: [string, string][] = [
+  ["nome", "Nome completo"], ["cpf", "CPF"], ["rg", "RG"], ["orgao_emissor", "Órgão emissor"], ["data_expedicao", "Data de expedição"],
+  ["nascimento", "Nascimento"], ["parentesco", "Parentesco"], ["cep", "CEP"], ["rua", "Rua"], ["numero", "Número"],
+  ["complemento", "Complemento"], ["bairro", "Bairro"], ["cidade", "Cidade"], ["estado", "UF"], ["whatsapp", "WhatsApp"], ["email", "E-mail"],
+];
 
 
 type App = {
@@ -35,6 +39,9 @@ type App = {
   network_review_message?: string | null;
   network_reviewed_at?: string | null;
   custom_data?: Record<string, string> | null;
+  guardian_token?: string;
+  guardian_data?: Record<string, string> | null;
+  guardian_submitted_at?: string | null;
 };
 
 
@@ -79,15 +86,14 @@ const Inner = () => {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [viewing, setViewing] = useState<App | null>(null);
-  const [customFields, setCustomFields] = useState<CustomField[]>([]);
-
-  useEffect(() => {
-    supabase
-      .from("enrollment_custom_fields")
-      .select("*")
-      .order("sort_order", { ascending: true })
-      .then(({ data }) => setCustomFields((data ?? []) as CustomField[]));
-  }, []);
+  const saveGuardian = async (a: App, key: string, value: string) => {
+    const next = { ...((a.guardian_data ?? {}) as Record<string, string>), [key]: value };
+    const { error } = await supabase.from("enrollment_applications").update({ guardian_data: next } as any).eq("id", a.id);
+    if (error) return toast.error(error.message);
+    toast.success("Salvo");
+    setList(l => l.map(x => (x.id === a.id ? { ...x, guardian_data: next } : x)));
+    setViewing(v => (v && v.id === a.id ? { ...v, guardian_data: next } : v));
+  };
 
   const saveCustomValue = async (a: App, key: string, value: string) => {
     const next = { ...(a.custom_data ?? {}), [key]: value };
@@ -700,7 +706,6 @@ const Inner = () => {
         )}
       </div>
 
-      <CustomFieldsManager />
 
 
 
@@ -942,18 +947,36 @@ const Inner = () => {
                 <EditField label="Ano de Formação" value={viewing.graduation_year} field="graduation_year" id={viewing.id} save={updateField} />
                 <EditField label="Instituição" value={viewing.institution} field="institution" id={viewing.id} save={updateField} />
               </Section>
-              {customFields.length > 0 && (
-                <Section title="Informações extras">
-                  {customFields.map(cf => (
-                    <EditCustomField
-                      key={cf.id}
-                      label={cf.label}
-                      value={(viewing.custom_data as any)?.[cf.field_key] ?? ""}
-                      onSave={(val) => { void saveCustomValue(viewing, cf.field_key, val); }}
-                    />
-                  ))}
-                </Section>
-              )}
+              {(() => {
+                const bd = viewing.birth_date ? new Date(viewing.birth_date + "T12:00:00") : null;
+                const idade = bd ? Math.floor((Date.now() - bd.getTime()) / 31557600000) : null;
+                const menor = idade !== null && idade < 18;
+                const link = `${window.location.origin}/responsavel/${viewing.guardian_token}`;
+                const g = (viewing.guardian_data ?? {}) as Record<string, string>;
+                return (
+                  <Section title="Responsável legal">
+                    <div className="md:col-span-2 space-y-2">
+                      {menor && !viewing.guardian_submitted_at && (
+                        <p className="text-xs rounded-md bg-destructive/10 text-destructive px-3 py-2">
+                          Menor de idade ({idade} anos) — enviar link do responsável. Aguardando responsável.
+                        </p>
+                      )}
+                      {viewing.guardian_submitted_at && (
+                        <p className="text-xs text-primary">Ficha enviada em {new Date(viewing.guardian_submitted_at).toLocaleString("pt-BR")}</p>
+                      )}
+                      <div className="flex gap-2">
+                        <Input readOnly value={link} className="text-xs" />
+                        <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(link); toast.success("Link do responsável copiado"); }}>
+                          Copiar link do responsável
+                        </Button>
+                      </div>
+                    </div>
+                    {GUARDIAN_FIELDS.map(([k, label]) => (
+                      <EditCustomField key={k} label={label} value={g[k] ?? ""} onSave={(val) => { void saveGuardian(viewing, k, val); }} />
+                    ))}
+                  </Section>
+                );
+              })()}
               <Section title="Observações">
                 <div className="md:col-span-2">
                   <textarea
