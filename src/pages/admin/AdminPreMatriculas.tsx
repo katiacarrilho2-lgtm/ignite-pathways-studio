@@ -567,6 +567,7 @@ const Inner = () => {
     : "";
   const [comboLinkEdited, setComboLinkEdited] = useState<string | null>(null);
   const comboLinkValue = comboLinkEdited ?? comboLink;
+  useEffect(() => { setComboLinkEdited(null); }, [comboSlugs]);
 
   const copyComboLink = async () => {
     if (comboSlugs.length < 2) return toast.error("Selecione pelo menos 2 cursos para montar um combo.");
