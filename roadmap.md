@@ -87,4 +87,5 @@
 - PDF A4 paisagem em `src/lib/certificadoPdf.ts` (logo, assinatura gráfica ou digitalizada, QR Code, carga horária só quando aplicável, marca CANCELADO).
 - Página pública `/validar-certificado/:codigo` (CPF mascarado) e área do aluno `/aluno/certificados` com download.
 - Admin `/admin/certificacao`: busca, filtro por status, download do PDF, cancelar/reativar com auditoria e aba de Configurações do certificado (inclui upload da assinatura).
-- [ ] Etapa 7 (painel de gestão consolidado + testes ponta a ponta) — aguardando autorização.
+- [x] Etapa 7 (painel consolidado /admin/cursos-livres + teste ponta a ponta) — concluída.
+- [ ] Pendente: chave do Mercado Pago (teste/produção) para cobranças reais.
