@@ -674,6 +674,10 @@ const Inner = () => {
         )}
       </div>
 
+      <CustomFieldsManager />
+
+
+
       <div className="relative max-w-md">
         <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input className="pl-9" placeholder="Buscar por nome, e-mail, curso, telefone..." value={q} onChange={e=>setQ(e.target.value)} />
