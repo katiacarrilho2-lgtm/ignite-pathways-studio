@@ -340,6 +340,35 @@ const Matricula = () => {
             </div>
           </Card>
 
+          {customFields.length > 0 && (
+            <Card className="p-5 md:p-6 space-y-4">
+              <h2 className="font-semibold text-primary">Informações complementares</h2>
+              <div className="grid md:grid-cols-2 gap-3">
+                {customFields.map(f => (
+                  <div key={f.id} className={f.field_type === "textarea" ? "md:col-span-2" : ""}>
+                    <Label>{f.label}{f.required ? " *" : ""}</Label>
+                    {f.field_type === "textarea" ? (
+                      <Textarea
+                        value={customData[f.field_key] ?? ""}
+                        placeholder={f.placeholder ?? ""}
+                        onChange={e => setCustomData(d => ({ ...d, [f.field_key]: e.target.value }))}
+                      />
+                    ) : (
+                      <Input
+                        type={f.field_type === "date" ? "date" : f.field_type === "number" ? "number" : f.field_type === "email" ? "email" : "text"}
+                        value={customData[f.field_key] ?? ""}
+                        placeholder={f.placeholder ?? ""}
+                        onChange={e => setCustomData(d => ({ ...d, [f.field_key]: e.target.value }))}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+
+
           <Card className="p-5 md:p-6 space-y-4">
             <h2 className="font-semibold text-primary">Curso e pagamento</h2>
             <div className="grid md:grid-cols-2 gap-3">
