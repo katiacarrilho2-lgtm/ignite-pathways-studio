@@ -89,3 +89,8 @@
 - Admin `/admin/certificacao`: busca, filtro por status, download do PDF, cancelar/reativar com auditoria e aba de Configurações do certificado (inclui upload da assinatura).
 - [x] Etapa 7 (painel consolidado /admin/cursos-livres + teste ponta a ponta) — concluída.
 - [ ] Pendente: chave do Mercado Pago (teste/produção) para cobranças reais.
+
+## Loja Online (InfinitePay) — 24/09/2026
+- [x] Tabelas store_* + RLS por conta, catálogo, carrinho, checkout, webhook, CRM, financeiro, admin (/admin/loja)
+- [ ] Informar InfiniteTag da InfinitePay no painel (Loja › Pagamentos) e fazer 1 compra real de valor mínimo — depende do usuário
+- [ ] Cadastrar produtos/preços/imagens — depende do usuário
