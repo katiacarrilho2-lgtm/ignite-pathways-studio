@@ -912,6 +912,18 @@ const Inner = () => {
                 <EditField label="Ano de Formação" value={viewing.graduation_year} field="graduation_year" id={viewing.id} save={updateField} />
                 <EditField label="Instituição" value={viewing.institution} field="institution" id={viewing.id} save={updateField} />
               </Section>
+              {customFields.length > 0 && (
+                <Section title="Informações extras">
+                  {customFields.map(cf => (
+                    <EditCustomField
+                      key={cf.id}
+                      label={cf.label}
+                      value={(viewing.custom_data as any)?.[cf.field_key] ?? ""}
+                      onSave={(val) => saveCustomValue(viewing, cf.field_key, val)}
+                    />
+                  ))}
+                </Section>
+              )}
               <Section title="Observações">
                 <div className="md:col-span-2">
                   <textarea
@@ -923,6 +935,7 @@ const Inner = () => {
                   <p className="text-[10px] text-muted-foreground mt-1">Salva automaticamente ao sair do campo.</p>
                 </div>
               </Section>
+
             </div>
           )}
         </DialogContent>
