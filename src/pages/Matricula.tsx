@@ -175,6 +175,8 @@ const Matricula = () => {
     if (!course) return;
     const parsed = schema.safeParse(form);
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    const faltando = customFields.find(f => f.required && !(customData[f.field_key] ?? "").trim());
+    if (faltando) return toast.error(`Preencha: ${faltando.label}`);
     setLoading(true);
     try {
       const allTitles = [course.title, ...comboCourses.map(c => c.title)];
@@ -182,15 +184,22 @@ const Matricula = () => {
       const comboNote = isCombo
         ? `COMBO solicitado:\n${allTitles.map(t => `• ${t}`).join("\n")}\n\n`
         : "";
+      const extras: Record<string, string> = {};
+      customFields.forEach(f => {
+        const v = (customData[f.field_key] ?? "").trim();
+        if (v) extras[f.field_key] = v;
+      });
       const payload: any = {
         ...form,
         notes: (comboNote + (form.notes ?? "")).trim() || null,
         birth_date: form.birth_date || null,
         rg_issue_date: form.rg_issue_date || null,
+        custom_data: extras,
         course_id: course.id,
         course_title: isCombo ? `COMBO: ${allTitles.join(" + ")}` : course.title,
         source: window.location.pathname.slice(0, 60),
       };
+
       const { error } = await supabase.from("enrollment_applications").insert(payload);
       if (error) throw error;
       setSent(true);
