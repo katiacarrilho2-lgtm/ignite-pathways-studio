@@ -100,6 +100,7 @@ import Checkout from "./pages/Checkout.tsx";
 import CertifiqueSuaExperiencia from "./pages/CertifiqueSuaExperiencia.tsx";
 import CertifiqueCurso from "./pages/CertifiqueCurso.tsx";
 import Matricula from "./pages/Matricula.tsx";
+import Responsavel from "./pages/Responsavel.tsx";
 import Prova from "./pages/Prova.tsx";
 import DocumentosUpload from "./pages/DocumentosUpload.tsx";
 import Unsubscribe from "./pages/Unsubscribe.tsx";
@@ -173,6 +174,7 @@ const App = () => (
               <Route path="/loja/confirmacao" element={<LojaConfirmacao />} />
               <Route path="/curso/:slug" element={<LojaProduto />} />
               <Route path="/matricula/:slug" element={<Matricula />} />
+              <Route path="/responsavel/:token" element={<Responsavel />} />
             </Route>
             <Route path="/prova/:token" element={<Prova />} />
             <Route path="/documentos/:token" element={<DocumentosUpload />} />
