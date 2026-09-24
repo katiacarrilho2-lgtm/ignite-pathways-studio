@@ -78,6 +78,7 @@ const Inner = () => {
   // Combo link builder (multi-cursos)
   const [comboSlugs, setComboSlugs] = useState<string[]>([]);
   const [comboSearch, setComboSearch] = useState("");
+  const [formLink, setFormLink] = useState("");
   const [entryDate, setEntryDate] = useState("");
   const [reminderDate, setReminderDate] = useState("");
   const [savingDates, setSavingDates] = useState(false);
@@ -490,9 +491,13 @@ const Inner = () => {
     load();
   };
 
-  const copyFormLink = async (slug: string) => {
-    const url = `${window.location.origin}/matricula/${slug}`;
-    await navigator.clipboard.writeText(url);
+  const buildFormLink = (slug: string) => {
+    setFormLink(`${window.location.origin}/matricula/${slug}`);
+  };
+
+  const copyEditedLink = async (url: string) => {
+    if (!url.trim()) return toast.error("O link está vazio.");
+    await navigator.clipboard.writeText(url.trim());
     toast.success("Link copiado!");
   };
 
@@ -557,12 +562,16 @@ const Inner = () => {
     setComboSlugs(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]);
   };
 
+  const comboLink = comboSlugs.length >= 2
+    ? `${window.location.origin}/matricula/${comboSlugs[0]}?combo=${comboSlugs.slice(1).join(",")}`
+    : "";
+  const [comboLinkEdited, setComboLinkEdited] = useState<string | null>(null);
+  const comboLinkValue = comboLinkEdited ?? comboLink;
+  useEffect(() => { setComboLinkEdited(null); }, [comboSlugs]);
+
   const copyComboLink = async () => {
     if (comboSlugs.length < 2) return toast.error("Selecione pelo menos 2 cursos para montar um combo.");
-    const [first, ...rest] = comboSlugs;
-    const url = `${window.location.origin}/matricula/${first}?combo=${rest.join(",")}`;
-    await navigator.clipboard.writeText(url);
-    toast.success(`Link do combo (${comboSlugs.length} cursos) copiado!`);
+    await copyEditedLink(comboLinkValue);
   };
 
   return (
@@ -590,11 +599,19 @@ const Inner = () => {
 
       <div className="bg-card border border-border rounded-xl p-4 md:p-5 space-y-3">
         <h2 className="text-sm font-semibold text-primary flex items-center gap-2"><Copy className="size-4" /> Compartilhar link do formulário</h2>
-        <p className="text-xs text-muted-foreground">Escolha um curso para copiar o link da ficha e enviar por WhatsApp, e-mail, redes sociais, etc.</p>
-        <Select onValueChange={copyFormLink}>
-          <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione um curso para copiar o link..." /></SelectTrigger>
+        <p className="text-xs text-muted-foreground">Escolha um curso, edite o link se quiser (ex.: adicionar informações extras) e depois copie para enviar por WhatsApp, e-mail, redes sociais, etc.</p>
+        <Select onValueChange={buildFormLink}>
+          <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione um curso para gerar o link..." /></SelectTrigger>
           <SelectContent>{courses.map(c => <SelectItem key={c.id} value={c.slug}>{c.title}</SelectItem>)}</SelectContent>
         </Select>
+        {formLink && (
+          <div className="flex items-center gap-2 max-w-2xl">
+            <Input value={formLink} onChange={e => setFormLink(e.target.value)} className="text-xs" />
+            <Button size="sm" variant="outline" onClick={() => copyEditedLink(formLink)}>
+              <Copy className="size-4" /> Copiar
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="bg-card border border-border rounded-xl p-4 md:p-5 space-y-3">
@@ -635,9 +652,12 @@ const Inner = () => {
             })}
         </div>
         {comboSlugs.length >= 2 && (
-          <p className="text-[11px] text-muted-foreground">
-            Curso principal (rótulo do link): <strong>{courses.find(c => c.slug === comboSlugs[0])?.title}</strong>. Os demais aparecem na ficha como parte do combo.
-          </p>
+          <>
+            <p className="text-[11px] text-muted-foreground">
+              Curso principal (rótulo do link): <strong>{courses.find(c => c.slug === comboSlugs[0])?.title}</strong>. Os demais aparecem na ficha como parte do combo. Você pode editar o link abaixo antes de copiar.
+            </p>
+            <Input value={comboLinkValue} onChange={e => setComboLinkEdited(e.target.value)} className="text-xs max-w-2xl" />
+          </>
         )}
       </div>
 
