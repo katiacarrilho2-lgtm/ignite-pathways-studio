@@ -599,11 +599,19 @@ const Inner = () => {
 
       <div className="bg-card border border-border rounded-xl p-4 md:p-5 space-y-3">
         <h2 className="text-sm font-semibold text-primary flex items-center gap-2"><Copy className="size-4" /> Compartilhar link do formulário</h2>
-        <p className="text-xs text-muted-foreground">Escolha um curso para copiar o link da ficha e enviar por WhatsApp, e-mail, redes sociais, etc.</p>
-        <Select onValueChange={copyFormLink}>
-          <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione um curso para copiar o link..." /></SelectTrigger>
+        <p className="text-xs text-muted-foreground">Escolha um curso, edite o link se quiser (ex.: adicionar informações extras) e depois copie para enviar por WhatsApp, e-mail, redes sociais, etc.</p>
+        <Select onValueChange={buildFormLink}>
+          <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione um curso para gerar o link..." /></SelectTrigger>
           <SelectContent>{courses.map(c => <SelectItem key={c.id} value={c.slug}>{c.title}</SelectItem>)}</SelectContent>
         </Select>
+        {formLink && (
+          <div className="flex items-center gap-2 max-w-2xl">
+            <Input value={formLink} onChange={e => setFormLink(e.target.value)} className="text-xs" />
+            <Button size="sm" variant="outline" onClick={() => copyEditedLink(formLink)}>
+              <Copy className="size-4" /> Copiar
+            </Button>
+          </div>
+        )}
       </div>
 
       <div className="bg-card border border-border rounded-xl p-4 md:p-5 space-y-3">
