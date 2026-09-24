@@ -34,7 +34,9 @@ type App = {
   network_review_status?: string | null;
   network_review_message?: string | null;
   network_reviewed_at?: string | null;
+  custom_data?: Record<string, string> | null;
 };
+
 
 const STATUS = [
   { v: "novo", label: "Novo" },
