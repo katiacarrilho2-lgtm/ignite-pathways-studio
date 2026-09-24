@@ -2216,6 +2216,7 @@ export type Database = {
           course_title: string
           cpf: string | null
           created_at: string
+          custom_data: Json
           email: string
           entry_date: string | null
           father_name: string | null
@@ -2260,6 +2261,7 @@ export type Database = {
           course_title: string
           cpf?: string | null
           created_at?: string
+          custom_data?: Json
           email: string
           entry_date?: string | null
           father_name?: string | null
@@ -2304,6 +2306,7 @@ export type Database = {
           course_title?: string
           cpf?: string | null
           created_at?: string
+          custom_data?: Json
           email?: string
           entry_date?: string | null
           father_name?: string | null
@@ -2347,6 +2350,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      enrollment_custom_fields: {
+        Row: {
+          active: boolean
+          created_at: string
+          field_key: string
+          field_type: string
+          id: string
+          label: string
+          placeholder: string | null
+          required: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          field_key: string
+          field_type?: string
+          id?: string
+          label: string
+          placeholder?: string | null
+          required?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          field_key?: string
+          field_type?: string
+          id?: string
+          label?: string
+          placeholder?: string | null
+          required?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       enrollment_exam_questions: {
         Row: {
