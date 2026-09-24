@@ -14,6 +14,8 @@ import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
 import { withAccount } from "@/lib/multiAccount";
 import { usePortalBase } from "@/lib/portal";
 import { buildStudentContractPdf } from "@/lib/contracts/studentContractPdf";
+import CustomFieldsManager, { type CustomField } from "@/components/admin/CustomFieldsManager";
+
 
 type App = {
   id: string; created_at: string; status: string; course_id: string | null; course_title: string;
@@ -32,7 +34,9 @@ type App = {
   network_review_status?: string | null;
   network_review_message?: string | null;
   network_reviewed_at?: string | null;
+  custom_data?: Record<string, string> | null;
 };
+
 
 const STATUS = [
   { v: "novo", label: "Novo" },
@@ -75,6 +79,28 @@ const Inner = () => {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [viewing, setViewing] = useState<App | null>(null);
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("enrollment_custom_fields")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => setCustomFields((data ?? []) as CustomField[]));
+  }, []);
+
+  const saveCustomValue = async (a: App, key: string, value: string) => {
+    const next = { ...(a.custom_data ?? {}), [key]: value };
+    const { error } = await supabase
+      .from("enrollment_applications")
+      .update({ custom_data: next } as any)
+      .eq("id", a.id);
+    if (error) return toast.error(error.message);
+    setList(l => l.map(x => (x.id === a.id ? { ...x, custom_data: next } : x)));
+    setViewing(v => (v && v.id === a.id ? { ...v, custom_data: next } : v));
+    toast.success("Informação salva");
+  };
+
   // Combo link builder (multi-cursos)
   const [comboSlugs, setComboSlugs] = useState<string[]>([]);
   const [comboSearch, setComboSearch] = useState("");
@@ -605,10 +631,8 @@ const Inner = () => {
             <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione um curso para gerar o link..." /></SelectTrigger>
             <SelectContent>{courses.map(c => <SelectItem key={c.id} value={c.slug}>{c.title}</SelectItem>)}</SelectContent>
           </Select>
-          <Button size="sm" onClick={() => setFormLink(" ")}>
-            + Criar novo link
-          </Button>
         </div>
+
         {formLink && (
           <div className="space-y-2 max-w-2xl">
             <Textarea
@@ -675,6 +699,10 @@ const Inner = () => {
           </>
         )}
       </div>
+
+      <CustomFieldsManager />
+
+
 
       <div className="relative max-w-md">
         <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -914,6 +942,18 @@ const Inner = () => {
                 <EditField label="Ano de Formação" value={viewing.graduation_year} field="graduation_year" id={viewing.id} save={updateField} />
                 <EditField label="Instituição" value={viewing.institution} field="institution" id={viewing.id} save={updateField} />
               </Section>
+              {customFields.length > 0 && (
+                <Section title="Informações extras">
+                  {customFields.map(cf => (
+                    <EditCustomField
+                      key={cf.id}
+                      label={cf.label}
+                      value={(viewing.custom_data as any)?.[cf.field_key] ?? ""}
+                      onSave={(val) => { void saveCustomValue(viewing, cf.field_key, val); }}
+                    />
+                  ))}
+                </Section>
+              )}
               <Section title="Observações">
                 <div className="md:col-span-2">
                   <textarea
@@ -925,6 +965,7 @@ const Inner = () => {
                   <p className="text-[10px] text-muted-foreground mt-1">Salva automaticamente ao sair do campo.</p>
                 </div>
               </Section>
+
             </div>
           )}
         </DialogContent>
@@ -1197,6 +1238,26 @@ const EditField = ({
     </div>
   );
 };
+
+const EditCustomField = ({
+  label, value, onSave,
+}: { label: string; value: string; onSave: (v: string) => void | Promise<void> }) => {
+  const [v, setV] = useState(value ?? "");
+  useEffect(() => { setV(value ?? ""); }, [value, label]);
+  return (
+    <div>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Input
+        value={v}
+        onChange={(e) => setV(e.target.value)}
+        onBlur={() => { if (v !== (value ?? "")) onSave(v); }}
+        className="h-8 text-sm"
+      />
+    </div>
+  );
+};
+
+
 
 const AdminPreMatriculas = () => <RequirePermission perm="manage_courses"><Inner /></RequirePermission>;
 export default AdminPreMatriculas;

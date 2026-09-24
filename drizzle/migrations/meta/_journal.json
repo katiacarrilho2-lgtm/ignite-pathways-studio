@@ -183,6 +183,13 @@
       "when": 1790272935563,
       "tag": "0025_loja_anon_can_manage",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1790275542222,
+      "tag": "0026_enrollment_custom_fields",
+      "breakpoints": true
     }
   ]
 }

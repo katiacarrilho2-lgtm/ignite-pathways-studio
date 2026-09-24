@@ -14,6 +14,12 @@ import { getReferralCode } from "@/hooks/useReferralCapture";
 
 type Course = { id: string | null; slug: string; title: string; description: string | null; price_cents: number | null; image_url: string | null };
 
+type CustomFieldDef = {
+  id: string; field_key: string; label: string; field_type: string;
+  placeholder: string | null; required: boolean; active: boolean; sort_order: number;
+};
+
+
 const schema = z.object({
   full_name: z.string().trim().min(3, "Informe o nome completo").max(120),
   email: z.string().trim().email("E-mail inválido").max(160),
@@ -139,7 +145,25 @@ const Matricula = () => {
     return () => { active = false; };
   }, [comboParam, slug]);
 
+  // Campos extras criados pela equipe no painel
+  const [customFields, setCustomFields] = useState<CustomFieldDef[]>([]);
+  const [customData, setCustomData] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("enrollment_custom_fields")
+        .select("id, field_key, label, field_type, placeholder, required, active, sort_order")
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      if (active) setCustomFields((data ?? []) as CustomFieldDef[]);
+    })();
+    return () => { active = false; };
+  }, []);
+
   const set = (k: keyof typeof initial, v: string) => setForm(f => ({ ...f, [k]: v }));
+
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
@@ -151,6 +175,8 @@ const Matricula = () => {
     if (!course) return;
     const parsed = schema.safeParse(form);
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    const faltando = customFields.find(f => f.required && !(customData[f.field_key] ?? "").trim());
+    if (faltando) return toast.error(`Preencha: ${faltando.label}`);
     setLoading(true);
     try {
       const allTitles = [course.title, ...comboCourses.map(c => c.title)];
@@ -158,15 +184,22 @@ const Matricula = () => {
       const comboNote = isCombo
         ? `COMBO solicitado:\n${allTitles.map(t => `• ${t}`).join("\n")}\n\n`
         : "";
+      const extras: Record<string, string> = {};
+      customFields.forEach(f => {
+        const v = (customData[f.field_key] ?? "").trim();
+        if (v) extras[f.field_key] = v;
+      });
       const payload: any = {
         ...form,
         notes: (comboNote + (form.notes ?? "")).trim() || null,
         birth_date: form.birth_date || null,
         rg_issue_date: form.rg_issue_date || null,
+        custom_data: extras,
         course_id: course.id,
         course_title: isCombo ? `COMBO: ${allTitles.join(" + ")}` : course.title,
         source: window.location.pathname.slice(0, 60),
       };
+
       const { error } = await supabase.from("enrollment_applications").insert(payload);
       if (error) throw error;
       setSent(true);
@@ -306,6 +339,35 @@ const Matricula = () => {
               <div><Label>Nome da Instituição</Label><Input value={form.institution} onChange={e=>set("institution", e.target.value)} /></div>
             </div>
           </Card>
+
+          {customFields.length > 0 && (
+            <Card className="p-5 md:p-6 space-y-4">
+              <h2 className="font-semibold text-primary">Informações complementares</h2>
+              <div className="grid md:grid-cols-2 gap-3">
+                {customFields.map(f => (
+                  <div key={f.id} className={f.field_type === "textarea" ? "md:col-span-2" : ""}>
+                    <Label>{f.label}{f.required ? " *" : ""}</Label>
+                    {f.field_type === "textarea" ? (
+                      <Textarea
+                        value={customData[f.field_key] ?? ""}
+                        placeholder={f.placeholder ?? ""}
+                        onChange={e => setCustomData(d => ({ ...d, [f.field_key]: e.target.value }))}
+                      />
+                    ) : (
+                      <Input
+                        type={f.field_type === "date" ? "date" : f.field_type === "number" ? "number" : f.field_type === "email" ? "email" : "text"}
+                        value={customData[f.field_key] ?? ""}
+                        placeholder={f.placeholder ?? ""}
+                        onChange={e => setCustomData(d => ({ ...d, [f.field_key]: e.target.value }))}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+
 
           <Card className="p-5 md:p-6 space-y-4">
             <h2 className="font-semibold text-primary">Curso e pagamento</h2>
