@@ -139,7 +139,25 @@ const Matricula = () => {
     return () => { active = false; };
   }, [comboParam, slug]);
 
+  // Campos extras criados pela equipe no painel
+  const [customFields, setCustomFields] = useState<CustomFieldDef[]>([]);
+  const [customData, setCustomData] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("enrollment_custom_fields")
+        .select("id, field_key, label, field_type, placeholder, required, active, sort_order")
+        .eq("active", true)
+        .order("sort_order", { ascending: true });
+      if (active) setCustomFields((data ?? []) as CustomFieldDef[]);
+    })();
+    return () => { active = false; };
+  }, []);
+
   const set = (k: keyof typeof initial, v: string) => setForm(f => ({ ...f, [k]: v }));
+
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
