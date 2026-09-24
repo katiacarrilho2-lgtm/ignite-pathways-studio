@@ -62,6 +62,7 @@ export const useCommercialAccounts = (): Result => {
         status: r.status ?? null,
       })),
     );
+    loadedOnce.current = true;
     setLoading(false);
   }, [user]);
 
