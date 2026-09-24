@@ -5296,6 +5296,21 @@ export type Database = {
         }
         Relationships: []
       }
+      zz_e2e_log: {
+        Row: {
+          i: number
+          msg: string | null
+        }
+        Insert: {
+          i?: number
+          msg?: string | null
+        }
+        Update: {
+          i?: number
+          msg?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
