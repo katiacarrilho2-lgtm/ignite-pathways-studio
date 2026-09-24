@@ -169,6 +169,13 @@
       "when": 1790272844207,
       "tag": "0023_loja_lead_owner",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790272887097,
+      "tag": "0024_loja_financeiro_kind",
+      "breakpoints": true
     }
   ]
 }
