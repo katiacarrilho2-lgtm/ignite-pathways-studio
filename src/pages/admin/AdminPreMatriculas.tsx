@@ -78,6 +78,7 @@ const Inner = () => {
   // Combo link builder (multi-cursos)
   const [comboSlugs, setComboSlugs] = useState<string[]>([]);
   const [comboSearch, setComboSearch] = useState("");
+  const [formLink, setFormLink] = useState("");
   const [entryDate, setEntryDate] = useState("");
   const [reminderDate, setReminderDate] = useState("");
   const [savingDates, setSavingDates] = useState(false);
