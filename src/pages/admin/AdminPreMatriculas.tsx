@@ -600,16 +600,31 @@ const Inner = () => {
       <div className="bg-card border border-border rounded-xl p-4 md:p-5 space-y-3">
         <h2 className="text-sm font-semibold text-primary flex items-center gap-2"><Copy className="size-4" /> Compartilhar link do formulário</h2>
         <p className="text-xs text-muted-foreground">Escolha um curso, edite o link se quiser (ex.: adicionar informações extras) e depois copie para enviar por WhatsApp, e-mail, redes sociais, etc.</p>
-        <Select onValueChange={buildFormLink}>
-          <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione um curso para gerar o link..." /></SelectTrigger>
-          <SelectContent>{courses.map(c => <SelectItem key={c.id} value={c.slug}>{c.title}</SelectItem>)}</SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select onValueChange={buildFormLink}>
+            <SelectTrigger className="max-w-md"><SelectValue placeholder="Selecione um curso para gerar o link..." /></SelectTrigger>
+            <SelectContent>{courses.map(c => <SelectItem key={c.id} value={c.slug}>{c.title}</SelectItem>)}</SelectContent>
+          </Select>
+          <Button size="sm" onClick={() => setFormLink(" ")}>
+            + Criar novo link
+          </Button>
+        </div>
         {formLink && (
-          <div className="flex items-center gap-2 max-w-2xl">
-            <Input value={formLink} onChange={e => setFormLink(e.target.value)} className="text-xs" />
-            <Button size="sm" variant="outline" onClick={() => copyEditedLink(formLink)}>
-              <Copy className="size-4" /> Copiar
-            </Button>
+          <div className="space-y-2 max-w-2xl">
+            <Textarea
+              value={formLink.trim() === "" ? "" : formLink}
+              onChange={e => setFormLink(e.target.value || " ")}
+              placeholder="Cole aqui o link e as informações que quiser enviar..."
+              rows={4}
+              className="text-xs"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => copyEditedLink(formLink)}>
+                <Copy className="size-4" /> Copiar
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setFormLink("")}>Limpar</Button>
+            </div>
           </div>
         )}
       </div>
