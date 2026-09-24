@@ -1239,5 +1239,25 @@ const EditField = ({
   );
 };
 
+const EditCustomField = ({
+  label, value, onSave,
+}: { label: string; value: string; onSave: (v: string) => void | Promise<void> }) => {
+  const [v, setV] = useState(value ?? "");
+  useEffect(() => { setV(value ?? ""); }, [value, label]);
+  return (
+    <div>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      <Input
+        value={v}
+        onChange={(e) => setV(e.target.value)}
+        onBlur={() => { if (v !== (value ?? "")) onSave(v); }}
+        className="h-8 text-sm"
+      />
+    </div>
+  );
+};
+
+
+
 const AdminPreMatriculas = () => <RequirePermission perm="manage_courses"><Inner /></RequirePermission>;
 export default AdminPreMatriculas;
