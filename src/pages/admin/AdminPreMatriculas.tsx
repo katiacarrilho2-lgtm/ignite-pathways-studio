@@ -562,12 +562,15 @@ const Inner = () => {
     setComboSlugs(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug]);
   };
 
+  const comboLink = comboSlugs.length >= 2
+    ? `${window.location.origin}/matricula/${comboSlugs[0]}?combo=${comboSlugs.slice(1).join(",")}`
+    : "";
+  const [comboLinkEdited, setComboLinkEdited] = useState<string | null>(null);
+  const comboLinkValue = comboLinkEdited ?? comboLink;
+
   const copyComboLink = async () => {
     if (comboSlugs.length < 2) return toast.error("Selecione pelo menos 2 cursos para montar um combo.");
-    const [first, ...rest] = comboSlugs;
-    const url = `${window.location.origin}/matricula/${first}?combo=${rest.join(",")}`;
-    await navigator.clipboard.writeText(url);
-    toast.success(`Link do combo (${comboSlugs.length} cursos) copiado!`);
+    await copyEditedLink(comboLinkValue);
   };
 
   return (
