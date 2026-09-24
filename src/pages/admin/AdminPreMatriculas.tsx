@@ -79,6 +79,28 @@ const Inner = () => {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [viewing, setViewing] = useState<App | null>(null);
+  const [customFields, setCustomFields] = useState<CustomField[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("enrollment_custom_fields")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => setCustomFields((data ?? []) as CustomField[]));
+  }, []);
+
+  const saveCustomValue = async (a: App, key: string, value: string) => {
+    const next = { ...(a.custom_data ?? {}), [key]: value };
+    const { error } = await supabase
+      .from("enrollment_applications")
+      .update({ custom_data: next } as any)
+      .eq("id", a.id);
+    if (error) return toast.error(error.message);
+    setList(l => l.map(x => (x.id === a.id ? { ...x, custom_data: next } : x)));
+    setViewing(v => (v && v.id === a.id ? { ...v, custom_data: next } : v));
+    toast.success("Informação salva");
+  };
+
   // Combo link builder (multi-cursos)
   const [comboSlugs, setComboSlugs] = useState<string[]>([]);
   const [comboSearch, setComboSearch] = useState("");
