@@ -14,6 +14,12 @@ import { getReferralCode } from "@/hooks/useReferralCapture";
 
 type Course = { id: string | null; slug: string; title: string; description: string | null; price_cents: number | null; image_url: string | null };
 
+type CustomFieldDef = {
+  id: string; field_key: string; label: string; field_type: string;
+  placeholder: string | null; required: boolean; active: boolean; sort_order: number;
+};
+
+
 const schema = z.object({
   full_name: z.string().trim().min(3, "Informe o nome completo").max(120),
   email: z.string().trim().email("E-mail inválido").max(160),
