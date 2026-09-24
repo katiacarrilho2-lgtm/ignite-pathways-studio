@@ -2222,6 +2222,9 @@ export type Database = {
           father_name: string | null
           full_name: string
           graduation_year: string | null
+          guardian_data: Json
+          guardian_submitted_at: string | null
+          guardian_token: string
           id: string
           institution: string | null
           mother_name: string | null
@@ -2267,6 +2270,9 @@ export type Database = {
           father_name?: string | null
           full_name: string
           graduation_year?: string | null
+          guardian_data?: Json
+          guardian_submitted_at?: string | null
+          guardian_token?: string
           id?: string
           institution?: string | null
           mother_name?: string | null
@@ -2312,6 +2318,9 @@ export type Database = {
           father_name?: string | null
           full_name?: string
           graduation_year?: string | null
+          guardian_data?: Json
+          guardian_submitted_at?: string | null
+          guardian_token?: string
           id?: string
           institution?: string | null
           mother_name?: string | null
@@ -6018,6 +6027,11 @@ export type Database = {
       }
       exam_status_curso: { Args: { _course_id: string }; Returns: Json }
       exam_tentativa: { Args: { _attempt_id: string }; Returns: Json }
+      guardian_form_info: { Args: { _token: string }; Returns: Json }
+      guardian_form_submit: {
+        Args: { _data: Json; _token: string }
+        Returns: Json
+      }
       has_permission: {
         Args: {
           _permission: Database["public"]["Enums"]["app_permission"]
