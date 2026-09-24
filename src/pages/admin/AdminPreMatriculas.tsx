@@ -491,9 +491,13 @@ const Inner = () => {
     load();
   };
 
-  const copyFormLink = async (slug: string) => {
-    const url = `${window.location.origin}/matricula/${slug}`;
-    await navigator.clipboard.writeText(url);
+  const buildFormLink = (slug: string) => {
+    setFormLink(`${window.location.origin}/matricula/${slug}`);
+  };
+
+  const copyEditedLink = async (url: string) => {
+    if (!url.trim()) return toast.error("O link está vazio.");
+    await navigator.clipboard.writeText(url.trim());
     toast.success("Link copiado!");
   };
 
