@@ -176,6 +176,13 @@
       "when": 1790272887097,
       "tag": "0024_loja_financeiro_kind",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1790272935563,
+      "tag": "0025_loja_anon_can_manage",
+      "breakpoints": true
     }
   ]
 }
