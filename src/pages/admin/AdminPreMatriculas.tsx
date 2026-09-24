@@ -810,7 +810,11 @@ const Inner = () => {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
           <DialogHeader><DialogTitle>Ficha de pré-matrícula</DialogTitle></DialogHeader>
           {viewing && (
             <div className="space-y-5 text-sm">
@@ -1237,6 +1241,26 @@ const Field = ({ label, value }: { label: string; value: string | null }) => (
   <div><span className="text-xs text-muted-foreground">{label}: </span><span className="font-medium">{value || "—"}</span></div>
 );
 
+/** Botão de cópia rápida de um campo da ficha (1 clique, sem selecionar texto). */
+const CopyBtn = ({ label, value }: { label: string; value: string }) => (
+  <button
+    type="button"
+    title={`Copiar ${label}`}
+    className="shrink-0 h-8 w-8 inline-flex items-center justify-center rounded-md border border-border text-muted-foreground hover:text-primary hover:bg-secondary disabled:opacity-40"
+    disabled={!value.trim()}
+    onClick={async () => {
+      try {
+        await navigator.clipboard.writeText(value.trim());
+        toast.success(`${label} copiado!`);
+      } catch {
+        toast.error("Não foi possível copiar.");
+      }
+    }}
+  >
+    <Copy className="size-3.5" />
+  </button>
+);
+
 const EditField = ({
   label, value, field, id, save, type = "text", placeholder, hint,
 }: {
@@ -1249,14 +1273,17 @@ const EditField = ({
   return (
     <div>
       <Label className="text-xs text-muted-foreground">{label}</Label>
-      <Input
-        type={type}
-        value={v}
-        placeholder={placeholder}
-        onChange={(e) => setV(e.target.value)}
-        onBlur={() => { if ((v || null) !== (value || null)) save(id, field, v); }}
-        className="h-8 text-sm"
-      />
+      <div className="flex items-center gap-1">
+        <Input
+          type={type}
+          value={v}
+          placeholder={placeholder}
+          onChange={(e) => setV(e.target.value)}
+          onBlur={() => { if ((v || null) !== (value || null)) save(id, field, v); }}
+          className="h-8 text-sm"
+        />
+        <CopyBtn label={label} value={v} />
+      </div>
       {hint && <p className="text-[10px] text-muted-foreground mt-0.5">{hint}</p>}
     </div>
   );
@@ -1270,12 +1297,15 @@ const EditCustomField = ({
   return (
     <div>
       <Label className="text-xs text-muted-foreground">{label}</Label>
-      <Input
-        value={v}
-        onChange={(e) => setV(e.target.value)}
-        onBlur={() => { if (v !== (value ?? "")) onSave(v); }}
-        className="h-8 text-sm"
-      />
+      <div className="flex items-center gap-1">
+        <Input
+          value={v}
+          onChange={(e) => setV(e.target.value)}
+          onBlur={() => { if (v !== (value ?? "")) onSave(v); }}
+          className="h-8 text-sm"
+        />
+        <CopyBtn label={label} value={v} />
+      </div>
     </div>
   );
 };
