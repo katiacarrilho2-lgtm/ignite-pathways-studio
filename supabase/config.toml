@@ -6,3 +6,7 @@ verify_jwt = false
 verify_jwt = false
 [functions.livre-mp-webhook]
 verify_jwt = false
+[functions.store-create-checkout]
+verify_jwt = false
+[functions.store-infinitepay-webhook]
+verify_jwt = false

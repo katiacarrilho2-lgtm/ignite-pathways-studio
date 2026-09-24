@@ -18,6 +18,11 @@ import Licenciado from "./pages/Licenciado.tsx";
 import SejaVendedor from "./pages/SejaVendedor.tsx";
 import PagamentoRetorno from "./pages/PagamentoRetorno.tsx";
 import Auth from "./pages/Auth.tsx";
+import Loja from "./pages/loja/Loja.tsx";
+import LojaProduto from "./pages/loja/Produto.tsx";
+import LojaCarrinho from "./pages/loja/Carrinho.tsx";
+import LojaConfirmacao from "./pages/loja/Confirmacao.tsx";
+import AdminLoja from "./pages/admin/AdminLoja.tsx";
 import Dashboard from "./pages/admin/Dashboard.tsx";
 import AdminCursos from "./pages/admin/AdminCursos.tsx";
 import AdminBancoQuestoes from "./pages/admin/AdminBancoQuestoes.tsx";
@@ -163,6 +168,10 @@ const App = () => (
               <Route path="/validar-certificado" element={<ValidarCertificado />} />
               <Route path="/validar-certificado/:codigo" element={<ValidarCertificado />} />
               <Route path="/checkout/:slug" element={<Checkout />} />
+              <Route path="/loja" element={<Loja />} />
+              <Route path="/loja/carrinho" element={<LojaCarrinho />} />
+              <Route path="/loja/confirmacao" element={<LojaConfirmacao />} />
+              <Route path="/curso/:slug" element={<LojaProduto />} />
               <Route path="/matricula/:slug" element={<Matricula />} />
             </Route>
             <Route path="/prova/:token" element={<Prova />} />
@@ -281,7 +290,8 @@ const App = () => (
               <Route path="afiliados" element={<AdminAfiliados />} />
               <Route path="meu-afiliado" element={<AlunoAfiliado />} />
               <Route path="promo" element={<AdminPromo />} />
-              <Route path="cupons" element={<AdminCupons />} />
+              <Route path="cupons" element={<Navigate to="/admin/loja?aba=cupons" replace />} />
+              <Route path="loja" element={<AdminLoja />} />
               <Route path="marketing" element={<MarketingLayout />}>
                 <Route index element={<MarketingDashboard />} />
                 <Route path="campanhas" element={<MarketingCampanhas />} />

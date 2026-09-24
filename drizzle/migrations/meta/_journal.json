@@ -148,6 +148,41 @@
       "when": 1790169845934,
       "tag": "0020_exam_finalizar_emite_certificado",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1790272290029,
+      "tag": "0021_loja_online_multplick",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1790272346684,
+      "tag": "0022_loja_settings_publico",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1790272844207,
+      "tag": "0023_loja_lead_owner",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790272887097,
+      "tag": "0024_loja_financeiro_kind",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1790272935563,
+      "tag": "0025_loja_anon_can_manage",
+      "breakpoints": true
     }
   ]
 }

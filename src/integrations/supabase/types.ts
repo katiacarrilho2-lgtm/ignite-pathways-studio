@@ -4897,6 +4897,613 @@ export type Database = {
         }
         Relationships: []
       }
+      store_banners: {
+        Row: {
+          ativo: boolean
+          botao_link: string | null
+          botao_texto: string | null
+          botao2_link: string | null
+          botao2_texto: string | null
+          created_at: string
+          id: string
+          imagem_desktop: string | null
+          imagem_mobile: string | null
+          ordem: number
+          subtitulo: string | null
+          titulo: string | null
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          botao_link?: string | null
+          botao_texto?: string | null
+          botao2_link?: string | null
+          botao2_texto?: string | null
+          created_at?: string
+          id?: string
+          imagem_desktop?: string | null
+          imagem_mobile?: string | null
+          ordem?: number
+          subtitulo?: string | null
+          titulo?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          botao_link?: string | null
+          botao_texto?: string | null
+          botao2_link?: string | null
+          botao2_texto?: string | null
+          created_at?: string
+          id?: string
+          imagem_desktop?: string | null
+          imagem_mobile?: string | null
+          ordem?: number
+          subtitulo?: string | null
+          titulo?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      store_bundle_items: {
+        Row: {
+          bundle_id: string
+          id: string
+          ordem: number
+          product_id: string
+        }
+        Insert: {
+          bundle_id: string
+          id?: string
+          ordem?: number
+          product_id: string
+        }
+        Update: {
+          bundle_id?: string
+          id?: string
+          ordem?: number
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_bundle_items_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_bundle_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_categories: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string | null
+          grupo: string
+          icone: string | null
+          id: string
+          imagem_url: string | null
+          nome: string
+          ordem: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          grupo?: string
+          icone?: string | null
+          id?: string
+          imagem_url?: string | null
+          nome: string
+          ordem?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          grupo?: string
+          icone?: string | null
+          id?: string
+          imagem_url?: string | null
+          nome?: string
+          ordem?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      store_coupons: {
+        Row: {
+          ativo: boolean
+          categorias: string[]
+          codigo: string
+          created_at: string
+          fim: string | null
+          id: string
+          inicio: string | null
+          limite_uso: number | null
+          produtos: string[]
+          tipo: string
+          updated_at: string
+          usos: number
+          valor: number
+        }
+        Insert: {
+          ativo?: boolean
+          categorias?: string[]
+          codigo: string
+          created_at?: string
+          fim?: string | null
+          id?: string
+          inicio?: string | null
+          limite_uso?: number | null
+          produtos?: string[]
+          tipo?: string
+          updated_at?: string
+          usos?: number
+          valor?: number
+        }
+        Update: {
+          ativo?: boolean
+          categorias?: string[]
+          codigo?: string
+          created_at?: string
+          fim?: string | null
+          id?: string
+          inicio?: string | null
+          limite_uso?: number | null
+          produtos?: string[]
+          tipo?: string
+          updated_at?: string
+          usos?: number
+          valor?: number
+        }
+        Relationships: []
+      }
+      store_order_items: {
+        Row: {
+          account_id: string | null
+          id: string
+          nome: string
+          order_id: string
+          preco_cents: number
+          product_id: string | null
+          quantidade: number
+        }
+        Insert: {
+          account_id?: string | null
+          id?: string
+          nome: string
+          order_id: string
+          preco_cents: number
+          product_id?: string | null
+          quantidade?: number
+        }
+        Update: {
+          account_id?: string | null
+          id?: string
+          nome?: string
+          order_id?: string
+          preco_cents?: number
+          product_id?: string | null
+          quantidade?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "store_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "store_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_orders: {
+        Row: {
+          account_id: string | null
+          affiliate_id: string | null
+          campanha: string | null
+          checkout_url: string | null
+          cidade: string | null
+          consultor: string | null
+          cpf: string | null
+          created_at: string
+          crm_lead_id: string | null
+          cupom_codigo: string | null
+          cupom_id: string | null
+          desconto_cents: number
+          email: string
+          enrollment_application_id: string | null
+          estado: string | null
+          id: string
+          idem_key: string | null
+          infinitepay_slug: string | null
+          metodo: string | null
+          nascimento: string | null
+          nome: string
+          numero: string | null
+          origem: string | null
+          paid_at: string | null
+          polo: string | null
+          receipt_url: string | null
+          status: string
+          subtotal_cents: number
+          token: string
+          total_cents: number
+          transaction_nsu: string | null
+          updated_at: string
+          user_id: string | null
+          whatsapp: string
+        }
+        Insert: {
+          account_id?: string | null
+          affiliate_id?: string | null
+          campanha?: string | null
+          checkout_url?: string | null
+          cidade?: string | null
+          consultor?: string | null
+          cpf?: string | null
+          created_at?: string
+          crm_lead_id?: string | null
+          cupom_codigo?: string | null
+          cupom_id?: string | null
+          desconto_cents?: number
+          email: string
+          enrollment_application_id?: string | null
+          estado?: string | null
+          id?: string
+          idem_key?: string | null
+          infinitepay_slug?: string | null
+          metodo?: string | null
+          nascimento?: string | null
+          nome: string
+          numero?: string | null
+          origem?: string | null
+          paid_at?: string | null
+          polo?: string | null
+          receipt_url?: string | null
+          status?: string
+          subtotal_cents?: number
+          token?: string
+          total_cents?: number
+          transaction_nsu?: string | null
+          updated_at?: string
+          user_id?: string | null
+          whatsapp: string
+        }
+        Update: {
+          account_id?: string | null
+          affiliate_id?: string | null
+          campanha?: string | null
+          checkout_url?: string | null
+          cidade?: string | null
+          consultor?: string | null
+          cpf?: string | null
+          created_at?: string
+          crm_lead_id?: string | null
+          cupom_codigo?: string | null
+          cupom_id?: string | null
+          desconto_cents?: number
+          email?: string
+          enrollment_application_id?: string | null
+          estado?: string | null
+          id?: string
+          idem_key?: string | null
+          infinitepay_slug?: string | null
+          metodo?: string | null
+          nascimento?: string | null
+          nome?: string
+          numero?: string | null
+          origem?: string | null
+          paid_at?: string | null
+          polo?: string | null
+          receipt_url?: string | null
+          status?: string
+          subtotal_cents?: number
+          token?: string
+          total_cents?: number
+          transaction_nsu?: string | null
+          updated_at?: string
+          user_id?: string | null
+          whatsapp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_orders_cupom_id_fkey"
+            columns: ["cupom_id"]
+            isOneToOne: false
+            referencedRelation: "store_coupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_payments: {
+        Row: {
+          account_id: string | null
+          created_at: string
+          id: string
+          metodo: string | null
+          order_id: string
+          parcelas: number | null
+          provider: string
+          raw: Json | null
+          receipt_url: string | null
+          status: string
+          transaction_nsu: string | null
+          valor_cents: number | null
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string
+          id?: string
+          metodo?: string | null
+          order_id: string
+          parcelas?: number | null
+          provider?: string
+          raw?: Json | null
+          receipt_url?: string | null
+          status: string
+          transaction_nsu?: string | null
+          valor_cents?: number | null
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string
+          id?: string
+          metodo?: string | null
+          order_id?: string
+          parcelas?: number | null
+          provider?: string
+          raw?: Json | null
+          receipt_url?: string | null
+          status?: string
+          transaction_nsu?: string | null
+          valor_cents?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "store_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_products: {
+        Row: {
+          beneficios: string | null
+          carga_horaria: string | null
+          category_id: string | null
+          certificado_texto: string | null
+          como_funciona: string | null
+          conselho_profissional: string | null
+          conteudo: string | null
+          course_id: string | null
+          created_at: string
+          cta_texto: string | null
+          descricao: string | null
+          descricao_curta: string | null
+          destaque: boolean
+          disponivel_loja: boolean
+          duracao: string | null
+          estoque: number | null
+          faq: Json
+          formas_pagamento: string | null
+          id: string
+          imagem_alt: string | null
+          imagem_url: string | null
+          indexavel: boolean
+          inicio: string | null
+          instituicao: string | null
+          mec_reconhecido: boolean
+          metodologia: string | null
+          modalidade: string | null
+          nome: string
+          objetivos: string[]
+          ordem: number
+          para_quem: string | null
+          pre_requisitos: string | null
+          preco_cents: number | null
+          preco_promo_cents: number | null
+          promo_ativa: boolean
+          promo_fim: string | null
+          promo_inicio: string | null
+          seo_descricao: string | null
+          seo_titulo: string | null
+          sistec: boolean
+          slug: string
+          texto_regulatorio: string | null
+          tipo: string
+          tipo_venda: string
+          updated_at: string
+          validade: string | null
+        }
+        Insert: {
+          beneficios?: string | null
+          carga_horaria?: string | null
+          category_id?: string | null
+          certificado_texto?: string | null
+          como_funciona?: string | null
+          conselho_profissional?: string | null
+          conteudo?: string | null
+          course_id?: string | null
+          created_at?: string
+          cta_texto?: string | null
+          descricao?: string | null
+          descricao_curta?: string | null
+          destaque?: boolean
+          disponivel_loja?: boolean
+          duracao?: string | null
+          estoque?: number | null
+          faq?: Json
+          formas_pagamento?: string | null
+          id?: string
+          imagem_alt?: string | null
+          imagem_url?: string | null
+          indexavel?: boolean
+          inicio?: string | null
+          instituicao?: string | null
+          mec_reconhecido?: boolean
+          metodologia?: string | null
+          modalidade?: string | null
+          nome: string
+          objetivos?: string[]
+          ordem?: number
+          para_quem?: string | null
+          pre_requisitos?: string | null
+          preco_cents?: number | null
+          preco_promo_cents?: number | null
+          promo_ativa?: boolean
+          promo_fim?: string | null
+          promo_inicio?: string | null
+          seo_descricao?: string | null
+          seo_titulo?: string | null
+          sistec?: boolean
+          slug: string
+          texto_regulatorio?: string | null
+          tipo?: string
+          tipo_venda?: string
+          updated_at?: string
+          validade?: string | null
+        }
+        Update: {
+          beneficios?: string | null
+          carga_horaria?: string | null
+          category_id?: string | null
+          certificado_texto?: string | null
+          como_funciona?: string | null
+          conselho_profissional?: string | null
+          conteudo?: string | null
+          course_id?: string | null
+          created_at?: string
+          cta_texto?: string | null
+          descricao?: string | null
+          descricao_curta?: string | null
+          destaque?: boolean
+          disponivel_loja?: boolean
+          duracao?: string | null
+          estoque?: number | null
+          faq?: Json
+          formas_pagamento?: string | null
+          id?: string
+          imagem_alt?: string | null
+          imagem_url?: string | null
+          indexavel?: boolean
+          inicio?: string | null
+          instituicao?: string | null
+          mec_reconhecido?: boolean
+          metodologia?: string | null
+          modalidade?: string | null
+          nome?: string
+          objetivos?: string[]
+          ordem?: number
+          para_quem?: string | null
+          pre_requisitos?: string | null
+          preco_cents?: number | null
+          preco_promo_cents?: number | null
+          promo_ativa?: boolean
+          promo_fim?: string | null
+          promo_inicio?: string | null
+          seo_descricao?: string | null
+          seo_titulo?: string | null
+          sistec?: boolean
+          slug?: string
+          texto_regulatorio?: string | null
+          tipo?: string
+          tipo_venda?: string
+          updated_at?: string
+          validade?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "store_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_products_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_settings: {
+        Row: {
+          aparencia: Json
+          id: number
+          infinitepay_handle: string | null
+          modo: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          aparencia?: Json
+          id?: number
+          infinitepay_handle?: string | null
+          modo?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          aparencia?: Json
+          id?: number
+          infinitepay_handle?: string | null
+          modo?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      store_webhook_logs: {
+        Row: {
+          created_at: string
+          id: string
+          order_nsu: string | null
+          payload: Json | null
+          provider: string | null
+          resultado: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_nsu?: string | null
+          payload?: Json | null
+          provider?: string | null
+          resultado?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_nsu?: string | null
+          payload?: Json | null
+          provider?: string | null
+          resultado?: string | null
+        }
+        Relationships: []
+      }
       student_documents: {
         Row: {
           created_at: string
@@ -5590,6 +6197,72 @@ export type Database = {
       repasse_sync_contrato: {
         Args: { _contrato_id: string }
         Returns: undefined
+      }
+      store_can_manage: { Args: { _uid: string }; Returns: boolean }
+      store_catalogo_ia: {
+        Args: { _busca?: string }
+        Returns: {
+          carga_horaria: string
+          categoria: string
+          duracao: string
+          formas_pagamento: string
+          link: string
+          modalidade: string
+          nome: string
+          preco_cents: number
+          preco_vigente_cents: number
+          promocao: boolean
+          slug: string
+          tipo_venda: string
+        }[]
+      }
+      store_confirmar_pagamento: {
+        Args: {
+          _metodo: string
+          _nsu: string
+          _order_id: string
+          _parcelas: number
+          _raw: Json
+          _receipt: string
+          _valor: number
+        }
+        Returns: Json
+      }
+      store_criar_pedido: {
+        Args: {
+          _cliente: Json
+          _cupom: string
+          _idem: string
+          _itens: string[]
+          _origem: Json
+        }
+        Returns: Json
+      }
+      store_pedido_publico: {
+        Args: { _id: string; _token: string }
+        Returns: Json
+      }
+      store_preco_vigente: {
+        Args: { _p: Database["public"]["Tables"]["store_products"]["Row"] }
+        Returns: number
+      }
+      store_registrar_interesse: {
+        Args: { _dados: Json; _tipo: string }
+        Returns: Json
+      }
+      store_upsert_lead: {
+        Args: {
+          _acc: string
+          _curso: string
+          _desc: string
+          _email: string
+          _estagio: string
+          _nome: string
+          _origem: string
+          _valor: number
+          _whats: string
+        }
+        Returns: string
       }
       user_home_account_id: { Args: { _uid?: string }; Returns: string }
     }

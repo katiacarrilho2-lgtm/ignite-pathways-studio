@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.store_can_manage(uuid) TO anon;

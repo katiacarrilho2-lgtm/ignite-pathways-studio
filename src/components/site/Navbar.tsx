@@ -10,6 +10,7 @@ const links = [
   { to: "/", label: "Início" },
   { to: "/sobre", label: "Sobre" },
   { to: "/cursos", label: "Cursos" },
+  { to: "/loja", label: "Loja" },
   { to: "/curso-regular", label: "Técnico Regular" },
   { to: "/curso-por-competencia", label: "Técnico por Competência" },
   { to: "/empresas", label: "Empresas" },
