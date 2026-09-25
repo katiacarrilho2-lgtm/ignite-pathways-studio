@@ -155,13 +155,15 @@ const lessonHtml = (lesson: Lesson, gabaritoCollector: Gabarito[], mode: Apostil
 export const generateApostila = async (
   course: Course,
   sections: Section[],
-  studentName?: string | null
+  studentName?: string | null,
+  mode: ApostilaMode = "aluno"
 ) => {
+  const isProf = mode === "professor";
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
   const logo = await loadImageDataUrl(logoUrl);
 
   // Collect gabarito as we render
-  const gabarito: { lessonTitle: string; questions: { q: string; correct: string }[] }[] = [];
+  const gabarito: Gabarito[] = [];
 
   // ---- Cover (page 1) ----
   if (logo) {
@@ -171,7 +173,7 @@ export const generateApostila = async (
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(28);
   pdf.setTextColor(30, 58, 138);
-  pdf.text("APOSTILA DO CURSO", A4.w / 2, 290, { align: "center" });
+  pdf.text(isProf ? "GUIA DO PROFESSOR" : "APOSTILA DO CURSO", A4.w / 2, 290, { align: "center" });
   pdf.setFontSize(22);
   pdf.setTextColor(15, 23, 42);
   const titleLines = pdf.splitTextToSize(course.title, A4.w - 100);
@@ -180,8 +182,10 @@ export const generateApostila = async (
   pdf.setFontSize(12);
   pdf.setTextColor(100, 116, 139);
   if (course.category) pdf.text(course.category, A4.w / 2, 380, { align: "center" });
-  if (studentName) pdf.text(`Aluno(a): ${studentName}`, A4.w / 2, 500, { align: "center" });
+  if (isProf) pdf.text("Material de uso exclusivo do instrutor", A4.w / 2, 410, { align: "center" });
+  if (studentName && !isProf) pdf.text(`Aluno(a): ${studentName}`, A4.w / 2, 500, { align: "center" });
   pdf.text(`Gerada em ${new Date().toLocaleDateString("pt-BR")}`, A4.w / 2, 520, { align: "center" });
+
 
   // ---- Content pages ----
   const contentW = A4.w - MARGIN.left - MARGIN.right;
