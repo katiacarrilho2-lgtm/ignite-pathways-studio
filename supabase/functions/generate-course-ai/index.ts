@@ -433,20 +433,29 @@ async function generateLessonText(
   opts: GenOptions,
   abortSignal?: AbortSignal,
 ) {
-  const sys = `Você é um especialista em educação profissionalizante brasileira. Gere conteúdo didático em português do Brasil, profissional, atualizado e correto. Para HTML use apenas <p>, <strong>, <em>, <ul>, <li>, <ol>, <h3>, <table>, <tr>, <td>, <th>. Nunca invente leis ou normas inexistentes.`;
+  const sys = `Você é um especialista em educação profissionalizante brasileira, no padrão de cursos online premium (estilo Coursebox). Gere conteúdo didático em português do Brasil, profissional, atualizado e correto, que NÃO deixe dúvidas no aluno: cada conceito é explicado do zero, com exemplo real antes de avançar. Para HTML use apenas <p>, <strong>, <em>, <ul>, <li>, <ol>, <h3>, <table>, <tr>, <td>, <th>. Nunca invente leis ou normas inexistentes.
+${languageDirective(opts.language_style)}`;
   const prompt = `Curso: "${courseTitle}". Módulo: "${moduleTitle}". Aula: "${lessonTitle}".
 Resumo da aula: ${lessonSummary}
 Nível: ${opts.level}. Profundidade: ${opts.depth}. Tom: ${opts.tone}.${opts.audience ? ` Público-alvo: ${opts.audience}.` : ""}${opts.workload ? ` Carga horária do curso: ${opts.workload}.` : ""}
+${languageDirective(opts.language_style)}
 
 Gere:
 - objective: objetivo de aprendizagem em 1-2 frases.
-- theory_html: conteúdo teórico completo da aula em HTML (mínimo 400 palavras, com subtítulos h3 e listas quando ajudar).
+- theory_html: conteúdo teórico completo da aula em HTML (mínimo 500 palavras, com subtítulos h3, exemplos reais do ofício e listas quando ajudar). Explique cada termo técnico na primeira vez que aparecer.
+- practical_steps: 5 a 10 passos práticos numerados de como executar/aplicar o que foi ensinado (se a aula for puramente teórica, use passos de raciocínio/aplicação).
+- checklist: 5 a 8 itens objetivos de verificação que o aluno confere antes de dar a tarefa por concluída.
+- common_mistakes: 3 a 6 itens { mistake: erro frequente na prática, fix: como evitar/corrigir }.
+- glossary: 4 a 8 itens { term, meaning } com os termos técnicos da aula explicados em linguagem simples.
+- memorization: 3 a 6 frases curtas de fixação/mnemônicas para o aluno memorizar o essencial.
+- teacher_notes: 3 a 6 orientações EXCLUSIVAS para o professor conduzir esta aula (como explicar, o que demonstrar, perguntas para a turma, tempo sugerido).
 - summary: resumo em 3-5 linhas.
 - key_points: 5 a 8 pontos-chave.
 - references: 3 a 6 referências bibliográficas reais (livros, normas, autores reconhecidos).
 - video_topics: 3 a 5 SUGESTÕES DE TEMAS de busca no YouTube relacionadas à aula (apenas o tema/termo de busca em português, NUNCA URLs ou nomes de canais inventados).
 - youtube_query: UM ÚNICO termo de busca curto, específico e em português, ideal para encontrar no YouTube o melhor vídeo prático/explicativo sobre esta aula. NÃO inclua URLs, nomes de canais nem aspas. Exemplos: "instalação de ar-condicionado split", "vácuo em sistemas de refrigeração", "PMOC manutenção de ar-condicionado".
 ${opts.include_materials ? "- complementary_materials: até 5 materiais (kind: norma, lei, manual, artigo ou documento; title; reference com identificador como 'NR-10', 'Lei 8.213/91', etc.; url opcional)." : "- complementary_materials: lista vazia."}`;
+
 
   const { object } = await generateValidatedWithFallback(
     gateway, opts.model, sys, prompt, LessonTextSchema, 12288, abortSignal,
