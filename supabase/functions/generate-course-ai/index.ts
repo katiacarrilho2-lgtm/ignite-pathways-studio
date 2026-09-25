@@ -927,6 +927,7 @@ async function actionFullCourse(payload: any, key: string) {
   const opts: GenOptions = {
     level, audience, workload, tone: tone || "Didático", depth: depth || "Intermediário",
     include_materials: include_materials !== false,
+    language_style: payload?.language_style,
     model: model || DEFAULT_MODEL,
   };
 
@@ -1097,6 +1098,7 @@ async function actionLesson(payload: any, key: string) {
     tone: options?.tone || "Didático",
     depth: options?.depth || "Intermediário",
     include_materials: options?.include_materials !== false,
+    language_style: options?.language_style,
     model: options?.model || DEFAULT_MODEL,
   };
 
@@ -1151,6 +1153,7 @@ async function actionModule(payload: any, key: string) {
     tone: options?.tone || "Didático",
     depth: options?.depth || "Intermediário",
     include_materials: options?.include_materials !== false,
+    language_style: options?.language_style,
     model: options?.model || DEFAULT_MODEL,
   };
 
@@ -1199,6 +1202,7 @@ async function actionLessonFromImage(payload: any, key: string) {
     tone: options?.tone || "Didático",
     depth: options?.depth || "Intermediário",
     include_materials: options?.include_materials !== false,
+    language_style: options?.language_style,
     model: options?.model || DEFAULT_MODEL,
   };
 
@@ -1325,6 +1329,7 @@ async function actionReprocessFailures(payload: any, key: string) {
     tone: options?.tone || "Didático",
     depth: options?.depth || "Intermediário",
     include_materials: options?.include_materials !== false,
+    language_style: options?.language_style,
     model: options?.model || DEFAULT_MODEL,
   };
 
@@ -1478,6 +1483,7 @@ async function actionImportSyllabus(payload: any, key: string) {
   const opts: GenOptions = {
     level, audience, workload, tone: tone || "Didático", depth: depth || "Intermediário",
     include_materials: include_materials !== false,
+    language_style: payload?.language_style,
     model: model || DEFAULT_MODEL,
   };
 
