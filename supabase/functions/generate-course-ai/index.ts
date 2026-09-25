@@ -935,7 +935,9 @@ async function actionFullCourse(payload: any, key: string) {
   const admin = sbAdmin();
 
   // Step A: skeleton
-  const sys = `Você é um designer instrucional brasileiro. Crie estruturas completas de cursos profissionalizantes, claras e progressivas, em português do Brasil.`;
+  const sys = `Você é um designer instrucional brasileiro. Crie estruturas completas de cursos profissionalizantes, claras e progressivas, em português do Brasil, no padrão de cursos online premium.
+${languageDirective(opts.language_style)}`;
+
   const prompt = `Crie a estrutura COMPLETA do curso a seguir.
 Título: "${title}"
 Categoria: ${category}
