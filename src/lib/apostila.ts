@@ -89,7 +89,16 @@ const attachmentsHtml = (atts?: Attachment[]) => {
   return `<div style="margin-top:6px;padding:8px 10px;background:#f1f5f9;border-radius:6px"><div class="label" style="font-size:11px;text-transform:uppercase;color:#64748b;margin-bottom:4px">Materiais</div>${items}</div>`;
 };
 
-const lessonHtml = (lesson: Lesson, gabaritoCollector: { lessonTitle: string; questions: { q: string; correct: string }[] }[]): string => {
+type Gabarito = { lessonTitle: string; questions: { q: string; correct: string; why?: string }[] };
+export type ApostilaMode = "aluno" | "professor";
+
+const teacherNotesHtml = (lesson: Lesson) => {
+  const notes: string[] = lesson.content?.teacher_notes ?? [];
+  if (!notes.length) return "";
+  return `<div class="apostila-card" style="background:#eff6ff;border-color:#93c5fd"><div class="label">Orientações do professor</div><ul>${notes.map(n => `<li>${escapeHtml(n)}</li>`).join("")}</ul></div>`;
+};
+
+const lessonHtml = (lesson: Lesson, gabaritoCollector: Gabarito[], mode: ApostilaMode = "aluno"): string => {
   const atts: Attachment[] = lesson.content?.attachments ?? [];
   const title = `<div class="apostila-lessonTitle">${escapeHtml(lesson.title)}</div>`;
   let body = "";
@@ -97,9 +106,13 @@ const lessonHtml = (lesson: Lesson, gabaritoCollector: { lessonTitle: string; qu
     case "text":
       body = lesson.content?.html ?? "<p><em>(sem conteúdo)</em></p>";
       break;
-    case "video":
-      body = `<p><em>Aula em vídeo. Assista no portal.</em></p>`;
+    case "video": {
+      const yt = lesson.content?.youtube;
+      body = yt?.url
+        ? `<p><em>Aula em vídeo:</em> ${escapeHtml(yt.title ?? "assista no portal")} — ${escapeHtml(yt.url)}</p>`
+        : `<p><em>Aula em vídeo. Assista no portal.</em></p>`;
       break;
+    }
     case "flip": {
       const items: { front: string; back: string }[] = lesson.content?.items ?? [];
       body = items.map((it, i) =>
@@ -115,23 +128,29 @@ const lessonHtml = (lesson: Lesson, gabaritoCollector: { lessonTitle: string; qu
       break;
     }
     case "quiz": {
-      const questions: { question: string; options: string[]; correct: number }[] = lesson.content?.questions ?? [];
+      const questions: { question: string; options: string[]; correct: number; explanation?: string }[] = lesson.content?.questions ?? [];
       body = questions.map((q, i) => {
         const opts = q.options.map(o => `<li>${escapeHtml(o)}</li>`).join("");
-        return `<div class="apostila-q"><div class="qnum">${i + 1}. ${escapeHtml(q.question)}</div><ol>${opts}</ol></div>`;
+        const inline = mode === "professor"
+          ? `<div style="color:#15803d;font-size:12px;margin-top:4px">Resposta: ${escapeHtml(String.fromCharCode(97 + (q.correct ?? 0)) + ") " + (q.options[q.correct] ?? ""))}${q.explanation ? ` — ${escapeHtml(q.explanation)}` : ""}</div>`
+          : "";
+        return `<div class="apostila-q"><div class="qnum">${i + 1}. ${escapeHtml(q.question)}</div><ol>${opts}</ol>${inline}</div>`;
       }).join("");
       gabaritoCollector.push({
         lessonTitle: lesson.title,
         questions: questions.map(q => ({
           q: q.question,
           correct: String.fromCharCode(97 + (q.correct ?? 0)) + ") " + (q.options[q.correct] ?? ""),
+          why: q.explanation,
         })),
       });
       break;
     }
   }
-  return title + body + attachmentsHtml(atts);
+  const notes = mode === "professor" ? teacherNotesHtml(lesson) : "";
+  return title + body + notes + attachmentsHtml(atts);
 };
+
 
 export const generateApostila = async (
   course: Course,
