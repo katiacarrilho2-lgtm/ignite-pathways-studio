@@ -502,10 +502,12 @@ async function generateFlashcards(
   opts: GenOptions,
   abortSignal?: AbortSignal,
 ) {
-  const sys = `Gere flashcards de estudo (frente: pergunta ou conceito; verso: resposta curta e clara) em português do Brasil.
+  const sys = `Gere flashcards de MEMORIZAÇÃO ATIVA (frente: pergunta direta, desafio ou conceito; verso: resposta curta, objetiva e fácil de fixar, com dica mnemônica quando ajudar) em português do Brasil.
+${languageDirective(opts.language_style)}
 FORMATO OBRIGATÓRIO: responda como JSON com o campo "items" (array). Cada item DEVE usar EXATAMENTE as chaves em INGLÊS: "front" (string) e "back" (string). NUNCA use "frente"/"verso" nem "flashcards".`;
   const prompt = `Curso: "${courseTitle}". Tema: "${lessonTitle}". Nível: ${opts.level}.
-Gere de 10 a 15 flashcards no formato { "items": [ { "front": "...", "back": "..." } ] }.`;
+Gere de 10 a 15 flashcards no formato { "items": [ { "front": "...", "back": "..." } ] }. Cubra números, normas, etapas e definições essenciais que o aluno precisa saber de cor.`;
+
   const { object } = await generateValidatedWithFallback(
     gateway, opts.model, sys, prompt, FlipSchema, 12288, abortSignal,
   );
