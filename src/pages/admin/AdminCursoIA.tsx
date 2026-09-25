@@ -17,7 +17,8 @@ const Inner = () => {
   const [form, setForm] = useState({
     title: "", category: "tecnicos", workload: "40h", level: "Iniciante",
     audience: "", num_modules: 4, lessons_per_module: 5, depth: "Intermediário",
-    tone: "Didático", extra_prompt: "", include_materials: true, include_image_prompts: true,
+    tone: "Didático", language_style: "simples",
+    extra_prompt: "", include_materials: true, include_image_prompts: true,
   });
 
   const generate = async () => {
@@ -31,10 +32,11 @@ const Inner = () => {
       if ((data as any)?.error) throw new Error((data as any).error);
       toast.success("Curso gerado! Redirecionando…");
       const courseId = (data as any)?.course_id;
-      if (courseId) nav(`/admin/cursos/${courseId}/builder`);
+      if (courseId) nav(`/admin/cursos/${courseId}/conteudo`);
     } catch (e: any) { toast.error(e.message ?? "Falha ao gerar"); }
     finally { setLoading(false); }
   };
+
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6">
