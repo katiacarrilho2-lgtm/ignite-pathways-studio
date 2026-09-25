@@ -204,6 +204,13 @@
       "when": 1790277445877,
       "tag": "0028_guardian_form",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1790346159018,
+      "tag": "0029_add_ai_meta_course_sections",
+      "breakpoints": true
     }
   ]
 }

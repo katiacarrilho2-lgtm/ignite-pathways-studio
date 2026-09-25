@@ -1649,6 +1649,7 @@ export type Database = {
       }
       course_sections: {
         Row: {
+          ai_meta: Json
           course_id: string
           created_at: string
           id: string
@@ -1657,6 +1658,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_meta?: Json
           course_id: string
           created_at?: string
           id?: string
@@ -1665,6 +1667,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_meta?: Json
           course_id?: string
           created_at?: string
           id?: string

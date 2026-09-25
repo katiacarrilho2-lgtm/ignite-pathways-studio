@@ -23,6 +23,8 @@ import { AiGenerateDialog, type AiOptions } from "@/components/admin/AiGenerateD
 import { LessonImageAiDialog } from "@/components/admin/LessonImageAiDialog";
 import { YoutubePickerDialog, type YoutubeVideo } from "@/components/admin/YoutubePickerDialog";
 import { exportCourseJson } from "@/lib/courseExport";
+import { generateApostila } from "@/lib/apostila";
+
 import { uploadCourseImage } from "@/lib/courseMedia";
 import { supabase as sb } from "@/integrations/supabase/client";
 
@@ -711,6 +713,23 @@ const Inner = () => {
           <Button size="sm" variant="outline" onClick={() => courseId && exportCourseJson(courseId).catch((e:any) => toast.error(e.message))} title="Exportar curso (JSON)">
             <Download className="size-4" /> Exportar
           </Button>
+          <Button size="sm" variant="outline" title="Baixar apostila completa do aluno (PDF)"
+            onClick={async () => {
+              if (!course) return;
+              try { toast.info("Gerando apostila do aluno…"); await generateApostila(course as any, sections as any, null, "aluno"); }
+              catch (e: any) { toast.error(e?.message ?? "Falha ao gerar apostila"); }
+            }}>
+            <Download className="size-4" /> Apostila do aluno
+          </Button>
+          <Button size="sm" variant="outline" title="Baixar guia do professor com gabarito comentado (PDF)"
+            onClick={async () => {
+              if (!course) return;
+              try { toast.info("Gerando guia do professor…"); await generateApostila(course as any, sections as any, null, "professor"); }
+              catch (e: any) { toast.error(e?.message ?? "Falha ao gerar guia"); }
+            }}>
+            <Download className="size-4" /> Apostila do professor
+          </Button>
+
           {isMaster && sections.some(s => s.lessons.some((l: any) => !!l.content?.ai_error)) && (
             <Button
               type="button"

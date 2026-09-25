@@ -17,7 +17,8 @@ const Inner = () => {
   const [form, setForm] = useState({
     title: "", category: "tecnicos", workload: "40h", level: "Iniciante",
     audience: "", num_modules: 4, lessons_per_module: 5, depth: "Intermediário",
-    tone: "Didático", extra_prompt: "", include_materials: true, include_image_prompts: true,
+    tone: "Didático", language_style: "simples",
+    extra_prompt: "", include_materials: true, include_image_prompts: true,
   });
 
   const generate = async () => {
@@ -31,10 +32,11 @@ const Inner = () => {
       if ((data as any)?.error) throw new Error((data as any).error);
       toast.success("Curso gerado! Redirecionando…");
       const courseId = (data as any)?.course_id;
-      if (courseId) nav(`/admin/cursos/${courseId}/builder`);
+      if (courseId) nav(`/admin/cursos/${courseId}/conteudo`);
     } catch (e: any) { toast.error(e.message ?? "Falha ao gerar"); }
     finally { setLoading(false); }
   };
+
 
   return (
     <div className="p-8 max-w-4xl mx-auto space-y-6">
@@ -69,7 +71,7 @@ const Inner = () => {
             <div><Label>Módulos</Label><Input type="number" min={1} max={12} value={form.num_modules} onChange={(e) => setForm({ ...form, num_modules: Number(e.target.value) })} /></div>
             <div><Label>Aulas / módulo</Label><Input type="number" min={1} max={15} value={form.lessons_per_module} onChange={(e) => setForm({ ...form, lessons_per_module: Number(e.target.value) })} /></div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <Label>Profundidade</Label>
               <Select value={form.depth} onValueChange={(v) => setForm({ ...form, depth: v })}>
@@ -81,8 +83,20 @@ const Inner = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <Label>Linguagem</Label>
+              <Select value={form.language_style} onValueChange={(v) => setForm({ ...form, language_style: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="simples">Simples (explica do zero)</SelectItem>
+                  <SelectItem value="tecnica">Técnica (termos do ofício)</SelectItem>
+                  <SelectItem value="formal">Formal (acadêmica)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div><Label>Tom</Label><Input value={form.tone} onChange={(e) => setForm({ ...form, tone: e.target.value })} /></div>
           </div>
+
           <div><Label>Público-alvo</Label><Input value={form.audience} onChange={(e) => setForm({ ...form, audience: e.target.value })} placeholder="Ex: Técnicos em refrigeração, jovens em qualificação" /></div>
           <div><Label>Instruções adicionais</Label><Textarea rows={4} value={form.extra_prompt} onChange={(e) => setForm({ ...form, extra_prompt: e.target.value })} placeholder="Aspectos que a IA deve enfatizar, normas específicas, exemplos regionais…" /></div>
           <div className="flex gap-4 text-sm">

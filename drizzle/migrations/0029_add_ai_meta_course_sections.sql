@@ -1,0 +1,1 @@
+ALTER TABLE public.course_sections ADD COLUMN IF NOT EXISTS ai_meta jsonb NOT NULL DEFAULT '{}'::jsonb;

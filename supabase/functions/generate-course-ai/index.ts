@@ -189,6 +189,18 @@ const LessonTextSchema = z.object({
   summary: z.string(),
   key_points: z.array(z.string()),
   references: z.array(z.string()),
+  practical_steps: z.array(z.string()).default([]),
+  checklist: z.array(z.string()).default([]),
+  common_mistakes: z.array(z.object({
+    mistake: z.string(),
+    fix: z.string(),
+  })).default([]),
+  glossary: z.array(z.object({
+    term: z.string(),
+    meaning: z.string(),
+  })).default([]),
+  memorization: z.array(z.string()).default([]),
+  teacher_notes: z.array(z.string()).default([]),
   video_topics: z.array(z.string()).default([]),
   youtube_query: z.string().default(""),
   complementary_materials: z.array(z.object({
@@ -199,6 +211,7 @@ const LessonTextSchema = z.object({
     url: z.preprocess((v) => (v == null ? "" : v), z.string().default("")),
   })).default([]),
 });
+
 
 // Coerções defensivas — Gemini às vezes devolve objetos/strings em campos string.
 const toStr = (v: any): any => {
@@ -251,12 +264,18 @@ const QuestionItem = z.preprocess((q: any) => {
     ),
     options,
     correct,
+    explanation: toStr(
+      q.explanation ?? q.rationale ?? q.justification
+      ?? q.explicacao ?? q.explicação ?? q.justificativa ?? q.comentario ?? q.comentário ?? "",
+    ) ?? "",
   };
 }, z.object({
   question: z.string(),
   options: z.array(z.string()),
   correct: z.number(),
+  explanation: z.string().default(""),
 }));
+
 const QuizSchema = z.preprocess(
   (v: any) => {
     if (Array.isArray(v)) return { questions: v };
@@ -350,15 +369,47 @@ function buildLessonHtml(c: z.infer<typeof LessonTextSchema>): string {
     ? sec("Material complementar", `<ul>${c.complementary_materials!.map((m) =>
         `<li><strong>${m.kind}:</strong> ${m.title} — <em>${m.reference}</em>${m.url ? ` (<a href="${m.url}" target="_blank" rel="noreferrer">link</a>)` : ""}</li>`).join("")}</ul>`)
     : "";
+  const stepsHtml = (c.practical_steps ?? []).length
+    ? sec("Passo a passo prático", `<ol>${c.practical_steps!.map((s) => `<li>${s}</li>`).join("")}</ol>`)
+    : "";
+  const checklistHtml = (c.checklist ?? []).length
+    ? sec("Checklist de execução", `<ul>${c.checklist!.map((s) => `<li>☐ ${s}</li>`).join("")}</ul>`)
+    : "";
+  const mistakesHtml = (c.common_mistakes ?? []).length
+    ? sec("Erros mais comuns e como evitar", `<ul>${c.common_mistakes!.map((m) =>
+        `<li><strong>Erro:</strong> ${m.mistake}<br/><strong>Como evitar:</strong> ${m.fix}</li>`).join("")}</ul>`)
+    : "";
+  const glossaryHtml = (c.glossary ?? []).length
+    ? sec("Glossário da aula", `<ul>${c.glossary!.map((g) =>
+        `<li><strong>${g.term}:</strong> ${g.meaning}</li>`).join("")}</ul>`)
+    : "";
+  const memoHtml = (c.memorization ?? []).length
+    ? sec("Memorize isto", list(c.memorization!))
+    : "";
   return [
     sec("Objetivo da aula", `<p>${c.objective}</p>`),
     sec("Conteúdo principal", c.theory_html),
+    stepsHtml,
+    checklistHtml,
+    mistakesHtml,
+    glossaryHtml,
     sec("Resumo", `<p>${c.summary}</p>`),
     sec("Pontos-chave", list(c.key_points)),
+    memoHtml,
     videoHtml,
     matHtml,
     sec("Referências", list(c.references)),
   ].filter(Boolean).join("\n");
+}
+
+const LANGUAGE_STYLES: Record<string, string> = {
+  simples: "Linguagem SIMPLES e acessível: frases curtas, zero jargão sem explicação, analogias do dia a dia, como se explicasse para quem nunca teve contato com o tema. Sempre que usar um termo técnico, explique entre parênteses.",
+  tecnica: "Linguagem TÉCNICA e profissional: terminologia correta do ofício, citação de normas e procedimentos, valores, tolerâncias e passos operacionais precisos, como um manual de campo.",
+  formal: "Linguagem FORMAL e acadêmica/institucional: norma culta, impessoalidade, estrutura dissertativa, adequada a certificações e capacitações corporativas.",
+};
+function languageDirective(style?: string) {
+  const key = String(style || "simples").toLowerCase();
+  return LANGUAGE_STYLES[key] ?? LANGUAGE_STYLES.simples;
 }
 
 type GenOptions = {
@@ -369,7 +420,9 @@ type GenOptions = {
   depth: string;
   include_materials: boolean;
   model: string;
+  language_style?: string;
 };
+
 
 async function generateLessonText(
   gateway: ReturnType<typeof buildGateway>,
@@ -380,20 +433,29 @@ async function generateLessonText(
   opts: GenOptions,
   abortSignal?: AbortSignal,
 ) {
-  const sys = `Você é um especialista em educação profissionalizante brasileira. Gere conteúdo didático em português do Brasil, profissional, atualizado e correto. Para HTML use apenas <p>, <strong>, <em>, <ul>, <li>, <ol>, <h3>, <table>, <tr>, <td>, <th>. Nunca invente leis ou normas inexistentes.`;
+  const sys = `Você é um especialista em educação profissionalizante brasileira, no padrão de cursos online premium (estilo Coursebox). Gere conteúdo didático em português do Brasil, profissional, atualizado e correto, que NÃO deixe dúvidas no aluno: cada conceito é explicado do zero, com exemplo real antes de avançar. Para HTML use apenas <p>, <strong>, <em>, <ul>, <li>, <ol>, <h3>, <table>, <tr>, <td>, <th>. Nunca invente leis ou normas inexistentes.
+${languageDirective(opts.language_style)}`;
   const prompt = `Curso: "${courseTitle}". Módulo: "${moduleTitle}". Aula: "${lessonTitle}".
 Resumo da aula: ${lessonSummary}
 Nível: ${opts.level}. Profundidade: ${opts.depth}. Tom: ${opts.tone}.${opts.audience ? ` Público-alvo: ${opts.audience}.` : ""}${opts.workload ? ` Carga horária do curso: ${opts.workload}.` : ""}
+${languageDirective(opts.language_style)}
 
 Gere:
 - objective: objetivo de aprendizagem em 1-2 frases.
-- theory_html: conteúdo teórico completo da aula em HTML (mínimo 400 palavras, com subtítulos h3 e listas quando ajudar).
+- theory_html: conteúdo teórico completo da aula em HTML (mínimo 500 palavras, com subtítulos h3, exemplos reais do ofício e listas quando ajudar). Explique cada termo técnico na primeira vez que aparecer.
+- practical_steps: 5 a 10 passos práticos numerados de como executar/aplicar o que foi ensinado (se a aula for puramente teórica, use passos de raciocínio/aplicação).
+- checklist: 5 a 8 itens objetivos de verificação que o aluno confere antes de dar a tarefa por concluída.
+- common_mistakes: 3 a 6 itens { mistake: erro frequente na prática, fix: como evitar/corrigir }.
+- glossary: 4 a 8 itens { term, meaning } com os termos técnicos da aula explicados em linguagem simples.
+- memorization: 3 a 6 frases curtas de fixação/mnemônicas para o aluno memorizar o essencial.
+- teacher_notes: 3 a 6 orientações EXCLUSIVAS para o professor conduzir esta aula (como explicar, o que demonstrar, perguntas para a turma, tempo sugerido).
 - summary: resumo em 3-5 linhas.
 - key_points: 5 a 8 pontos-chave.
 - references: 3 a 6 referências bibliográficas reais (livros, normas, autores reconhecidos).
 - video_topics: 3 a 5 SUGESTÕES DE TEMAS de busca no YouTube relacionadas à aula (apenas o tema/termo de busca em português, NUNCA URLs ou nomes de canais inventados).
 - youtube_query: UM ÚNICO termo de busca curto, específico e em português, ideal para encontrar no YouTube o melhor vídeo prático/explicativo sobre esta aula. NÃO inclua URLs, nomes de canais nem aspas. Exemplos: "instalação de ar-condicionado split", "vácuo em sistemas de refrigeração", "PMOC manutenção de ar-condicionado".
 ${opts.include_materials ? "- complementary_materials: até 5 materiais (kind: norma, lei, manual, artigo ou documento; title; reference com identificador como 'NR-10', 'Lei 8.213/91', etc.; url opcional)." : "- complementary_materials: lista vazia."}`;
+
 
   const { object } = await generateValidatedWithFallback(
     gateway, opts.model, sys, prompt, LessonTextSchema, 12288, abortSignal,
@@ -409,10 +471,12 @@ async function generateQuiz(
   opts: GenOptions,
   abortSignal?: AbortSignal,
 ) {
-  const sys = `Gere questões de múltipla escolha didáticas e desafiadoras em português do Brasil. Cada questão tem exatamente 4 alternativas, uma correta (índice 0-3). Não repita perguntas.
-FORMATO OBRIGATÓRIO: responda como JSON com o campo "questions" (array). Cada item DEVE usar EXATAMENTE as chaves em INGLÊS: "question" (string), "options" (array de 4 strings), "correct" (número 0 a 3). NUNCA use "pergunta", "alternativas" ou "resposta_correta".`;
+  const sys = `Gere questões de múltipla escolha didáticas e contextualizadas com situações reais do ofício, em português do Brasil. Cada questão tem exatamente 4 alternativas plausíveis, uma correta (índice 0-3). Não repita perguntas. Cada questão traz uma justificativa didática explicando por que a alternativa correta está certa.
+${languageDirective(opts.language_style)}
+FORMATO OBRIGATÓRIO: responda como JSON com o campo "questions" (array). Cada item DEVE usar EXATAMENTE as chaves em INGLÊS: "question" (string), "options" (array de 4 strings), "correct" (número 0 a 3), "explanation" (string). NUNCA use "pergunta", "alternativas" ou "resposta_correta".`;
   const prompt = `Curso: "${courseTitle}". Tema: "${lessonTitle}". Nível: ${opts.level}. Profundidade: ${opts.depth}.
-Gere ${numQuestions} questões no formato { "questions": [ { "question": "...", "options": ["a","b","c","d"], "correct": 0 } ] }.`;
+Gere ${numQuestions} questões no formato { "questions": [ { "question": "...", "options": ["a","b","c","d"], "correct": 0, "explanation": "..." } ] }.`;
+
   const { object } = await generateValidatedWithFallback(
     gateway, opts.model, sys, prompt, QuizSchema, 8192, abortSignal,
   );
@@ -438,10 +502,12 @@ async function generateFlashcards(
   opts: GenOptions,
   abortSignal?: AbortSignal,
 ) {
-  const sys = `Gere flashcards de estudo (frente: pergunta ou conceito; verso: resposta curta e clara) em português do Brasil.
+  const sys = `Gere flashcards de MEMORIZAÇÃO ATIVA (frente: pergunta direta, desafio ou conceito; verso: resposta curta, objetiva e fácil de fixar, com dica mnemônica quando ajudar) em português do Brasil.
+${languageDirective(opts.language_style)}
 FORMATO OBRIGATÓRIO: responda como JSON com o campo "items" (array). Cada item DEVE usar EXATAMENTE as chaves em INGLÊS: "front" (string) e "back" (string). NUNCA use "frente"/"verso" nem "flashcards".`;
   const prompt = `Curso: "${courseTitle}". Tema: "${lessonTitle}". Nível: ${opts.level}.
-Gere de 10 a 15 flashcards no formato { "items": [ { "front": "...", "back": "..." } ] }.`;
+Gere de 10 a 15 flashcards no formato { "items": [ { "front": "...", "back": "..." } ] }. Cubra números, normas, etapas e definições essenciais que o aluno precisa saber de cor.`;
+
   const { object } = await generateValidatedWithFallback(
     gateway, opts.model, sys, prompt, FlipSchema, 12288, abortSignal,
   );
@@ -639,8 +705,15 @@ async function generateLessonContentBackground(
         summary: content.summary,
         key_points: content.key_points,
         references: content.references,
+        practical_steps: content.practical_steps ?? [],
+        checklist: content.checklist ?? [],
+        common_mistakes: content.common_mistakes ?? [],
+        glossary: content.glossary ?? [],
+        memorization: content.memorization ?? [],
+        teacher_notes: content.teacher_notes ?? [],
         video_topics: content.video_topics ?? [],
         complementary_materials: content.complementary_materials ?? [],
+
         youtube: youtube ?? null,
         // Preserva anexos enviados manualmente
         attachments: existingAttachments,
@@ -854,6 +927,7 @@ async function actionFullCourse(payload: any, key: string) {
   const opts: GenOptions = {
     level, audience, workload, tone: tone || "Didático", depth: depth || "Intermediário",
     include_materials: include_materials !== false,
+    language_style: payload?.language_style,
     model: model || DEFAULT_MODEL,
   };
 
@@ -861,7 +935,9 @@ async function actionFullCourse(payload: any, key: string) {
   const admin = sbAdmin();
 
   // Step A: skeleton
-  const sys = `Você é um designer instrucional brasileiro. Crie estruturas completas de cursos profissionalizantes, claras e progressivas, em português do Brasil.`;
+  const sys = `Você é um designer instrucional brasileiro. Crie estruturas completas de cursos profissionalizantes, claras e progressivas, em português do Brasil, no padrão de cursos online premium.
+${languageDirective(opts.language_style)}`;
+
   const prompt = `Crie a estrutura COMPLETA do curso a seguir.
 Título: "${title}"
 Categoria: ${category}
@@ -960,6 +1036,13 @@ Progressão didática: do fundamental ao avançado. Cubra teoria, prática, segu
       section_id: sec.id, title: `Flashcards — ${m.title}`, lesson_type: "flip", sort_order: order,
       content: { ai_pending: true, ai_run_id: runId, ai_cancelled: false, items: [] },
     });
+    order += 10;
+    // Espaço reservado para videoaula do módulo (o instrutor cola o link ou envia a gravação)
+    lessonRows.push({
+      section_id: sec.id, title: `Videoaula — ${m.title}`, lesson_type: "video", sort_order: order,
+      content: { placeholder: true, youtube: null, attachments: [] },
+    });
+
     const { data: created } = await admin.from("course_lessons").insert(lessonRows).select("id, title, lesson_type, sort_order");
     const sorted = [...(created ?? [])].sort((a: any, b: any) => a.sort_order - b.sort_order);
     for (let i = 0; i < m.lessons.length; i++) {
@@ -1024,6 +1107,7 @@ async function actionLesson(payload: any, key: string) {
     tone: options?.tone || "Didático",
     depth: options?.depth || "Intermediário",
     include_materials: options?.include_materials !== false,
+    language_style: options?.language_style,
     model: options?.model || DEFAULT_MODEL,
   };
 
@@ -1078,6 +1162,7 @@ async function actionModule(payload: any, key: string) {
     tone: options?.tone || "Didático",
     depth: options?.depth || "Intermediário",
     include_materials: options?.include_materials !== false,
+    language_style: options?.language_style,
     model: options?.model || DEFAULT_MODEL,
   };
 
@@ -1126,6 +1211,7 @@ async function actionLessonFromImage(payload: any, key: string) {
     tone: options?.tone || "Didático",
     depth: options?.depth || "Intermediário",
     include_materials: options?.include_materials !== false,
+    language_style: options?.language_style,
     model: options?.model || DEFAULT_MODEL,
   };
 
@@ -1252,6 +1338,7 @@ async function actionReprocessFailures(payload: any, key: string) {
     tone: options?.tone || "Didático",
     depth: options?.depth || "Intermediário",
     include_materials: options?.include_materials !== false,
+    language_style: options?.language_style,
     model: options?.model || DEFAULT_MODEL,
   };
 
@@ -1405,6 +1492,7 @@ async function actionImportSyllabus(payload: any, key: string) {
   const opts: GenOptions = {
     level, audience, workload, tone: tone || "Didático", depth: depth || "Intermediário",
     include_materials: include_materials !== false,
+    language_style: payload?.language_style,
     model: model || DEFAULT_MODEL,
   };
 

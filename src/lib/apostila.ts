@@ -89,7 +89,16 @@ const attachmentsHtml = (atts?: Attachment[]) => {
   return `<div style="margin-top:6px;padding:8px 10px;background:#f1f5f9;border-radius:6px"><div class="label" style="font-size:11px;text-transform:uppercase;color:#64748b;margin-bottom:4px">Materiais</div>${items}</div>`;
 };
 
-const lessonHtml = (lesson: Lesson, gabaritoCollector: { lessonTitle: string; questions: { q: string; correct: string }[] }[]): string => {
+type Gabarito = { lessonTitle: string; questions: { q: string; correct: string; why?: string }[] };
+export type ApostilaMode = "aluno" | "professor";
+
+const teacherNotesHtml = (lesson: Lesson) => {
+  const notes: string[] = lesson.content?.teacher_notes ?? [];
+  if (!notes.length) return "";
+  return `<div class="apostila-card" style="background:#eff6ff;border-color:#93c5fd"><div class="label">Orientações do professor</div><ul>${notes.map(n => `<li>${escapeHtml(n)}</li>`).join("")}</ul></div>`;
+};
+
+const lessonHtml = (lesson: Lesson, gabaritoCollector: Gabarito[], mode: ApostilaMode = "aluno"): string => {
   const atts: Attachment[] = lesson.content?.attachments ?? [];
   const title = `<div class="apostila-lessonTitle">${escapeHtml(lesson.title)}</div>`;
   let body = "";
@@ -97,9 +106,13 @@ const lessonHtml = (lesson: Lesson, gabaritoCollector: { lessonTitle: string; qu
     case "text":
       body = lesson.content?.html ?? "<p><em>(sem conteúdo)</em></p>";
       break;
-    case "video":
-      body = `<p><em>Aula em vídeo. Assista no portal.</em></p>`;
+    case "video": {
+      const yt = lesson.content?.youtube;
+      body = yt?.url
+        ? `<p><em>Aula em vídeo:</em> ${escapeHtml(yt.title ?? "assista no portal")} — ${escapeHtml(yt.url)}</p>`
+        : `<p><em>Aula em vídeo. Assista no portal.</em></p>`;
       break;
+    }
     case "flip": {
       const items: { front: string; back: string }[] = lesson.content?.items ?? [];
       body = items.map((it, i) =>
@@ -115,34 +128,42 @@ const lessonHtml = (lesson: Lesson, gabaritoCollector: { lessonTitle: string; qu
       break;
     }
     case "quiz": {
-      const questions: { question: string; options: string[]; correct: number }[] = lesson.content?.questions ?? [];
+      const questions: { question: string; options: string[]; correct: number; explanation?: string }[] = lesson.content?.questions ?? [];
       body = questions.map((q, i) => {
         const opts = q.options.map(o => `<li>${escapeHtml(o)}</li>`).join("");
-        return `<div class="apostila-q"><div class="qnum">${i + 1}. ${escapeHtml(q.question)}</div><ol>${opts}</ol></div>`;
+        const inline = mode === "professor"
+          ? `<div style="color:#15803d;font-size:12px;margin-top:4px">Resposta: ${escapeHtml(String.fromCharCode(97 + (q.correct ?? 0)) + ") " + (q.options[q.correct] ?? ""))}${q.explanation ? ` — ${escapeHtml(q.explanation)}` : ""}</div>`
+          : "";
+        return `<div class="apostila-q"><div class="qnum">${i + 1}. ${escapeHtml(q.question)}</div><ol>${opts}</ol>${inline}</div>`;
       }).join("");
       gabaritoCollector.push({
         lessonTitle: lesson.title,
         questions: questions.map(q => ({
           q: q.question,
           correct: String.fromCharCode(97 + (q.correct ?? 0)) + ") " + (q.options[q.correct] ?? ""),
+          why: q.explanation,
         })),
       });
       break;
     }
   }
-  return title + body + attachmentsHtml(atts);
+  const notes = mode === "professor" ? teacherNotesHtml(lesson) : "";
+  return title + body + notes + attachmentsHtml(atts);
 };
+
 
 export const generateApostila = async (
   course: Course,
   sections: Section[],
-  studentName?: string | null
+  studentName?: string | null,
+  mode: ApostilaMode = "aluno"
 ) => {
+  const isProf = mode === "professor";
   const pdf = new jsPDF({ unit: "pt", format: "a4" });
   const logo = await loadImageDataUrl(logoUrl);
 
   // Collect gabarito as we render
-  const gabarito: { lessonTitle: string; questions: { q: string; correct: string }[] }[] = [];
+  const gabarito: Gabarito[] = [];
 
   // ---- Cover (page 1) ----
   if (logo) {
@@ -152,7 +173,7 @@ export const generateApostila = async (
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(28);
   pdf.setTextColor(30, 58, 138);
-  pdf.text("APOSTILA DO CURSO", A4.w / 2, 290, { align: "center" });
+  pdf.text(isProf ? "GUIA DO PROFESSOR" : "APOSTILA DO CURSO", A4.w / 2, 290, { align: "center" });
   pdf.setFontSize(22);
   pdf.setTextColor(15, 23, 42);
   const titleLines = pdf.splitTextToSize(course.title, A4.w - 100);
@@ -161,8 +182,10 @@ export const generateApostila = async (
   pdf.setFontSize(12);
   pdf.setTextColor(100, 116, 139);
   if (course.category) pdf.text(course.category, A4.w / 2, 380, { align: "center" });
-  if (studentName) pdf.text(`Aluno(a): ${studentName}`, A4.w / 2, 500, { align: "center" });
+  if (isProf) pdf.text("Material de uso exclusivo do instrutor", A4.w / 2, 410, { align: "center" });
+  if (studentName && !isProf) pdf.text(`Aluno(a): ${studentName}`, A4.w / 2, 500, { align: "center" });
   pdf.text(`Gerada em ${new Date().toLocaleDateString("pt-BR")}`, A4.w / 2, 520, { align: "center" });
+
 
   // ---- Content pages ----
   const contentW = A4.w - MARGIN.left - MARGIN.right;
@@ -198,10 +221,22 @@ export const generateApostila = async (
     }
   };
 
+  // ---- Sumário ----
+  {
+    const items = sections.map((s, i) =>
+      `<div style="margin:0 0 6px"><strong>Módulo ${i + 1} — ${escapeHtml(s.title)}</strong><div style="color:#475569;font-size:12px">${s.lessons.map(l => escapeHtml(l.title)).join(" · ")}</div></div>`
+    ).join("");
+    const plano = isProf
+      ? `<div class="apostila-card"><div class="label">Plano de aula sugerido</div><div>Divida a carga horária entre os ${sections.length} módulos. Para cada módulo: exposição do conteúdo, demonstração prática, aplicação do quiz e revisão com os flashcards. Use as orientações do professor destacadas em cada aula.</div></div>`
+      : "";
+    const canvas = await renderBlockToCanvas(`<div class="apostila-sectionTitle">Sumário</div>${items}${plano}`);
+    await addBlockCanvas(canvas);
+  }
+
   for (const section of sections) {
     let html = `<div class="apostila-sectionTitle">${escapeHtml(section.title)}</div>`;
     for (const lesson of section.lessons) {
-      html += lessonHtml(lesson, gabarito);
+      html += lessonHtml(lesson, gabarito, mode);
     }
     const canvas = await renderBlockToCanvas(html);
     await addBlockCanvas(canvas);
@@ -209,14 +244,15 @@ export const generateApostila = async (
 
   // ---- Gabarito ----
   if (gabarito.length) {
-    let html = `<div class="apostila-sectionTitle">Gabarito dos Quizzes</div>`;
+    let html = `<div class="apostila-sectionTitle">${isProf ? "Gabarito comentado" : "Gabarito dos Quizzes"}</div>`;
     gabarito.forEach(g => {
       html += `<div class="apostila-lessonTitle">${escapeHtml(g.lessonTitle)}</div>`;
-      html += g.questions.map((q, i) => `<div style="margin:4px 0"><strong>${i + 1}.</strong> ${escapeHtml(q.q)}<br><span style="color:#15803d">Resposta: ${escapeHtml(q.correct)}</span></div>`).join("");
+      html += g.questions.map((q, i) => `<div style="margin:4px 0"><strong>${i + 1}.</strong> ${escapeHtml(q.q)}<br><span style="color:#15803d">Resposta: ${escapeHtml(q.correct)}</span>${isProf && q.why ? `<br><span style="color:#475569;font-size:12px">Por quê: ${escapeHtml(q.why)}</span>` : ""}</div>`).join("");
     });
     const canvas = await renderBlockToCanvas(html);
     await addBlockCanvas(canvas);
   }
+
 
   // ---- Header / footer / watermark on every page ----
   const total = pdf.getNumberOfPages();
@@ -257,6 +293,6 @@ export const generateApostila = async (
     pdf.text(`Página ${p} de ${total}`, A4.w - MARGIN.right, A4.h - 25, { align: "right" });
   }
 
-  const filename = `apostila-${slugify(course.slug || course.title)}.pdf`;
+  const filename = `${isProf ? "guia-professor" : "apostila"}-${slugify(course.slug || course.title)}.pdf`;
   pdf.save(filename);
 };
