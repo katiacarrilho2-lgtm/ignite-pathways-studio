@@ -72,6 +72,9 @@ const AdminLayoutInner = () => {
   const { counts, markRead } = useAdminBadges();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { homeAccountId, loading: loadingAccounts } = useCommercialAccounts();
+  // Depois da primeira carga, nunca mais troca a tela por "Carregando…".
+  const [ready, setReady] = useState(false);
+  useEffect(() => { if (!loading && !loadingAccounts) setReady(true); }, [loading, loadingAccounts]);
 
   // Marcar canal como lido ao entrar na rota correspondente
   useEffect(() => {
@@ -91,7 +94,7 @@ const AdminLayoutInner = () => {
     return <Navigate to="/admin/certificacao" replace />;
   }
 
-  if (loading || loadingAccounts) return <div className="min-h-screen grid place-items-center text-muted-foreground">Carregando…</div>;
+  if (!ready && (loading || loadingAccounts)) return <div className="min-h-screen grid place-items-center text-muted-foreground">Carregando…</div>;
   if (!user) return <Navigate to="/auth" state={{ from: pathname }} replace />;
 
   // Usuário de Polo/Revendedor nunca opera no painel da Matriz: é levado ao Portal.

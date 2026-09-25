@@ -135,7 +135,7 @@ import { AlunoLayout } from "./components/aluno/AlunoLayout";
 import { AuthProvider } from "./hooks/useAuth";
 import { useReferralCapture } from "./hooks/useReferralCapture";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false, refetchOnReconnect: false } } });
 
 const ReferralWatcher = () => { useReferralCapture(); return null; };
 
