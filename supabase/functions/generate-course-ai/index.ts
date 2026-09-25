@@ -369,15 +369,47 @@ function buildLessonHtml(c: z.infer<typeof LessonTextSchema>): string {
     ? sec("Material complementar", `<ul>${c.complementary_materials!.map((m) =>
         `<li><strong>${m.kind}:</strong> ${m.title} — <em>${m.reference}</em>${m.url ? ` (<a href="${m.url}" target="_blank" rel="noreferrer">link</a>)` : ""}</li>`).join("")}</ul>`)
     : "";
+  const stepsHtml = (c.practical_steps ?? []).length
+    ? sec("Passo a passo prático", `<ol>${c.practical_steps!.map((s) => `<li>${s}</li>`).join("")}</ol>`)
+    : "";
+  const checklistHtml = (c.checklist ?? []).length
+    ? sec("Checklist de execução", `<ul>${c.checklist!.map((s) => `<li>☐ ${s}</li>`).join("")}</ul>`)
+    : "";
+  const mistakesHtml = (c.common_mistakes ?? []).length
+    ? sec("Erros mais comuns e como evitar", `<ul>${c.common_mistakes!.map((m) =>
+        `<li><strong>Erro:</strong> ${m.mistake}<br/><strong>Como evitar:</strong> ${m.fix}</li>`).join("")}</ul>`)
+    : "";
+  const glossaryHtml = (c.glossary ?? []).length
+    ? sec("Glossário da aula", `<ul>${c.glossary!.map((g) =>
+        `<li><strong>${g.term}:</strong> ${g.meaning}</li>`).join("")}</ul>`)
+    : "";
+  const memoHtml = (c.memorization ?? []).length
+    ? sec("Memorize isto", list(c.memorization!))
+    : "";
   return [
     sec("Objetivo da aula", `<p>${c.objective}</p>`),
     sec("Conteúdo principal", c.theory_html),
+    stepsHtml,
+    checklistHtml,
+    mistakesHtml,
+    glossaryHtml,
     sec("Resumo", `<p>${c.summary}</p>`),
     sec("Pontos-chave", list(c.key_points)),
+    memoHtml,
     videoHtml,
     matHtml,
     sec("Referências", list(c.references)),
   ].filter(Boolean).join("\n");
+}
+
+const LANGUAGE_STYLES: Record<string, string> = {
+  simples: "Linguagem SIMPLES e acessível: frases curtas, zero jargão sem explicação, analogias do dia a dia, como se explicasse para quem nunca teve contato com o tema. Sempre que usar um termo técnico, explique entre parênteses.",
+  tecnica: "Linguagem TÉCNICA e profissional: terminologia correta do ofício, citação de normas e procedimentos, valores, tolerâncias e passos operacionais precisos, como um manual de campo.",
+  formal: "Linguagem FORMAL e acadêmica/institucional: norma culta, impessoalidade, estrutura dissertativa, adequada a certificações e capacitações corporativas.",
+};
+function languageDirective(style?: string) {
+  const key = String(style || "simples").toLowerCase();
+  return LANGUAGE_STYLES[key] ?? LANGUAGE_STYLES.simples;
 }
 
 type GenOptions = {
@@ -388,7 +420,9 @@ type GenOptions = {
   depth: string;
   include_materials: boolean;
   model: string;
+  language_style?: string;
 };
+
 
 async function generateLessonText(
   gateway: ReturnType<typeof buildGateway>,
