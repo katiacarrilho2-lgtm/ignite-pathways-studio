@@ -21,6 +21,7 @@ import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { LessonAttachmentsEditor, type Attachment } from "@/components/admin/LessonAttachmentsEditor";
 import { AiGenerateDialog, type AiOptions } from "@/components/admin/AiGenerateDialog";
 import { LessonImageAiDialog } from "@/components/admin/LessonImageAiDialog";
+import { LessonImageGenDialog } from "@/components/admin/LessonImageGenDialog";
 import { YoutubePickerDialog, type YoutubeVideo } from "@/components/admin/YoutubePickerDialog";
 import { exportCourseJson } from "@/lib/courseExport";
 import { generateApostila } from "@/lib/apostila";
@@ -131,6 +132,7 @@ const Inner = () => {
   const [aiBusy, setAiBusy] = useState(false);
   const [imgAiTarget, setImgAiTarget] = useState<{ lessonId: string; title: string } | null>(null);
   const [imgAiBusy, setImgAiBusy] = useState(false);
+  const [imgGenOpen, setImgGenOpen] = useState(false);
   const [ytPickerOpen, setYtPickerOpen] = useState(false);
   const [reprocessingFailures, setReprocessingFailures] = useState(false);
   const [cancellingGeneration, setCancellingGeneration] = useState(false);
@@ -986,7 +988,10 @@ const Inner = () => {
                   <div className="border border-border rounded-lg p-3 bg-secondary/20 space-y-3">
                     <div className="flex items-center justify-between gap-2">
                       <Label className="text-sm">Imagens da aula</Label>
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
+                        <Button type="button" size="sm" variant="outline" onClick={() => setImgGenOpen(true)}>
+                          <Sparkles className="size-3.5" /> Gerar ilustração com IA
+                        </Button>
                         <label className="inline-flex items-center gap-1 cursor-pointer text-xs px-2.5 py-1.5 rounded-md border border-border hover:bg-secondary">
                           <Plus className="size-3.5" /> Galeria
                           <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
@@ -1178,6 +1183,24 @@ const Inner = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <LessonImageGenDialog
+        open={imgGenOpen}
+        onOpenChange={setImgGenOpen}
+        defaultPrompt={[editing?.title, course?.title].filter(Boolean).join(" — ")}
+        folder={`lessons/${editing?.id ?? courseId}`}
+        onUse={(url, target) => setEditing(prev => {
+          if (!prev) return prev;
+          const content = { ...(prev.content ?? {}) };
+          if (target === "cover") {
+            content.image_url = url;
+            content.image_width = content.image_width ?? 720;
+          } else {
+            content.extra_images = [...(content.extra_images ?? []), { url, width: 480, caption: "" }];
+          }
+          return { ...prev, content };
+        })}
+      />
 
       <LessonImageAiDialog
         open={!!imgAiTarget}
