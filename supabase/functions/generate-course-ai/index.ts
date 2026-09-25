@@ -189,6 +189,18 @@ const LessonTextSchema = z.object({
   summary: z.string(),
   key_points: z.array(z.string()),
   references: z.array(z.string()),
+  practical_steps: z.array(z.string()).default([]),
+  checklist: z.array(z.string()).default([]),
+  common_mistakes: z.array(z.object({
+    mistake: z.string(),
+    fix: z.string(),
+  })).default([]),
+  glossary: z.array(z.object({
+    term: z.string(),
+    meaning: z.string(),
+  })).default([]),
+  memorization: z.array(z.string()).default([]),
+  teacher_notes: z.array(z.string()).default([]),
   video_topics: z.array(z.string()).default([]),
   youtube_query: z.string().default(""),
   complementary_materials: z.array(z.object({
@@ -199,6 +211,7 @@ const LessonTextSchema = z.object({
     url: z.preprocess((v) => (v == null ? "" : v), z.string().default("")),
   })).default([]),
 });
+
 
 // Coerções defensivas — Gemini às vezes devolve objetos/strings em campos string.
 const toStr = (v: any): any => {
