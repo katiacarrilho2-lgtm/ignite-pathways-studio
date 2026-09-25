@@ -471,10 +471,12 @@ async function generateQuiz(
   opts: GenOptions,
   abortSignal?: AbortSignal,
 ) {
-  const sys = `Gere questões de múltipla escolha didáticas e desafiadoras em português do Brasil. Cada questão tem exatamente 4 alternativas, uma correta (índice 0-3). Não repita perguntas.
-FORMATO OBRIGATÓRIO: responda como JSON com o campo "questions" (array). Cada item DEVE usar EXATAMENTE as chaves em INGLÊS: "question" (string), "options" (array de 4 strings), "correct" (número 0 a 3). NUNCA use "pergunta", "alternativas" ou "resposta_correta".`;
+  const sys = `Gere questões de múltipla escolha didáticas e contextualizadas com situações reais do ofício, em português do Brasil. Cada questão tem exatamente 4 alternativas plausíveis, uma correta (índice 0-3). Não repita perguntas. Cada questão traz uma justificativa didática explicando por que a alternativa correta está certa.
+${languageDirective(opts.language_style)}
+FORMATO OBRIGATÓRIO: responda como JSON com o campo "questions" (array). Cada item DEVE usar EXATAMENTE as chaves em INGLÊS: "question" (string), "options" (array de 4 strings), "correct" (número 0 a 3), "explanation" (string). NUNCA use "pergunta", "alternativas" ou "resposta_correta".`;
   const prompt = `Curso: "${courseTitle}". Tema: "${lessonTitle}". Nível: ${opts.level}. Profundidade: ${opts.depth}.
-Gere ${numQuestions} questões no formato { "questions": [ { "question": "...", "options": ["a","b","c","d"], "correct": 0 } ] }.`;
+Gere ${numQuestions} questões no formato { "questions": [ { "question": "...", "options": ["a","b","c","d"], "correct": 0, "explanation": "..." } ] }.`;
+
   const { object } = await generateValidatedWithFallback(
     gateway, opts.model, sys, prompt, QuizSchema, 8192, abortSignal,
   );
