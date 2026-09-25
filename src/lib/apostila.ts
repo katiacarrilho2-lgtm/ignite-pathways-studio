@@ -221,10 +221,22 @@ export const generateApostila = async (
     }
   };
 
+  // ---- Sumário ----
+  {
+    const items = sections.map((s, i) =>
+      `<div style="margin:0 0 6px"><strong>Módulo ${i + 1} — ${escapeHtml(s.title)}</strong><div style="color:#475569;font-size:12px">${s.lessons.map(l => escapeHtml(l.title)).join(" · ")}</div></div>`
+    ).join("");
+    const plano = isProf
+      ? `<div class="apostila-card"><div class="label">Plano de aula sugerido</div><div>Divida a carga horária entre os ${sections.length} módulos. Para cada módulo: exposição do conteúdo, demonstração prática, aplicação do quiz e revisão com os flashcards. Use as orientações do professor destacadas em cada aula.</div></div>`
+      : "";
+    const canvas = await renderBlockToCanvas(`<div class="apostila-sectionTitle">Sumário</div>${items}${plano}`);
+    await addBlockCanvas(canvas);
+  }
+
   for (const section of sections) {
     let html = `<div class="apostila-sectionTitle">${escapeHtml(section.title)}</div>`;
     for (const lesson of section.lessons) {
-      html += lessonHtml(lesson, gabarito);
+      html += lessonHtml(lesson, gabarito, mode);
     }
     const canvas = await renderBlockToCanvas(html);
     await addBlockCanvas(canvas);
@@ -232,14 +244,15 @@ export const generateApostila = async (
 
   // ---- Gabarito ----
   if (gabarito.length) {
-    let html = `<div class="apostila-sectionTitle">Gabarito dos Quizzes</div>`;
+    let html = `<div class="apostila-sectionTitle">${isProf ? "Gabarito comentado" : "Gabarito dos Quizzes"}</div>`;
     gabarito.forEach(g => {
       html += `<div class="apostila-lessonTitle">${escapeHtml(g.lessonTitle)}</div>`;
-      html += g.questions.map((q, i) => `<div style="margin:4px 0"><strong>${i + 1}.</strong> ${escapeHtml(q.q)}<br><span style="color:#15803d">Resposta: ${escapeHtml(q.correct)}</span></div>`).join("");
+      html += g.questions.map((q, i) => `<div style="margin:4px 0"><strong>${i + 1}.</strong> ${escapeHtml(q.q)}<br><span style="color:#15803d">Resposta: ${escapeHtml(q.correct)}</span>${isProf && q.why ? `<br><span style="color:#475569;font-size:12px">Por quê: ${escapeHtml(q.why)}</span>` : ""}</div>`).join("");
     });
     const canvas = await renderBlockToCanvas(html);
     await addBlockCanvas(canvas);
   }
+
 
   // ---- Header / footer / watermark on every page ----
   const total = pdf.getNumberOfPages();
