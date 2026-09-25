@@ -705,8 +705,15 @@ async function generateLessonContentBackground(
         summary: content.summary,
         key_points: content.key_points,
         references: content.references,
+        practical_steps: content.practical_steps ?? [],
+        checklist: content.checklist ?? [],
+        common_mistakes: content.common_mistakes ?? [],
+        glossary: content.glossary ?? [],
+        memorization: content.memorization ?? [],
+        teacher_notes: content.teacher_notes ?? [],
         video_topics: content.video_topics ?? [],
         complementary_materials: content.complementary_materials ?? [],
+
         youtube: youtube ?? null,
         // Preserva anexos enviados manualmente
         attachments: existingAttachments,
