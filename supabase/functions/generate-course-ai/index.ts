@@ -264,12 +264,18 @@ const QuestionItem = z.preprocess((q: any) => {
     ),
     options,
     correct,
+    explanation: toStr(
+      q.explanation ?? q.rationale ?? q.justification
+      ?? q.explicacao ?? q.explicação ?? q.justificativa ?? q.comentario ?? q.comentário ?? "",
+    ) ?? "",
   };
 }, z.object({
   question: z.string(),
   options: z.array(z.string()),
   correct: z.number(),
+  explanation: z.string().default(""),
 }));
+
 const QuizSchema = z.preprocess(
   (v: any) => {
     if (Array.isArray(v)) return { questions: v };
