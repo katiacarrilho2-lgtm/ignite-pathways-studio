@@ -1036,6 +1036,13 @@ Progressão didática: do fundamental ao avançado. Cubra teoria, prática, segu
       section_id: sec.id, title: `Flashcards — ${m.title}`, lesson_type: "flip", sort_order: order,
       content: { ai_pending: true, ai_run_id: runId, ai_cancelled: false, items: [] },
     });
+    order += 10;
+    // Espaço reservado para videoaula do módulo (o instrutor cola o link ou envia a gravação)
+    lessonRows.push({
+      section_id: sec.id, title: `Videoaula — ${m.title}`, lesson_type: "video", sort_order: order,
+      content: { placeholder: true, youtube: null, attachments: [] },
+    });
+
     const { data: created } = await admin.from("course_lessons").insert(lessonRows).select("id, title, lesson_type, sort_order");
     const sorted = [...(created ?? [])].sort((a: any, b: any) => a.sort_order - b.sort_order);
     for (let i = 0; i < m.lessons.length; i++) {
