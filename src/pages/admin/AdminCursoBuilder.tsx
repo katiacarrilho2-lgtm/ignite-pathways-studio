@@ -21,6 +21,7 @@ import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { LessonAttachmentsEditor, type Attachment } from "@/components/admin/LessonAttachmentsEditor";
 import { AiGenerateDialog, type AiOptions } from "@/components/admin/AiGenerateDialog";
 import { LessonImageAiDialog } from "@/components/admin/LessonImageAiDialog";
+import { LessonImageGenDialog } from "@/components/admin/LessonImageGenDialog";
 import { YoutubePickerDialog, type YoutubeVideo } from "@/components/admin/YoutubePickerDialog";
 import { exportCourseJson } from "@/lib/courseExport";
 import { generateApostila } from "@/lib/apostila";
@@ -131,6 +132,7 @@ const Inner = () => {
   const [aiBusy, setAiBusy] = useState(false);
   const [imgAiTarget, setImgAiTarget] = useState<{ lessonId: string; title: string } | null>(null);
   const [imgAiBusy, setImgAiBusy] = useState(false);
+  const [imgGenOpen, setImgGenOpen] = useState(false);
   const [ytPickerOpen, setYtPickerOpen] = useState(false);
   const [reprocessingFailures, setReprocessingFailures] = useState(false);
   const [cancellingGeneration, setCancellingGeneration] = useState(false);
