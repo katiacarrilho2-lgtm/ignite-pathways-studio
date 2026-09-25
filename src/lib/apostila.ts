@@ -293,6 +293,6 @@ export const generateApostila = async (
     pdf.text(`Página ${p} de ${total}`, A4.w - MARGIN.right, A4.h - 25, { align: "right" });
   }
 
-  const filename = `apostila-${slugify(course.slug || course.title)}.pdf`;
+  const filename = `${isProf ? "guia-professor" : "apostila"}-${slugify(course.slug || course.title)}.pdf`;
   pdf.save(filename);
 };
