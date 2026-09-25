@@ -23,6 +23,8 @@ import { AiGenerateDialog, type AiOptions } from "@/components/admin/AiGenerateD
 import { LessonImageAiDialog } from "@/components/admin/LessonImageAiDialog";
 import { YoutubePickerDialog, type YoutubeVideo } from "@/components/admin/YoutubePickerDialog";
 import { exportCourseJson } from "@/lib/courseExport";
+import { generateApostila } from "@/lib/apostila";
+
 import { uploadCourseImage } from "@/lib/courseMedia";
 import { supabase as sb } from "@/integrations/supabase/client";
 
