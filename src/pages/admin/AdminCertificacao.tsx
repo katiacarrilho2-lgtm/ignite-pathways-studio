@@ -90,7 +90,6 @@ const Inner = () => {
   const save = async () => {
     if (!form.user_id || !form.course_id) return toast.error("Aluno e curso são obrigatórios");
     const prof = students.find((s) => s.user_id === form.user_id);
-    const pr = list.length >= 0 ? undefined : undefined; void pr;
     const curso = courses.find((c) => c.id === form.course_id);
     const alunoNome = prof?.label.split(" · ").slice(1).join(" · ") || prof?.label || "";
     const ch = parseInt(form.carga_horaria, 10);
@@ -260,7 +259,7 @@ const Inner = () => {
               <tbody>
                 {loading && <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Carregando…</td></tr>}
                 {!loading && filtrada.map((c) => {
-                  const cancelado = (c.status ?? "ativo") !== "ativo";
+                  const cancelado = c.status === "cancelado";
                   return (
                     <tr key={c.id} className="border-t border-border">
                       <td className="p-3 font-mono">{c.numero}</td>
