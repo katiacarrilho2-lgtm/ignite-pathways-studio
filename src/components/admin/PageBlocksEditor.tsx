@@ -70,7 +70,7 @@ export const PageBlocksEditor = ({ value, onChange, onUpload }: Props) => {
         <CardHeader className="flex-row items-center justify-between gap-3 flex-wrap">
           <CardTitle>Blocos da página</CardTitle>
           <div className="flex items-center gap-2">
-            <Select onValueChange={(v) => add(v as BlockKind)}>
+            <Select value="" onValueChange={(v) => { if (v) add(v as BlockKind); }}>
               <SelectTrigger className="w-56"><SelectValue placeholder="Adicionar bloco…" /></SelectTrigger>
               <SelectContent>
                 {ADDABLE_BLOCK_KINDS.map((k) => <SelectItem key={k} value={k}>{BLOCK_KIND_LABELS[k]}</SelectItem>)}

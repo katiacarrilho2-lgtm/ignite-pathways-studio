@@ -502,7 +502,14 @@ const VideoBlock = ({ lesson, done, onComplete }: { lesson: Lesson; done: boolea
       </div>
     );
   }
-  if (!lesson.video_path) return <div className="p-6 text-muted-foreground bg-secondary/30 rounded-lg">Vídeo não enviado.</div>;
+  if (!lesson.video_path) return (
+    <div className="space-y-3">
+      <div className="p-6 text-muted-foreground bg-secondary/30 rounded-lg">Vídeo ainda não disponível para esta aula.</div>
+      <Button variant={done ? "outline" : "hero"} size="sm" onClick={onComplete}>
+        {done ? <><CheckCircle2 className="size-4" /> Concluída</> : "Marcar como concluída"}
+      </Button>
+    </div>
+  );
   if (!url) return <div className="aspect-video bg-black/90 rounded-lg grid place-items-center text-white"><Loader2 className="size-6 animate-spin" /></div>;
 
   return (

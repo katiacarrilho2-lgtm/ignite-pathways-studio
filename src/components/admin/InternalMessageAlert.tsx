@@ -93,7 +93,8 @@ export const InternalMessageAlert = () => {
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "internal_messages" }, (payload: any) => {
           const m = payload.new;
           if (m.sender_id === user.id) return;
-          if (convIds.length && !convIds.includes(m.conversation_id)) return;
+          // RLS já limita as mensagens entregues às conversas do usuário; lista local só acelera.
+          if (!convIds.includes(m.conversation_id)) convIds = [...convIds, m.conversation_id];
           abrir(m.conversation_id, m.id);
         })
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "internal_participants", filter: `user_id=eq.${user.id}` }, (payload: any) => {
