@@ -1693,6 +1693,7 @@ export type Database = {
           category: string
           certificado_texto_custom: string | null
           certificado_texto_modo: string
+          conteudo_programatico: string | null
           coursebox_embed_url: string | null
           created_at: string
           description: string | null
@@ -1732,6 +1733,7 @@ export type Database = {
           category: string
           certificado_texto_custom?: string | null
           certificado_texto_modo?: string
+          conteudo_programatico?: string | null
           coursebox_embed_url?: string | null
           created_at?: string
           description?: string | null
@@ -1771,6 +1773,7 @@ export type Database = {
           category?: string
           certificado_texto_custom?: string | null
           certificado_texto_modo?: string
+          conteudo_programatico?: string | null
           coursebox_embed_url?: string | null
           created_at?: string
           description?: string | null

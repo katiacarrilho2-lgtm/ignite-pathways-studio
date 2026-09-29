@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, ExternalLink, RefreshCcw, Award, Download, Ban, RotateCcw, Search } from "lucide-react";
+import { Plus, Trash2, ExternalLink, RefreshCcw, Award, Download, Ban, RotateCcw, Search, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,23 +41,31 @@ const Inner = () => {
   const { user } = useAuth();
   const [list, setList] = useState<Row[]>([]);
   const [students, setStudents] = useState<{ user_id: string; label: string }[]>([]);
-  const [courses, setCourses] = useState<{ id: string; title: string }[]>([]);
+  const [courses, setCourses] = useState<{ id: string; title: string; conteudo_programatico: string | null }[]>([]);
   const [open, setOpen] = useState(false);
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("todos");
-  const [form, setForm] = useState({ user_id: "", course_id: "", numero: genNumber(), carga_horaria: "", nota_final: "", observacoes: "" });
+  const emptyForm = { user_id: "", course_id: "", numero: genNumber(), carga_horaria: "", nota_final: "", observacoes: "",
+    incluir_historico: false, incluir_conteudo: false, conteudo_programatico: "", historico_obs: "", salvar_padrao: true };
+  const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [cfg, setCfg] = useState<Settings | null>(null);
+  const [verso, setVerso] = useState<Row | null>(null);
+  const [versoForm, setVersoForm] = useState({ incluir_historico: false, incluir_conteudo: false, conteudo_programatico: "", historico_obs: "" });
+  const [cpCurso, setCpCurso] = useState("");
+  const [cpTexto, setCpTexto] = useState("");
 
   const load = async () => {
     setLoading(true);
-    const [{ data: certs }, { data: profs }, { data: cs }, { data: st }] = await Promise.all([
-      supabase.from("certificates").select("*, student:profiles!certificates_user_id_fkey(username,display_name,email), course:courses(title,slug)").order("emitido_em", { ascending: false }),
+    const [{ data: certs, error: ce }, { data: profs }, { data: cs }, { data: st }] = await Promise.all([
+      supabase.from("certificates").select("*, course:courses(title,slug)").order("emitido_em", { ascending: false }),
       supabase.from("profiles").select("user_id,username,display_name,email").order("username"),
-      supabase.from("courses").select("id,title").eq("active", true).order("title"),
+      supabase.from("courses").select("id,title,conteudo_programatico").order("title"),
       supabase.from("certificate_settings").select("*").limit(1).maybeSingle(),
     ]);
-    setList((certs ?? []) as any);
+    if (ce) toast.error(ce.message);
+    const pmap = new Map((profs ?? []).map((p: any) => [p.user_id, p]));
+    setList(((certs ?? []) as any[]).map((c) => ({ ...c, student: pmap.get(c.user_id) ?? null })));
     setStudents((profs ?? []).map((p: any) => ({ user_id: p.user_id, label: `${p.username ?? ""} · ${p.display_name ?? p.email ?? ""}` })));
     setCourses((cs ?? []) as any);
     if (st) setCfg({
@@ -72,20 +80,61 @@ const Inner = () => {
   };
   useEffect(() => { load(); }, []);
 
+  const salvarConteudoCurso = async (courseId: string, texto: string) => {
+    const { error } = await supabase.from("courses").update({ conteudo_programatico: texto || null } as any).eq("id", courseId);
+    if (error) { toast.error(error.message); return false; }
+    setCourses((cs) => cs.map((c) => (c.id === courseId ? { ...c, conteudo_programatico: texto } : c)));
+    return true;
+  };
+
   const save = async () => {
     if (!form.user_id || !form.course_id) return toast.error("Aluno e curso são obrigatórios");
+    const prof = students.find((s) => s.user_id === form.user_id);
+    const curso = courses.find((c) => c.id === form.course_id);
+    const alunoNome = prof?.label.split(" · ").slice(1).join(" · ") || prof?.label || "";
+    const ch = parseInt(form.carga_horaria, 10);
     const payload: any = {
       user_id: form.user_id, course_id: form.course_id, numero: form.numero.trim() || genNumber(),
       carga_horaria: form.carga_horaria || null,
+      carga_horaria_horas: Number.isFinite(ch) ? ch : null,
       nota_final: form.nota_final ? Number(form.nota_final) : null,
       observacoes: form.observacoes || null,
       emitido_por: user?.id ?? null,
+      codigo_validacao: crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase(),
+      snapshot: {
+        aluno_nome: alunoNome, curso_titulo: curso?.title ?? "",
+        incluir_historico: form.incluir_historico, incluir_conteudo: form.incluir_conteudo,
+        conteudo_programatico: form.conteudo_programatico || null, historico_obs: form.historico_obs || null,
+      },
     };
     const { error } = await supabase.from("certificates").insert(payload);
     if (error) return toast.error(error.message);
+    if (form.incluir_conteudo && form.salvar_padrao && form.conteudo_programatico !== (curso?.conteudo_programatico ?? "")) {
+      await salvarConteudoCurso(form.course_id, form.conteudo_programatico);
+    }
     toast.success("Certificado emitido");
-    setOpen(false); setForm({ user_id: "", course_id: "", numero: genNumber(), carga_horaria: "", nota_final: "", observacoes: "" });
+    setOpen(false); setForm({ ...emptyForm, numero: genNumber() });
     load();
+  };
+
+  const abrirVerso = (c: Row) => {
+    const s = (c.snapshot ?? {}) as CertificadoSnapshot;
+    const curso = courses.find((x) => x.id === c.course_id);
+    setVersoForm({
+      incluir_historico: !!s.incluir_historico, incluir_conteudo: !!s.incluir_conteudo,
+      conteudo_programatico: s.conteudo_programatico || curso?.conteudo_programatico || "",
+      historico_obs: s.historico_obs || "",
+    });
+    setVerso(c);
+  };
+
+  const salvarVerso = async () => {
+    if (!verso) return;
+    const snapshot = { ...(verso.snapshot ?? {}), ...versoForm };
+    const { error } = await supabase.from("certificates").update({ snapshot } as any).eq("id", verso.id);
+    if (error) return toast.error(error.message);
+    toast.success("Verso salvo");
+    setVerso(null); load();
   };
 
   const remove = async (id: string) => {
@@ -120,13 +169,16 @@ const Inner = () => {
         ...Object.fromEntries(Object.entries(s).filter(([, v]) => v !== null && v !== "")),
         aluno_nome: aluno, curso_titulo: curso, texto: s.texto || textoBase,
       };
+      if (snap.incluir_conteudo && !snap.conteudo_programatico) {
+        snap.conteudo_programatico = courses.find((x) => x.id === c.course_id)?.conteudo_programatico ?? "";
+      }
       const ch = c.carga_horaria_horas ?? (parseInt(String((c as any).carga_horaria ?? ""), 10) || null);
       await baixarCertificadoPdf({
         numero: c.numero, codigo_validacao: c.codigo_validacao || c.numero, emitido_em: c.emitido_em,
         status: c.status, nota_final: c.nota_final, carga_horaria_horas: ch,
         snapshot: snap,
       });
-    } catch { toast.error("Não foi possível gerar o PDF."); }
+    } catch (e) { console.error(e); toast.error("Não foi possível gerar o PDF."); }
   };
 
   const salvarConfig = async () => {
@@ -172,6 +224,7 @@ const Inner = () => {
       <Tabs defaultValue="lista">
         <TabsList>
           <TabsTrigger value="lista">Certificados</TabsTrigger>
+          <TabsTrigger value="conteudo">Conteúdo programático</TabsTrigger>
           <TabsTrigger value="config">Configurações do certificado</TabsTrigger>
         </TabsList>
 
@@ -207,7 +260,7 @@ const Inner = () => {
               <tbody>
                 {loading && <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Carregando…</td></tr>}
                 {!loading && filtrada.map((c) => {
-                  const cancelado = (c.status ?? "ativo") !== "ativo";
+                  const cancelado = c.status === "cancelado";
                   return (
                     <tr key={c.id} className="border-t border-border">
                       <td className="p-3 font-mono">{c.numero}</td>
@@ -222,6 +275,7 @@ const Inner = () => {
                       <td className="p-3 text-muted-foreground">{new Date(c.emitido_em).toLocaleDateString("pt-BR")}</td>
                       <td className="p-3 text-right whitespace-nowrap">
                         <Button size="sm" variant="ghost" title="Baixar PDF" onClick={() => baixar(c)}><Download className="size-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Verso: histórico e conteúdo programático" onClick={() => abrirVerso(c)}><FileText className="size-4" /></Button>
                         {c.codigo_validacao && (
                           <Button asChild size="sm" variant="ghost" title="Validação pública">
                             <Link to={`/validar-certificado/${c.codigo_validacao}`} target="_blank"><ExternalLink className="size-4" /></Link>
@@ -238,6 +292,18 @@ const Inner = () => {
                 {!loading && filtrada.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Nenhum certificado encontrado.</td></tr>}
               </tbody>
             </table>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="conteudo">
+          <div className="bg-card border border-border rounded-xl p-6 space-y-4 max-w-3xl">
+            <p className="text-sm text-muted-foreground">Escolha o curso e digite ou cole o conteúdo programático. Ele será usado no verso dos certificados desse curso.</p>
+            <Select value={cpCurso} onValueChange={(v) => { setCpCurso(v); setCpTexto(courses.find((c) => c.id === v)?.conteudo_programatico ?? ""); }}>
+              <SelectTrigger><SelectValue placeholder="Selecione o curso" /></SelectTrigger>
+              <SelectContent>{courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}{c.conteudo_programatico ? " ✓" : ""}</SelectItem>)}</SelectContent>
+            </Select>
+            <Textarea rows={14} disabled={!cpCurso} placeholder="Ex.:&#10;Módulo 1 – Introdução&#10;Módulo 2 – Normas e segurança" value={cpTexto} onChange={(e) => setCpTexto(e.target.value)} />
+            <Button variant="hero" disabled={!cpCurso} onClick={async () => { if (await salvarConteudoCurso(cpCurso, cpTexto)) toast.success("Conteúdo programático salvo"); }}>Salvar conteúdo programático</Button>
           </div>
         </TabsContent>
 
@@ -291,7 +357,33 @@ const Inner = () => {
             </div>
             <div><Label>Nota final</Label><Input type="number" value={form.nota_final} onChange={(e) => setForm({ ...form, nota_final: e.target.value })} /></div>
             <div><Label>Observações</Label><Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} /></div>
+            <div className="border-t border-border pt-3 space-y-2">
+              <p className="text-sm font-semibold">Verso do certificado (opcional)</p>
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.incluir_historico} onChange={(e) => setForm({ ...form, incluir_historico: e.target.checked })} /> Incluir histórico</label>
+              {form.incluir_historico && <Textarea rows={2} placeholder="Observações do histórico (opcional)" value={form.historico_obs} onChange={(e) => setForm({ ...form, historico_obs: e.target.value })} />}
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.incluir_conteudo} onChange={(e) => {
+                const c = courses.find((x) => x.id === form.course_id);
+                setForm({ ...form, incluir_conteudo: e.target.checked, conteudo_programatico: form.conteudo_programatico || c?.conteudo_programatico || "" });
+              }} /> Incluir conteúdo programático</label>
+              {form.incluir_conteudo && <>
+                <Textarea rows={6} placeholder="Digite ou cole o conteúdo programático (um tópico por linha)" value={form.conteudo_programatico} onChange={(e) => setForm({ ...form, conteudo_programatico: e.target.value })} />
+                <label className="flex items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={form.salvar_padrao} onChange={(e) => setForm({ ...form, salvar_padrao: e.target.checked })} /> Salvar como padrão deste curso</label>
+              </>}
+            </div>
             <Button variant="hero" className="w-full" onClick={save}>Emitir</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!verso} onOpenChange={(o) => !o && setVerso(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Verso do certificado</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={versoForm.incluir_historico} onChange={(e) => setVersoForm({ ...versoForm, incluir_historico: e.target.checked })} /> Incluir histórico</label>
+            {versoForm.incluir_historico && <Textarea rows={2} placeholder="Observações do histórico (opcional)" value={versoForm.historico_obs} onChange={(e) => setVersoForm({ ...versoForm, historico_obs: e.target.value })} />}
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={versoForm.incluir_conteudo} onChange={(e) => setVersoForm({ ...versoForm, incluir_conteudo: e.target.checked })} /> Incluir conteúdo programático</label>
+            {versoForm.incluir_conteudo && <Textarea rows={8} placeholder="Digite ou cole o conteúdo programático" value={versoForm.conteudo_programatico} onChange={(e) => setVersoForm({ ...versoForm, conteudo_programatico: e.target.value })} />}
+            <Button variant="hero" className="w-full" onClick={salvarVerso}>Salvar verso</Button>
           </div>
         </DialogContent>
       </Dialog>
