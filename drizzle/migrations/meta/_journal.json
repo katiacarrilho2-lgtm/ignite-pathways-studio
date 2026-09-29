@@ -211,6 +211,13 @@
       "when": 1790346159018,
       "tag": "0029_add_ai_meta_course_sections",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1790642140938,
+      "tag": "0030_fix_anon_is_staff_and_realtime_participants",
+      "breakpoints": true
     }
   ]
 }
