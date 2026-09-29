@@ -219,6 +219,12 @@ export default function AdminLicenciados() {
         toast({ title: "Unidade salva, mas o usuário falhou", description: fnErr?.message ?? (res as any)?.error, variant: "destructive" });
       } else {
         await supabase.from("contas_comerciais").update({ responsavel_user_id: (res as any).user_id }).eq("id", unitId);
+        // Libera os módulos do Portal do Polo para o novo responsável
+        const mods = respLogin.cargo === "vendedor"
+          ? ["mod_agenda", "mod_crm", "mod_leads", "mod_pre_matriculas", "mod_mensagens", "mod_suporte", "mod_treinamentos"]
+          : ["mod_afiliados", "mod_agenda", "mod_almoxarifado", "mod_crm", "mod_documentos_internos", "mod_documentos_links", "mod_escola_fisica", "mod_financeiro", "mod_frequencia", "mod_leads", "mod_mensagens", "mod_pedagogia", "mod_pre_matriculas", "mod_relatorios", "mod_solicitacoes", "mod_suporte", "mod_treinamentos", "mod_turmas", "mod_usuarios"];
+        const uid = (res as any).user_id;
+        if (uid) await supabase.from("user_permissions").insert(mods.map((p) => ({ user_id: uid, permission: p as any })));
         toast({ title: `Responsável criado: login ${(res as any).username}` });
       }
     }
