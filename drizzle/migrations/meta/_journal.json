@@ -218,6 +218,13 @@
       "when": 1790642140938,
       "tag": "0030_fix_anon_is_staff_and_realtime_participants",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1790692910718,
+      "tag": "0031_courses_conteudo_programatico",
+      "breakpoints": true
     }
   ]
 }
