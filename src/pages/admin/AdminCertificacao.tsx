@@ -108,10 +108,23 @@ const Inner = () => {
 
   const baixar = async (c: Row) => {
     try {
+      const s = (c.snapshot ?? {}) as CertificadoSnapshot;
+      const curso = s.curso_titulo || c.course?.title || "";
+      const aluno = s.aluno_nome || c.student?.display_name || c.student?.username || "";
+      const textoBase = cfg?.texto_padrao ||
+        "Certificamos que [NOME DO ALUNO] concluiu com aproveitamento o curso [NOME DO CURSO].";
+      const snap: CertificadoSnapshot = {
+        empresa: cfg?.empresa || undefined, cnpj: cfg?.cnpj || undefined,
+        responsavel_nome: cfg?.responsavel_nome || undefined, responsavel_cargo: cfg?.responsavel_cargo || undefined,
+        assinatura_url: cfg?.assinatura_url ?? undefined, validacao_base_url: cfg?.validacao_base_url || undefined,
+        ...Object.fromEntries(Object.entries(s).filter(([, v]) => v !== null && v !== "")),
+        aluno_nome: aluno, curso_titulo: curso, texto: s.texto || textoBase,
+      };
+      const ch = c.carga_horaria_horas ?? (parseInt(String((c as any).carga_horaria ?? ""), 10) || null);
       await baixarCertificadoPdf({
-        numero: c.numero, codigo_validacao: c.codigo_validacao, emitido_em: c.emitido_em,
-        status: c.status, nota_final: c.nota_final, carga_horaria_horas: c.carga_horaria_horas,
-        snapshot: (c.snapshot ?? { curso_titulo: c.course?.title, aluno_nome: c.student?.display_name ?? "" }) as CertificadoSnapshot,
+        numero: c.numero, codigo_validacao: c.codigo_validacao || c.numero, emitido_em: c.emitido_em,
+        status: c.status, nota_final: c.nota_final, carga_horaria_horas: ch,
+        snapshot: snap,
       });
     } catch { toast.error("Não foi possível gerar o PDF."); }
   };
