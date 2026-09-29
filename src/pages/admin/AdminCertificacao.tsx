@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, ExternalLink, RefreshCcw, Award, Download, Ban, RotateCcw, Search } from "lucide-react";
+import { Plus, Trash2, ExternalLink, RefreshCcw, Award, Download, Ban, RotateCcw, Search, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useAuth } from "@/hooks/useAuth";
@@ -224,6 +224,7 @@ const Inner = () => {
       <Tabs defaultValue="lista">
         <TabsList>
           <TabsTrigger value="lista">Certificados</TabsTrigger>
+          <TabsTrigger value="conteudo">Conteúdo programático</TabsTrigger>
           <TabsTrigger value="config">Configurações do certificado</TabsTrigger>
         </TabsList>
 
@@ -274,6 +275,7 @@ const Inner = () => {
                       <td className="p-3 text-muted-foreground">{new Date(c.emitido_em).toLocaleDateString("pt-BR")}</td>
                       <td className="p-3 text-right whitespace-nowrap">
                         <Button size="sm" variant="ghost" title="Baixar PDF" onClick={() => baixar(c)}><Download className="size-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Verso: histórico e conteúdo programático" onClick={() => abrirVerso(c)}><FileText className="size-4" /></Button>
                         {c.codigo_validacao && (
                           <Button asChild size="sm" variant="ghost" title="Validação pública">
                             <Link to={`/validar-certificado/${c.codigo_validacao}`} target="_blank"><ExternalLink className="size-4" /></Link>
@@ -290,6 +292,18 @@ const Inner = () => {
                 {!loading && filtrada.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">Nenhum certificado encontrado.</td></tr>}
               </tbody>
             </table>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="conteudo">
+          <div className="bg-card border border-border rounded-xl p-6 space-y-4 max-w-3xl">
+            <p className="text-sm text-muted-foreground">Escolha o curso e digite ou cole o conteúdo programático. Ele será usado no verso dos certificados desse curso.</p>
+            <Select value={cpCurso} onValueChange={(v) => { setCpCurso(v); setCpTexto(courses.find((c) => c.id === v)?.conteudo_programatico ?? ""); }}>
+              <SelectTrigger><SelectValue placeholder="Selecione o curso" /></SelectTrigger>
+              <SelectContent>{courses.map((c) => <SelectItem key={c.id} value={c.id}>{c.title}{c.conteudo_programatico ? " ✓" : ""}</SelectItem>)}</SelectContent>
+            </Select>
+            <Textarea rows={14} disabled={!cpCurso} placeholder="Ex.:&#10;Módulo 1 – Introdução&#10;Módulo 2 – Normas e segurança" value={cpTexto} onChange={(e) => setCpTexto(e.target.value)} />
+            <Button variant="hero" disabled={!cpCurso} onClick={async () => { if (await salvarConteudoCurso(cpCurso, cpTexto)) toast.success("Conteúdo programático salvo"); }}>Salvar conteúdo programático</Button>
           </div>
         </TabsContent>
 
@@ -343,7 +357,33 @@ const Inner = () => {
             </div>
             <div><Label>Nota final</Label><Input type="number" value={form.nota_final} onChange={(e) => setForm({ ...form, nota_final: e.target.value })} /></div>
             <div><Label>Observações</Label><Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} /></div>
+            <div className="border-t border-border pt-3 space-y-2">
+              <p className="text-sm font-semibold">Verso do certificado (opcional)</p>
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.incluir_historico} onChange={(e) => setForm({ ...form, incluir_historico: e.target.checked })} /> Incluir histórico</label>
+              {form.incluir_historico && <Textarea rows={2} placeholder="Observações do histórico (opcional)" value={form.historico_obs} onChange={(e) => setForm({ ...form, historico_obs: e.target.value })} />}
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.incluir_conteudo} onChange={(e) => {
+                const c = courses.find((x) => x.id === form.course_id);
+                setForm({ ...form, incluir_conteudo: e.target.checked, conteudo_programatico: form.conteudo_programatico || c?.conteudo_programatico || "" });
+              }} /> Incluir conteúdo programático</label>
+              {form.incluir_conteudo && <>
+                <Textarea rows={6} placeholder="Digite ou cole o conteúdo programático (um tópico por linha)" value={form.conteudo_programatico} onChange={(e) => setForm({ ...form, conteudo_programatico: e.target.value })} />
+                <label className="flex items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={form.salvar_padrao} onChange={(e) => setForm({ ...form, salvar_padrao: e.target.checked })} /> Salvar como padrão deste curso</label>
+              </>}
+            </div>
             <Button variant="hero" className="w-full" onClick={save}>Emitir</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!verso} onOpenChange={(o) => !o && setVerso(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Verso do certificado</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={versoForm.incluir_historico} onChange={(e) => setVersoForm({ ...versoForm, incluir_historico: e.target.checked })} /> Incluir histórico</label>
+            {versoForm.incluir_historico && <Textarea rows={2} placeholder="Observações do histórico (opcional)" value={versoForm.historico_obs} onChange={(e) => setVersoForm({ ...versoForm, historico_obs: e.target.value })} />}
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={versoForm.incluir_conteudo} onChange={(e) => setVersoForm({ ...versoForm, incluir_conteudo: e.target.checked })} /> Incluir conteúdo programático</label>
+            {versoForm.incluir_conteudo && <Textarea rows={8} placeholder="Digite ou cole o conteúdo programático" value={versoForm.conteudo_programatico} onChange={(e) => setVersoForm({ ...versoForm, conteudo_programatico: e.target.value })} />}
+            <Button variant="hero" className="w-full" onClick={salvarVerso}>Salvar verso</Button>
           </div>
         </DialogContent>
       </Dialog>
