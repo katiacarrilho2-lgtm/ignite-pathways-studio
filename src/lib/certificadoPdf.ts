@@ -24,6 +24,10 @@ export type CertificadoSnapshot = {
   assinatura_url?: string | null;
   logo_url?: string | null;
   validacao_base_url?: string | null;
+  incluir_historico?: boolean | null;
+  incluir_conteudo?: boolean | null;
+  conteudo_programatico?: string | null;
+  historico_obs?: string | null;
 };
 
 export type CertificadoRecord = {
@@ -165,11 +169,74 @@ export const buildCertificadoPdf = async (r: CertificadoRecord): Promise<jsPDF> 
     doc.text(r.codigo_validacao ?? "", W - 102, H - 54, { align: "center" });
   } catch { /* ignore */ }
 
-  if ((r.status ?? "ativo") !== "ativo") {
+  const cancelado = r.status === "cancelado";
+  if (cancelado) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(60);
     doc.setTextColor(200, 60, 60);
     doc.text("CANCELADO", W / 2, H / 2, { align: "center", angle: 20 });
+  }
+
+  // Verso: histórico e/ou conteúdo programático
+  const temHist = !!s.incluir_historico;
+  const conteudo = (s.incluir_conteudo ? (s.conteudo_programatico || "") : "").trim();
+  if (temHist || conteudo) {
+    doc.addPage("a4", "landscape");
+    doc.setFillColor(...NAVY);
+    doc.rect(0, 0, W, 14, "F");
+    doc.rect(0, H - 14, W, 14, "F");
+    doc.setDrawColor(...GOLD);
+    doc.setLineWidth(1.2);
+    doc.rect(26, 26, W - 52, H - 52);
+    let yy = 66;
+    const margem = 60;
+    const larg = W - margem * 2;
+    const novaPagina = () => {
+      doc.addPage("a4", "landscape");
+      doc.setDrawColor(...GOLD); doc.rect(26, 26, W - 52, H - 52);
+      yy = 60;
+    };
+    if (temHist) {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(...NAVY);
+      doc.text("HISTÓRICO", W / 2, yy, { align: "center" }); yy += 24;
+      doc.setFont("helvetica", "normal"); doc.setFontSize(10.5); doc.setTextColor(60, 66, 78);
+      const itens: [string, string][] = [
+        ["Aluno", s.aluno_nome || ""],
+        ["CPF", mascaraCpf(s.aluno_cpf) || "—"],
+        ["Curso", s.curso_titulo || ""],
+        ["Carga horária", ch ? `${ch} horas` : "—"],
+        ["Nota final", r.nota_final != null ? Number(r.nota_final).toFixed(2).replace(".", ",") : "—"],
+        ["Situação", cancelado ? "Cancelado" : "Aprovado"],
+        ["Data de emissão", new Date(r.emitido_em).toLocaleDateString("pt-BR")],
+        ["Certificado nº", r.numero],
+      ];
+      itens.forEach(([k, v], i) => {
+        const col = i % 2, row = Math.floor(i / 2);
+        const x = margem + col * (larg / 2);
+        const y0 = yy + row * 18;
+        doc.setFont("helvetica", "bold"); doc.text(`${k}:`, x, y0);
+        doc.setFont("helvetica", "normal"); doc.text(String(v), x + 95, y0, { maxWidth: larg / 2 - 100 });
+      });
+      yy += Math.ceil(itens.length / 2) * 18 + 16;
+      if (s.historico_obs) {
+        const l = doc.splitTextToSize(s.historico_obs, larg);
+        doc.text(l, margem, yy); yy += l.length * 14 + 10;
+      }
+    }
+    if (conteudo) {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(...NAVY);
+      doc.text("CONTEÚDO PROGRAMÁTICO", W / 2, yy, { align: "center" }); yy += 22;
+      doc.setFont("helvetica", "normal"); doc.setTextColor(60, 66, 78);
+      const linhasC = conteudo.split("\n").length;
+      const fs = linhasC > 40 ? 8.5 : linhasC > 25 ? 9.5 : 10.5;
+      doc.setFontSize(fs);
+      const lh = fs * 1.35;
+      const linhas2 = doc.splitTextToSize(conteudo, larg);
+      for (const ln of linhas2) {
+        if (yy > H - 50) novaPagina();
+        doc.text(ln, margem, yy); yy += lh;
+      }
+    }
   }
 
   return doc;

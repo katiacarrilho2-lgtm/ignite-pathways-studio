@@ -53,7 +53,7 @@ const Certificados = () => {
       <div className="grid gap-4 md:grid-cols-2">
         {list.map((c) => {
           const s = (c.snapshot ?? {}) as CertificadoSnapshot;
-          const cancelado = (c.status ?? "ativo") !== "ativo";
+          const cancelado = c.status === "cancelado";
           return (
             <div key={c.id} className="bg-card border border-border rounded-xl p-5 space-y-3">
               <div className="flex items-start justify-between gap-3">
