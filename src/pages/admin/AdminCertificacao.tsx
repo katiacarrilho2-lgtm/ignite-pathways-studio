@@ -41,23 +41,31 @@ const Inner = () => {
   const { user } = useAuth();
   const [list, setList] = useState<Row[]>([]);
   const [students, setStudents] = useState<{ user_id: string; label: string }[]>([]);
-  const [courses, setCourses] = useState<{ id: string; title: string }[]>([]);
+  const [courses, setCourses] = useState<{ id: string; title: string; conteudo_programatico: string | null }[]>([]);
   const [open, setOpen] = useState(false);
   const [busca, setBusca] = useState("");
   const [statusFiltro, setStatusFiltro] = useState("todos");
-  const [form, setForm] = useState({ user_id: "", course_id: "", numero: genNumber(), carga_horaria: "", nota_final: "", observacoes: "" });
+  const emptyForm = { user_id: "", course_id: "", numero: genNumber(), carga_horaria: "", nota_final: "", observacoes: "",
+    incluir_historico: false, incluir_conteudo: false, conteudo_programatico: "", historico_obs: "", salvar_padrao: true };
+  const [form, setForm] = useState(emptyForm);
   const [loading, setLoading] = useState(true);
   const [cfg, setCfg] = useState<Settings | null>(null);
+  const [verso, setVerso] = useState<Row | null>(null);
+  const [versoForm, setVersoForm] = useState({ incluir_historico: false, incluir_conteudo: false, conteudo_programatico: "", historico_obs: "" });
+  const [cpCurso, setCpCurso] = useState("");
+  const [cpTexto, setCpTexto] = useState("");
 
   const load = async () => {
     setLoading(true);
-    const [{ data: certs }, { data: profs }, { data: cs }, { data: st }] = await Promise.all([
-      supabase.from("certificates").select("*, student:profiles!certificates_user_id_fkey(username,display_name,email), course:courses(title,slug)").order("emitido_em", { ascending: false }),
+    const [{ data: certs, error: ce }, { data: profs }, { data: cs }, { data: st }] = await Promise.all([
+      supabase.from("certificates").select("*, course:courses(title,slug)").order("emitido_em", { ascending: false }),
       supabase.from("profiles").select("user_id,username,display_name,email").order("username"),
-      supabase.from("courses").select("id,title").eq("active", true).order("title"),
+      supabase.from("courses").select("id,title,conteudo_programatico").order("title"),
       supabase.from("certificate_settings").select("*").limit(1).maybeSingle(),
     ]);
-    setList((certs ?? []) as any);
+    if (ce) toast.error(ce.message);
+    const pmap = new Map((profs ?? []).map((p: any) => [p.user_id, p]));
+    setList(((certs ?? []) as any[]).map((c) => ({ ...c, student: pmap.get(c.user_id) ?? null })));
     setStudents((profs ?? []).map((p: any) => ({ user_id: p.user_id, label: `${p.username ?? ""} · ${p.display_name ?? p.email ?? ""}` })));
     setCourses((cs ?? []) as any);
     if (st) setCfg({
@@ -72,20 +80,62 @@ const Inner = () => {
   };
   useEffect(() => { load(); }, []);
 
+  const salvarConteudoCurso = async (courseId: string, texto: string) => {
+    const { error } = await supabase.from("courses").update({ conteudo_programatico: texto || null } as any).eq("id", courseId);
+    if (error) { toast.error(error.message); return false; }
+    setCourses((cs) => cs.map((c) => (c.id === courseId ? { ...c, conteudo_programatico: texto } : c)));
+    return true;
+  };
+
   const save = async () => {
     if (!form.user_id || !form.course_id) return toast.error("Aluno e curso são obrigatórios");
+    const prof = students.find((s) => s.user_id === form.user_id);
+    const pr = list.length >= 0 ? undefined : undefined; void pr;
+    const curso = courses.find((c) => c.id === form.course_id);
+    const alunoNome = prof?.label.split(" · ").slice(1).join(" · ") || prof?.label || "";
+    const ch = parseInt(form.carga_horaria, 10);
     const payload: any = {
       user_id: form.user_id, course_id: form.course_id, numero: form.numero.trim() || genNumber(),
       carga_horaria: form.carga_horaria || null,
+      carga_horaria_horas: Number.isFinite(ch) ? ch : null,
       nota_final: form.nota_final ? Number(form.nota_final) : null,
       observacoes: form.observacoes || null,
       emitido_por: user?.id ?? null,
+      codigo_validacao: crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase(),
+      snapshot: {
+        aluno_nome: alunoNome, curso_titulo: curso?.title ?? "",
+        incluir_historico: form.incluir_historico, incluir_conteudo: form.incluir_conteudo,
+        conteudo_programatico: form.conteudo_programatico || null, historico_obs: form.historico_obs || null,
+      },
     };
     const { error } = await supabase.from("certificates").insert(payload);
     if (error) return toast.error(error.message);
+    if (form.incluir_conteudo && form.salvar_padrao && form.conteudo_programatico !== (curso?.conteudo_programatico ?? "")) {
+      await salvarConteudoCurso(form.course_id, form.conteudo_programatico);
+    }
     toast.success("Certificado emitido");
-    setOpen(false); setForm({ user_id: "", course_id: "", numero: genNumber(), carga_horaria: "", nota_final: "", observacoes: "" });
+    setOpen(false); setForm({ ...emptyForm, numero: genNumber() });
     load();
+  };
+
+  const abrirVerso = (c: Row) => {
+    const s = (c.snapshot ?? {}) as CertificadoSnapshot;
+    const curso = courses.find((x) => x.id === c.course_id);
+    setVersoForm({
+      incluir_historico: !!s.incluir_historico, incluir_conteudo: !!s.incluir_conteudo,
+      conteudo_programatico: s.conteudo_programatico || curso?.conteudo_programatico || "",
+      historico_obs: s.historico_obs || "",
+    });
+    setVerso(c);
+  };
+
+  const salvarVerso = async () => {
+    if (!verso) return;
+    const snapshot = { ...(verso.snapshot ?? {}), ...versoForm };
+    const { error } = await supabase.from("certificates").update({ snapshot } as any).eq("id", verso.id);
+    if (error) return toast.error(error.message);
+    toast.success("Verso salvo");
+    setVerso(null); load();
   };
 
   const remove = async (id: string) => {
@@ -120,13 +170,16 @@ const Inner = () => {
         ...Object.fromEntries(Object.entries(s).filter(([, v]) => v !== null && v !== "")),
         aluno_nome: aluno, curso_titulo: curso, texto: s.texto || textoBase,
       };
+      if (snap.incluir_conteudo && !snap.conteudo_programatico) {
+        snap.conteudo_programatico = courses.find((x) => x.id === c.course_id)?.conteudo_programatico ?? "";
+      }
       const ch = c.carga_horaria_horas ?? (parseInt(String((c as any).carga_horaria ?? ""), 10) || null);
       await baixarCertificadoPdf({
         numero: c.numero, codigo_validacao: c.codigo_validacao || c.numero, emitido_em: c.emitido_em,
         status: c.status, nota_final: c.nota_final, carga_horaria_horas: ch,
         snapshot: snap,
       });
-    } catch { toast.error("Não foi possível gerar o PDF."); }
+    } catch (e) { console.error(e); toast.error("Não foi possível gerar o PDF."); }
   };
 
   const salvarConfig = async () => {
