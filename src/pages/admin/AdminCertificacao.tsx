@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
+import { maskCpf } from "@/lib/cpf";
 import { baixarCertificadoPdf, type CertificadoSnapshot } from "@/lib/certificadoPdf";
 
 type Row = {
@@ -51,18 +52,23 @@ const Inner = () => {
   const [loading, setLoading] = useState(true);
   const [cfg, setCfg] = useState<Settings | null>(null);
   const [verso, setVerso] = useState<Row | null>(null);
-  const [versoForm, setVersoForm] = useState({ incluir_historico: false, incluir_conteudo: false, conteudo_programatico: "", historico_obs: "" });
+  const emptyEdit = { aluno_nome: "", aluno_cpf: "", curso_titulo: "", titulo_documento: "", texto: "", numero: "", carga_horaria_horas: "", nota_final: "", emitido_em: "",
+    incluir_historico: false, incluir_conteudo: false, conteudo_programatico: "", historico_obs: "" };
+  const [versoForm, setVersoForm] = useState(emptyEdit);
+  const [fichas, setFichas] = useState<Map<string, { cpf: string | null; full_name: string | null }>>(new Map());
   const [cpCurso, setCpCurso] = useState("");
   const [cpTexto, setCpTexto] = useState("");
 
   const load = async () => {
     setLoading(true);
-    const [{ data: certs, error: ce }, { data: profs }, { data: cs }, { data: st }] = await Promise.all([
+    const [{ data: certs, error: ce }, { data: profs }, { data: cs }, { data: st }, { data: sps }] = await Promise.all([
       supabase.from("certificates").select("*, course:courses(title,slug)").order("emitido_em", { ascending: false }),
       supabase.from("profiles").select("user_id,username,display_name,email").order("username"),
       supabase.from("courses").select("id,title,conteudo_programatico").order("title"),
       supabase.from("certificate_settings").select("*").limit(1).maybeSingle(),
+      supabase.from("student_profiles").select("user_id,cpf,full_name"),
     ]);
+    setFichas(new Map((sps ?? []).map((f: any) => [f.user_id, { cpf: f.cpf, full_name: f.full_name }])));
     if (ce) toast.error(ce.message);
     const pmap = new Map((profs ?? []).map((p: any) => [p.user_id, p]));
     setList(((certs ?? []) as any[]).map((c) => ({ ...c, student: pmap.get(c.user_id) ?? null })));
@@ -91,7 +97,8 @@ const Inner = () => {
     if (!form.user_id || !form.course_id) return toast.error("Aluno e curso são obrigatórios");
     const prof = students.find((s) => s.user_id === form.user_id);
     const curso = courses.find((c) => c.id === form.course_id);
-    const alunoNome = prof?.label.split(" · ").slice(1).join(" · ") || prof?.label || "";
+    const ficha = fichas.get(form.user_id);
+    const alunoNome = ficha?.full_name || prof?.label.split(" · ").slice(1).join(" · ") || prof?.label || "";
     const ch = parseInt(form.carga_horaria, 10);
     const payload: any = {
       user_id: form.user_id, course_id: form.course_id, numero: form.numero.trim() || genNumber(),
@@ -102,7 +109,7 @@ const Inner = () => {
       emitido_por: user?.id ?? null,
       codigo_validacao: crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase(),
       snapshot: {
-        aluno_nome: alunoNome, curso_titulo: curso?.title ?? "",
+        aluno_nome: alunoNome, aluno_cpf: ficha?.cpf || null, curso_titulo: curso?.title ?? "",
         incluir_historico: form.incluir_historico, incluir_conteudo: form.incluir_conteudo,
         conteudo_programatico: form.conteudo_programatico || null, historico_obs: form.historico_obs || null,
       },
@@ -120,7 +127,17 @@ const Inner = () => {
   const abrirVerso = (c: Row) => {
     const s = (c.snapshot ?? {}) as CertificadoSnapshot;
     const curso = courses.find((x) => x.id === c.course_id);
+    const ficha = fichas.get(c.user_id);
     setVersoForm({
+      aluno_nome: s.aluno_nome || ficha?.full_name || c.student?.display_name || "",
+      aluno_cpf: s.aluno_cpf || ficha?.cpf || "",
+      curso_titulo: s.curso_titulo || c.course?.title || "",
+      titulo_documento: s.titulo_documento || "CERTIFICADO DE CONCLUSÃO",
+      texto: s.texto || cfg?.texto_padrao || "Certificamos que [NOME DO ALUNO] concluiu com aproveitamento o curso [NOME DO CURSO].",
+      numero: c.numero,
+      carga_horaria_horas: String(c.carga_horaria_horas ?? (parseInt(String(c.carga_horaria ?? ""), 10) || "")),
+      nota_final: c.nota_final != null ? String(c.nota_final) : "",
+      emitido_em: c.emitido_em.slice(0, 10),
       incluir_historico: !!s.incluir_historico, incluir_conteudo: !!s.incluir_conteudo,
       conteudo_programatico: s.conteudo_programatico || curso?.conteudo_programatico || "",
       historico_obs: s.historico_obs || "",
@@ -130,10 +147,19 @@ const Inner = () => {
 
   const salvarVerso = async () => {
     if (!verso) return;
-    const snapshot = { ...(verso.snapshot ?? {}), ...versoForm };
-    const { error } = await supabase.from("certificates").update({ snapshot } as any).eq("id", verso.id);
+    const { numero, carga_horaria_horas, nota_final, emitido_em, ...snapFields } = versoForm;
+    const snapshot = { ...(verso.snapshot ?? {}), ...snapFields };
+    const ch = parseInt(carga_horaria_horas, 10);
+    const upd: any = {
+      snapshot, numero: numero.trim() || verso.numero,
+      carga_horaria_horas: Number.isFinite(ch) ? ch : null,
+      carga_horaria: Number.isFinite(ch) ? `${ch}h` : null,
+      nota_final: nota_final.trim() ? Number(nota_final.replace(",", ".")) : null,
+    };
+    if (emitido_em) upd.emitido_em = new Date(`${emitido_em}T12:00:00`).toISOString();
+    const { error } = await supabase.from("certificates").update(upd).eq("id", verso.id);
     if (error) return toast.error(error.message);
-    toast.success("Verso salvo");
+    toast.success("Certificado atualizado");
     setVerso(null); load();
   };
 
@@ -159,7 +185,7 @@ const Inner = () => {
     try {
       const s = (c.snapshot ?? {}) as CertificadoSnapshot;
       const curso = s.curso_titulo || c.course?.title || "";
-      const aluno = s.aluno_nome || c.student?.display_name || c.student?.username || "";
+      const aluno = s.aluno_nome || fichas.get(c.user_id)?.full_name || c.student?.display_name || c.student?.username || "";
       const textoBase = cfg?.texto_padrao ||
         "Certificamos que [NOME DO ALUNO] concluiu com aproveitamento o curso [NOME DO CURSO].";
       const snap: CertificadoSnapshot = {
@@ -168,6 +194,7 @@ const Inner = () => {
         assinatura_url: cfg?.assinatura_url ?? undefined, validacao_base_url: cfg?.validacao_base_url || undefined,
         ...Object.fromEntries(Object.entries(s).filter(([, v]) => v !== null && v !== "")),
         aluno_nome: aluno, curso_titulo: curso, texto: s.texto || textoBase,
+        aluno_cpf: s.aluno_cpf || fichas.get(c.user_id)?.cpf || null,
       };
       if (snap.incluir_conteudo && !snap.conteudo_programatico) {
         snap.conteudo_programatico = courses.find((x) => x.id === c.course_id)?.conteudo_programatico ?? "";
@@ -275,7 +302,7 @@ const Inner = () => {
                       <td className="p-3 text-muted-foreground">{new Date(c.emitido_em).toLocaleDateString("pt-BR")}</td>
                       <td className="p-3 text-right whitespace-nowrap">
                         <Button size="sm" variant="ghost" title="Baixar PDF" onClick={() => baixar(c)}><Download className="size-4" /></Button>
-                        <Button size="sm" variant="ghost" title="Verso: histórico e conteúdo programático" onClick={() => abrirVerso(c)}><FileText className="size-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Editar certificado (dados, histórico e conteúdo)" onClick={() => abrirVerso(c)}><FileText className="size-4" /></Button>
                         {c.codigo_validacao && (
                           <Button asChild size="sm" variant="ghost" title="Validação pública">
                             <Link to={`/validar-certificado/${c.codigo_validacao}`} target="_blank"><ExternalLink className="size-4" /></Link>
@@ -377,13 +404,28 @@ const Inner = () => {
 
       <Dialog open={!!verso} onOpenChange={(o) => !o && setVerso(null)}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Verso do certificado</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Editar certificado</DialogTitle></DialogHeader>
+          <div className="space-y-3 mb-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2"><Label>Nome do aluno</Label><Input value={versoForm.aluno_nome} onChange={(e) => setVersoForm({ ...versoForm, aluno_nome: e.target.value })} /></div>
+              <div><Label>CPF</Label><Input value={versoForm.aluno_cpf} onChange={(e) => setVersoForm({ ...versoForm, aluno_cpf: maskCpf(e.target.value) })} /></div>
+              <div><Label>Nº do certificado</Label><Input value={versoForm.numero} onChange={(e) => setVersoForm({ ...versoForm, numero: e.target.value })} /></div>
+              <div className="col-span-2"><Label>Curso</Label><Input value={versoForm.curso_titulo} onChange={(e) => setVersoForm({ ...versoForm, curso_titulo: e.target.value })} /></div>
+              <div className="col-span-2"><Label>Título do documento</Label><Input value={versoForm.titulo_documento} onChange={(e) => setVersoForm({ ...versoForm, titulo_documento: e.target.value })} /></div>
+              <div><Label>Carga horária (horas)</Label><Input type="number" value={versoForm.carga_horaria_horas} onChange={(e) => setVersoForm({ ...versoForm, carga_horaria_horas: e.target.value })} /></div>
+              <div><Label>Nota final</Label><Input value={versoForm.nota_final} onChange={(e) => setVersoForm({ ...versoForm, nota_final: e.target.value })} /></div>
+              <div><Label>Data de emissão</Label><Input type="date" value={versoForm.emitido_em} onChange={(e) => setVersoForm({ ...versoForm, emitido_em: e.target.value })} /></div>
+            </div>
+            <div><Label>Texto do certificado</Label><Textarea rows={3} value={versoForm.texto} onChange={(e) => setVersoForm({ ...versoForm, texto: e.target.value })} />
+              <p className="text-xs text-muted-foreground mt-1">[NOME DO ALUNO] e [NOME DO CURSO] são trocados automaticamente.</p></div>
+            <p className="text-sm font-semibold border-t border-border pt-3">Verso (opcional)</p>
+          </div>
           <div className="space-y-3">
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={versoForm.incluir_historico} onChange={(e) => setVersoForm({ ...versoForm, incluir_historico: e.target.checked })} /> Incluir histórico</label>
             {versoForm.incluir_historico && <Textarea rows={2} placeholder="Observações do histórico (opcional)" value={versoForm.historico_obs} onChange={(e) => setVersoForm({ ...versoForm, historico_obs: e.target.value })} />}
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={versoForm.incluir_conteudo} onChange={(e) => setVersoForm({ ...versoForm, incluir_conteudo: e.target.checked })} /> Incluir conteúdo programático</label>
             {versoForm.incluir_conteudo && <Textarea rows={8} placeholder="Digite ou cole o conteúdo programático" value={versoForm.conteudo_programatico} onChange={(e) => setVersoForm({ ...versoForm, conteudo_programatico: e.target.value })} />}
-            <Button variant="hero" className="w-full" onClick={salvarVerso}>Salvar verso</Button>
+            <Button variant="hero" className="w-full" onClick={salvarVerso}>Salvar alterações</Button>
           </div>
         </DialogContent>
       </Dialog>
