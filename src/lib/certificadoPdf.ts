@@ -44,7 +44,7 @@ export type CertificadoRecord = {
 
 const mascaraCpf = (cpf?: string | null) => {
   const d = (cpf ?? "").replace(/\D/g, "");
-  return d.length === 11 ? `***.***.***-${d.slice(-2)}` : null;
+  return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : (cpf?.trim() || null);
 };
 
 const urlValidacao = (r: CertificadoRecord) => {
