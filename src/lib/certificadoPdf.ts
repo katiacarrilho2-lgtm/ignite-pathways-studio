@@ -195,16 +195,30 @@ export const buildCertificadoPdf = async (r: CertificadoRecord): Promise<jsPDF> 
 
   drawSeal(doc, W / 2, signatureY - 1);
 
-  doc.setFont("times", "normal");
-  doc.setFontSize(9.5);
-  doc.setTextColor(...INK);
-  doc.text(`Emitido em ${dataEmissao}`, W - 240, signatureY - 3, { align: "center" });
+  const alunoSignX = W - 240;
+  if (s.aluno_nome) {
+    try {
+      doc.addFileToVFS("DancingScript.ttf", DANCING_SCRIPT_B64);
+      doc.addFont("DancingScript.ttf", "DancingScript", "normal");
+      doc.setFont("DancingScript", "normal");
+      doc.setFontSize(22);
+      doc.setTextColor(...NAVY);
+      doc.text(s.aluno_nome, alunoSignX, signatureY - 9, { align: "center" });
+    } catch { /* fonte opcional */ }
+  }
   doc.setDrawColor(...MUTED);
-  doc.line(W - 342, signatureY + 3, W - 138, signatureY + 3);
+  doc.setLineWidth(0.55);
+  doc.line(alunoSignX - 102, signatureY + 3, alunoSignX + 102, signatureY + 3);
   doc.setFont("times", "bold");
-  doc.setFontSize(8.5);
+  doc.setFontSize(9.5);
   doc.setTextColor(...NAVY);
-  doc.text("DATA DE EMISSÃO", W - 240, signatureY + 20, { align: "center" });
+  doc.text((s.aluno_nome || "ALUNO(A)").toUpperCase(), alunoSignX, signatureY + 18, { align: "center" });
+  doc.setFont("times", "normal");
+  doc.setFontSize(8.5);
+  doc.setTextColor(...MUTED);
+  doc.text("Assinatura do(a) aluno(a)", alunoSignX, signatureY + 31, { align: "center" });
+  doc.setFontSize(8);
+  doc.text(`Emitido em ${dataEmissao}`, alunoSignX, signatureY + 43, { align: "center" });
 
   doc.setDrawColor(...GOLD_LIGHT);
   doc.setLineWidth(0.5);
