@@ -396,6 +396,14 @@ const Inner = () => {
                     <Label>Busca sem resultado — sugestão</Label>
                     <Input value={cert.empty_hint} onChange={(e) => setCert({ empty_hint: e.target.value })} />
                   </div>
+                  <div>
+                    <Label>Botão dos cartões de curso</Label>
+                    <Input value={cert.card_button} onChange={(e) => setCert({ card_button: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Filtro “todas as áreas”</Label>
+                    <Input value={cert.all_areas_label} onChange={(e) => setCert({ all_areas_label: e.target.value })} />
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Os cursos, preços e capas continuam sendo cadastrados em <b>Cursos Livres</b> — aqui você muda apenas os textos desta tela.

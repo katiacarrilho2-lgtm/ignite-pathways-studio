@@ -471,6 +471,8 @@ export type CertificacaoSettings = PageSettings & {
   search_placeholder: string;
   empty_title: string;
   empty_hint: string;
+  card_button: string;
+  all_areas_label: string;
 };
 
 export const CERTIFICACAO_DEFAULTS: CertificacaoSettings = {
@@ -484,6 +486,8 @@ export const CERTIFICACAO_DEFAULTS: CertificacaoSettings = {
   search_placeholder: "Digite o nome do curso ou sua área...",
   empty_title: "Nenhum curso encontrado.",
   empty_hint: "Tente outra palavra, como “Excel”, “Administração” ou “Cuidador”.",
+  card_button: "VER CURSO",
+  all_areas_label: "Todas as áreas",
   blocks: [contentSlot("liv_conteudo", "Busca, áreas e cartões de cursos (automático)")],
 };
 
