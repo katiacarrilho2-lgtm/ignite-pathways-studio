@@ -15,7 +15,7 @@ import { formatBRL, precoVigenteCents } from "@/lib/cursoLivre";
 const normalize = (v: string) =>
   v.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-const CourseCard = ({ c }: { c: LivreCourse }) => {
+const CourseCard = ({ c, cta }: { c: LivreCourse; cta: string }) => {
   const vigente = precoVigenteCents(c);
   const promo = vigente != null && c.price_cents != null && vigente < c.price_cents;
   return (
@@ -51,7 +51,7 @@ const CourseCard = ({ c }: { c: LivreCourse }) => {
             <span className="text-xl font-extrabold text-primary">{formatBRL(vigente)}</span>
           </div>
           <Button asChild variant="hero" size="sm">
-            <Link to={`/certifique-sua-experiencia/${c.slug}`}>VER CURSO</Link>
+            <Link to={`/certifique-sua-experiencia/${c.slug}`}>{cta}</Link>
           </Button>
         </div>
       </div>
@@ -146,7 +146,7 @@ const CertifiqueSuaExperiencia = () => {
             className="rounded-full"
             onClick={() => setCat("todas")}
           >
-            Todas as áreas
+            {settings.all_areas_label || "Todas as áreas"}
           </Button>
           {categories.map((c) => (
             <Button
@@ -175,7 +175,7 @@ const CertifiqueSuaExperiencia = () => {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((c) => <CourseCard key={c.id} c={c} />)}
+            {filtered.map((c) => <CourseCard key={c.id} c={c} cta={settings.card_button || "VER CURSO"} />)}
           </div>
         )}
       </main>
