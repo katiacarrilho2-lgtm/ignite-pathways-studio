@@ -5,6 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { SiteBlocks } from "@/components/site/SiteBlocks";
+import {
+  CERTIFICACAO_DEFAULTS, SECTION_CERTIFICACAO, CertificacaoSettings, fetchSection,
+} from "@/lib/siteSettings";
 import { fetchLivreCourses, LivreCourse, setPageMeta } from "@/lib/livre";
 import { formatBRL, precoVigenteCents } from "@/lib/cursoLivre";
 
@@ -59,17 +63,21 @@ const CertifiqueSuaExperiencia = () => {
   const [params] = useSearchParams();
   const { isStaff } = useAuth();
   const preview = params.get("preview") === "1" && isStaff;
+  const [settings, setSettings] = useState<CertificacaoSettings>(CERTIFICACAO_DEFAULTS);
   const [courses, setCourses] = useState<LivreCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [term, setTerm] = useState("");
   const [cat, setCat] = useState<string>("todas");
 
   useEffect(() => {
-    setPageMeta(
-      "Cursos Livres e Certificação | Multplick Formação Profissional",
-      "Encontre cursos livres em diversas áreas e confira as opções disponíveis na Multplick Formação Profissional.",
-    );
-  }, []);
+    let alive = true;
+    fetchSection<CertificacaoSettings>(
+      SECTION_CERTIFICACAO,
+      CERTIFICACAO_DEFAULTS,
+      preview ? "draft" : "published",
+    ).then((v) => { if (alive) setSettings(v); });
+    return () => { alive = false; };
+  }, [preview]);
 
   useEffect(() => {
     let alive = true;
@@ -79,6 +87,14 @@ const CertifiqueSuaExperiencia = () => {
     });
     return () => { alive = false; };
   }, [preview]);
+
+  useEffect(() => {
+    const titulo = [settings.hero_title, settings.hero_title_highlight].filter(Boolean).join(" ");
+    setPageMeta(
+      `${titulo} | Multplick Formação Profissional`,
+      settings.hero_description || "Encontre cursos livres em diversas áreas e confira as opções disponíveis na Multplick Formação Profissional.",
+    );
+  }, [settings]);
 
   const categories = useMemo(
     () => Array.from(new Set(courses.map((c) => c.category).filter(Boolean) as string[])),
@@ -100,36 +116,12 @@ const CertifiqueSuaExperiencia = () => {
     return valores.length ? Math.min(...valores) : null;
   }, [courses]);
 
-  return (
-    <div className="bg-background">
-      {preview && (
-        <div className="flex items-center justify-center gap-2 bg-gold px-4 py-2 text-center text-sm font-medium text-gold-foreground">
-          <Eye className="size-4" /> Modo de pré-visualização da sede — inclui cursos ainda não publicados.
-        </div>
-      )}
+  const chamadaPreco = settings.price_label.trim()
+    ? settings.price_label.replace(/\{preco\}/gi, formatBRL(menorPreco ?? settings.price_fallback_cents))
+    : "";
 
-      {/* Hero */}
-      <header className="relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
-        <div className="mx-auto max-w-5xl px-5 py-14 text-center text-primary-foreground sm:py-20">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em]">
-            <ShieldCheck className="size-3.5" /> Multplick Formação Profissional
-          </span>
-          <h1 className="mt-6 text-3xl font-extrabold leading-tight sm:text-5xl">
-            TEM EXPERIÊNCIA?<br />
-            <span className="text-gold">VALORIZE O QUE VOCÊ JÁ SABE FAZER!</span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">
-            Encontre sua área, escolha sua formação e consulte as opções disponíveis na Multplick Formação Profissional.
-          </p>
-          <p className="mt-7 inline-block rounded-xl border border-gold/40 bg-white/10 px-5 py-3 text-base font-bold text-gold sm:text-lg">
-            CURSOS A PARTIR DE {formatBRL(menorPreco ?? 5990)}*
-          </p>
-          <p className="mt-3 text-[11px] text-white/60">
-            *Valores e modalidades podem variar conforme a formação escolhida.
-          </p>
-        </div>
-      </header>
-
+  const conteudo = (
+    <>
       {/* Busca */}
       <section className="mx-auto -mt-8 max-w-3xl px-5">
         <label htmlFor="busca-curso" className="sr-only">Buscar curso</label>
@@ -139,7 +131,7 @@ const CertifiqueSuaExperiencia = () => {
             id="busca-curso"
             value={term}
             onChange={(e) => setTerm(e.target.value)}
-            placeholder="Digite o nome do curso ou sua área..."
+            placeholder={settings.search_placeholder}
             className="h-14 rounded-2xl border-border bg-card pl-12 text-base shadow-elegant"
           />
         </div>
@@ -176,10 +168,10 @@ const CertifiqueSuaExperiencia = () => {
           <p className="py-16 text-center text-muted-foreground">Carregando cursos…</p>
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border py-16 text-center">
-            <p className="font-medium text-primary">Nenhum curso encontrado.</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Tente outra palavra, como “Excel”, “Administração” ou “Cuidador”.
-            </p>
+            <p className="font-medium text-primary">{settings.empty_title}</p>
+            {settings.empty_hint && (
+              <p className="mt-1 text-sm text-muted-foreground">{settings.empty_hint}</p>
+            )}
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -187,6 +179,48 @@ const CertifiqueSuaExperiencia = () => {
           </div>
         )}
       </main>
+    </>
+  );
+
+  return (
+    <div className="bg-background">
+      {preview && (
+        <div className="flex items-center justify-center gap-2 bg-gold px-4 py-2 text-center text-sm font-medium text-gold-foreground">
+          <Eye className="size-4" /> Modo de pré-visualização da sede — inclui cursos ainda não publicados.
+        </div>
+      )}
+
+      {/* Hero */}
+      <header className="relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+        <div className="mx-auto max-w-5xl px-5 py-14 text-center text-primary-foreground sm:py-20">
+          {settings.hero_eyebrow && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em]">
+              <ShieldCheck className="size-3.5" /> {settings.hero_eyebrow}
+            </span>
+          )}
+          <h1 className="mt-6 whitespace-pre-line text-3xl font-extrabold leading-tight sm:text-5xl">
+            {settings.hero_title}
+            {settings.hero_title_highlight && (
+              <><br /><span className="text-gold">{settings.hero_title_highlight}</span></>
+            )}
+          </h1>
+          {settings.hero_description && (
+            <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">
+              {settings.hero_description}
+            </p>
+          )}
+          {chamadaPreco && (
+            <p className="mt-7 inline-block rounded-xl border border-gold/40 bg-white/10 px-5 py-3 text-base font-bold text-gold sm:text-lg">
+              {chamadaPreco}
+            </p>
+          )}
+          {settings.price_note && (
+            <p className="mt-3 text-[11px] text-white/60">{settings.price_note}</p>
+          )}
+        </div>
+      </header>
+
+      <SiteBlocks blocks={settings.blocks} slots={{ conteudo }} />
     </div>
   );
 };

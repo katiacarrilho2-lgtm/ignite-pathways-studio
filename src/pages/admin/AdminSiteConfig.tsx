@@ -17,6 +17,7 @@ import {
   HOME_DEFAULTS, HomeSettings, SECTION_HOME, DIFF_ICONS,
   applyIdentity, hexToHsl, hslToHex,
   PAGE_SECTIONS, PAGE_LABELS, PAGE_DEFAULTS, PageKey, PageSettings,
+  CERTIFICACAO_DEFAULTS, CertificacaoSettings,
 } from "@/lib/siteSettings";
 import { PageBlocksEditor } from "@/components/admin/PageBlocksEditor";
 
@@ -24,6 +25,7 @@ const PAGE_PATHS: Record<PageKey, string> = {
   sobre: "/sobre", empresas: "/empresas", incompany: "/in-company",
   licenciado: "/licenciado", contato: "/contato",
   cursos: "/cursos", regular: "/curso-regular", competencia: "/curso-por-competencia", eja: "/eja",
+  certificacao: "/certifique-sua-experiencia",
 };
 
 type SectionState<T> = { draft: T; published: T };
@@ -91,6 +93,9 @@ const Inner = () => {
   const setH = (patch: Partial<HomeSettings>) => setHome((s) => ({ ...s, draft: { ...s.draft, ...patch } }));
   const i = ident.draft;
   const h = home.draft;
+  const cert = { ...CERTIFICACAO_DEFAULTS, ...(pages.certificacao?.draft ?? {}) } as CertificacaoSettings;
+  const setCert = (patch: Partial<CertificacaoSettings>) =>
+    setPages((s) => ({ ...s, certificacao: { ...s.certificacao, draft: { ...CERTIFICACAO_DEFAULTS, ...s.certificacao.draft, ...patch } } }));
 
   const upload = async (file: File, apply: (url: string) => void) => {
     try {
@@ -344,6 +349,56 @@ const Inner = () => {
               ))}
             </CardContent>
           </Card>
+          {page === "certificacao" && (
+            <Card>
+              <CardHeader><CardTitle>Topo azul, busca e avisos</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <Label>Linha destacada em dourado</Label>
+                    <Input value={cert.hero_title_highlight} onChange={(e) => setCert({ hero_title_highlight: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Frase dentro da caixa de busca</Label>
+                    <Input value={cert.search_placeholder} onChange={(e) => setCert({ search_placeholder: e.target.value })} />
+                  </div>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <Label>Chamada de preço</Label>
+                    <Input value={cert.price_label} onChange={(e) => setCert({ price_label: e.target.value })} />
+                    <p className="text-xs text-muted-foreground mt-1">Onde estiver {"{preco}"} aparece sozinho o menor valor publicado.</p>
+                  </div>
+                  <div>
+                    <Label>Valor mostrado quando não houver curso publicado (R$)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={String(cert.price_fallback_cents / 100)}
+                      onChange={(e) => setCert({ price_fallback_cents: Math.round(Number(e.target.value || 0) * 100) })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>Aviso miudinho abaixo da chamada de preço</Label>
+                  <Textarea rows={2} value={cert.price_note} onChange={(e) => setCert({ price_note: e.target.value })} />
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div>
+                    <Label>Busca sem resultado — primeira frase</Label>
+                    <Input value={cert.empty_title} onChange={(e) => setCert({ empty_title: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Busca sem resultado — sugestão</Label>
+                    <Input value={cert.empty_hint} onChange={(e) => setCert({ empty_hint: e.target.value })} />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Os cursos, preços e capas continuam sendo cadastrados em <b>Cursos Livres</b> — aqui você muda apenas os textos desta tela.
+                </p>
+              </CardContent>
+            </Card>
+          )}
           <PageBlocksEditor
             value={pages[page].draft}
             onChange={(v) => setPages((s) => ({ ...s, [page]: { ...s[page], draft: v } }))}
