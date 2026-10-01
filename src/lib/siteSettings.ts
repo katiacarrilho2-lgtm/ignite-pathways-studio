@@ -270,6 +270,7 @@ export const PAGE_SECTIONS = {
   regular: "pagina_regular",
   competencia: "pagina_competencia",
   eja: "pagina_eja",
+  certificacao: "pagina_certificacao",
 } as const;
 
 export type PageKey = keyof typeof PAGE_SECTIONS;
@@ -284,6 +285,7 @@ export const PAGE_LABELS: Record<PageKey, string> = {
   regular: "Técnico Regular",
   competencia: "Técnico por Competência",
   eja: "EJA",
+  certificacao: "Certificação · Cursos Livres",
 };
 
 export const SOBRE_DEFAULTS: PageSettings = {
@@ -457,6 +459,32 @@ export const EJA_DEFAULTS: PageSettings = {
   blocks: [contentSlot("eja_conteudo", "Conteúdo atual da página (parceria, planos, FAQ)")],
 };
 
+/* --------------------------------------- Certificação · cursos livres ---- */
+
+export type CertificacaoSettings = PageSettings & {
+  hero_title_highlight: string;
+  price_label: string;
+  price_fallback_cents: number;
+  price_note: string;
+  search_placeholder: string;
+  empty_title: string;
+  empty_hint: string;
+};
+
+export const CERTIFICACAO_DEFAULTS: CertificacaoSettings = {
+  hero_eyebrow: "Multplick Formação Profissional",
+  hero_title: "TEM EXPERIÊNCIA?",
+  hero_title_highlight: "VALORIZE O QUE VOCÊ JÁ SABE FAZER!",
+  hero_description: "Encontre sua área, escolha sua formação e consulte as opções disponíveis na Multplick Formação Profissional.",
+  price_label: "CURSOS A PARTIR DE {preco}*",
+  price_fallback_cents: 5990,
+  price_note: "*Valores e modalidades podem variar conforme a formação escolhida.",
+  search_placeholder: "Digite o nome do curso ou sua área...",
+  empty_title: "Nenhum curso encontrado.",
+  empty_hint: "Tente outra palavra, como “Excel”, “Administração” ou “Cuidador”.",
+  blocks: [contentSlot("liv_conteudo", "Busca, áreas e cartões de cursos (automático)")],
+};
+
 export const PAGE_DEFAULTS: Record<PageKey, PageSettings> = {
   sobre: SOBRE_DEFAULTS,
   empresas: EMPRESAS_DEFAULTS,
@@ -467,5 +495,6 @@ export const PAGE_DEFAULTS: Record<PageKey, PageSettings> = {
   regular: REGULAR_DEFAULTS,
   competencia: COMPETENCIA_DEFAULTS,
   eja: EJA_DEFAULTS,
+  certificacao: CERTIFICACAO_DEFAULTS,
 };
 
