@@ -82,10 +82,14 @@ const Inner = () => {
     }
   };
 
-  const restore = () => {
+  const restore = async () => {
     if (tab === "identidade") setIdent((s) => ({ ...s, draft: s.published }));
     else if (tab === "home") setHome((s) => ({ ...s, draft: s.published }));
     else setPages((s) => ({ ...s, [page]: { ...s[page], draft: s[page].published } }));
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert({ section: current.section, draft: current.published }, { onConflict: "section" });
+    if (error) return toast.error(error.message);
     toast.success("Voltou para a versão publicada.");
   };
 
