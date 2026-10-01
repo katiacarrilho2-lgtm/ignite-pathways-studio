@@ -461,6 +461,8 @@ export const EJA_DEFAULTS: PageSettings = {
 
 /* --------------------------------------- Certificação · cursos livres ---- */
 
+export const SECTION_CERTIFICACAO = PAGE_SECTIONS.certificacao;
+
 export type CertificacaoSettings = PageSettings & {
   hero_title_highlight: string;
   price_label: string;
