@@ -67,7 +67,7 @@ export const CourseTutorChat = ({
         >
           <span className="relative">
             <img src={tutorAvatar} alt="" className="size-10 rounded-full bg-background object-cover" />
-            <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-primary bg-success" aria-hidden="true" />
+            <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-primary bg-primary" aria-hidden="true" />
           </span>
           <span className="flex flex-col items-start leading-tight">
             <span className="text-sm font-semibold">Professor virtual</span>
