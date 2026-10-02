@@ -196,16 +196,6 @@ export const buildCertificadoPdf = async (r: CertificadoRecord): Promise<jsPDF> 
   drawSeal(doc, W / 2, signatureY - 1);
 
   const alunoSignX = W - 240;
-  if (s.aluno_nome) {
-    try {
-      doc.addFileToVFS("DancingScript.ttf", DANCING_SCRIPT_B64);
-      doc.addFont("DancingScript.ttf", "DancingScript", "normal");
-      doc.setFont("DancingScript", "normal");
-      doc.setFontSize(22);
-      doc.setTextColor(...NAVY);
-      doc.text(s.aluno_nome, alunoSignX, signatureY - 9, { align: "center" });
-    } catch { /* fonte opcional */ }
-  }
   doc.setDrawColor(...MUTED);
   doc.setLineWidth(0.55);
   doc.line(alunoSignX - 102, signatureY + 3, alunoSignX + 102, signatureY + 3);
