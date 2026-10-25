@@ -191,6 +191,16 @@ const AdminCursosInner = () => {
               <a href="/certifique-sua-experiencia?preview=1" target="_blank" rel="noreferrer"><Eye className="size-4" /> Pré-visualizar vitrine</a>
             </Button>
             <Button asChild variant="outline"><Link to="/admin/cursos/ia"><Sparkles className="size-4" /> Novo com IA</Link></Button>
+            <Button variant="outline" title="Corrige técnicos fora da aba e adiciona todos os cursos do portfólio Unicorp 2026" onClick={async () => {
+              if (!confirm("Importar todo o catálogo Unicorp 2026? Cursos já existentes não são duplicados.")) return;
+              const t = toast.loading("Importando catálogo Unicorp…");
+              try {
+                const { importUnicorpCatalog } = await import("@/lib/unicorpImport");
+                const r = await importUnicorpCatalog();
+                toast.success(`Pronto: ${r.inserted} cursos adicionados, ${r.fixed} técnicos corrigidos, ${r.both} marcados U/FL`, { id: t });
+                load();
+              } catch (e: any) { toast.error(e.message, { id: t }); }
+            }}><Download className="size-4" /> Importar catálogo Unicorp</Button>
             <Button onClick={openNew} variant="hero"><Plus className="size-4" /> Novo curso</Button>
           </div>
         )}

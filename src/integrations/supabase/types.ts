@@ -1705,6 +1705,7 @@ export type Database = {
           has_teacher_manual: boolean
           id: string
           image_url: string | null
+          instituicao: string
           is_treinamento: boolean
           live_label: string | null
           live_url: string | null
@@ -1745,6 +1746,7 @@ export type Database = {
           has_teacher_manual?: boolean
           id?: string
           image_url?: string | null
+          instituicao?: string
           is_treinamento?: boolean
           live_label?: string | null
           live_url?: string | null
@@ -1785,6 +1787,7 @@ export type Database = {
           has_teacher_manual?: boolean
           id?: string
           image_url?: string | null
+          instituicao?: string
           is_treinamento?: boolean
           live_label?: string | null
           live_url?: string | null

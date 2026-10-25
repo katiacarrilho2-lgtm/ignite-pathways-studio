@@ -37,8 +37,8 @@ const Cursos = () => {
       const cat = norm(c.category ?? ""), t = norm(c.title);
       if (cat.includes("pos")) return "pos";
       if (cat.includes("gradua")) return "graduacao";
-      if (cat.includes("tecnic")) return cat.includes("compet") || t.includes("competencia") ? "competencia" : "tecnicos";
-      if (cat.includes("compet")) return "competencia";
+      if (cat.includes("compet") || t.includes("competencia")) return "competencia";
+      if (cat.includes("tecnic") || /^(curso )?tecnico\b/.test(t)) return "tecnicos";
       return "profissionalizantes";
     };
     const defs = [
