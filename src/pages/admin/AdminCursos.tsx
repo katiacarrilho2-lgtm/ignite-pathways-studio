@@ -27,6 +27,7 @@ type Course = {
   image_url: string | null; external_url: string | null; coursebox_embed_url: string | null;
   featured: boolean; active: boolean; published: boolean; sort_order: number;
   categoria_id: string | null;
+  instituicao?: string | null;
   has_teacher_manual: boolean;
   teacher_manual_image_url: string | null;
   tipo_curso: string | null;
@@ -113,6 +114,7 @@ const AdminCursosInner = () => {
       const catName = categories.find(c => c.id === editing.categoria_id)?.name ?? editing.category ?? "";
       const payload: any = {
         title: editing.title, category: catName, categoria_id: editing.categoria_id, duration: editing.duration,
+        instituicao: editing.instituicao ?? "FL",
         price_cents: editing.price_cents ?? null, description: editing.description, long_description: editing.long_description,
         image_url, external_url: editing.external_url,
         coursebox_embed_url: editing.coursebox_embed_url || null,
@@ -298,6 +300,15 @@ const AdminCursosInner = () => {
                     <SelectContent>{categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-1">Gerencie as opções em <a href="/admin/categorias" className="underline">Categorias</a>.</p>
+                </div>
+                <div>
+                  <Label>Faculdade que ministra</Label>
+                  <select className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm" value={editing.instituicao ?? "FL"} onChange={e=>setEditing({...editing, instituicao: e.target.value})}>
+                    <option value="U">U — Unicorp</option>
+                    <option value="FL">FL — Faculdade LA</option>
+                    <option value="U/FL">U/FL — Ambas</option>
+                    <option value="M">M — Multplick (profissionalizante)</option>
+                  </select>
                 </div>
                 <div><Label>Duração</Label><Input value={editing.duration ?? ""} onChange={e=>setEditing({...editing, duration: e.target.value})} placeholder="Ex: 90 dias, 200h" /></div>
                 <div>

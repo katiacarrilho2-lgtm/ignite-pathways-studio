@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { toast as sonner } from "sonner";
 import placeholder from "@/assets/course-tecnico.jpg";
+import { InstitutionBadge } from "./InstitutionBadge";
 
 const resolveImage = (url: string | null) => {
   if (!url) return placeholder;
@@ -52,6 +53,7 @@ export const CourseCard = ({ course }: { course: DbCourse }) => {
   <article className="game-card group rounded-xl overflow-hidden transition-smooth flex flex-col h-full">
     <div className="aspect-[4/3] overflow-hidden relative bg-secondary">
       <span className="game-card__badge">{course.category}</span>
+      <span className="absolute top-3 right-3 z-10"><InstitutionBadge value={course.instituicao} /></span>
       <img
         src={imgSrc}
         alt={course.title}

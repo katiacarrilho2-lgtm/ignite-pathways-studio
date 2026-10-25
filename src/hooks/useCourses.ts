@@ -13,6 +13,7 @@ export type DbCourse = {
   featured: boolean;
   sort_order: number;
   price_cents: number | null;
+  instituicao?: string | null;
 };
 
 export const useCourses = (opts?: { featuredOnly?: boolean; limit?: number }) => {
