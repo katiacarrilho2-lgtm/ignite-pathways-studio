@@ -8,6 +8,8 @@ import { CourseCard } from "@/components/site/CourseCard";
 import { useCourses } from "@/hooks/useCourses";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { InstitutionBadge, INSTITUICAO_LABEL } from "@/components/site/InstitutionBadge";
 import { ExternalLink, Loader2, Search, X } from "lucide-react";
 
 const CATALOG_URL = "https://licenciado.laeducacao.com.br/catalogo-la";
@@ -28,24 +30,26 @@ const Cursos = () => {
   }, []);
 
   const grouped = useMemo(() => {
-    // Filtro por nome (apenas título do curso, case-insensitive)
     const q = query.trim().toLowerCase();
-    const source = q
-      ? courses.filter((c) => c.title.toLowerCase().includes(q))
-      : courses;
-    // Agrupa cursos pela categoria gerenciada (nome exato). Cursos com categoria
-    // não cadastrada vão para "Outros cursos".
-    const used = new Set<string>();
-    const groups = dbCats.map((cat) => {
-      const items = source.filter((c) => {
-        if (c.category === cat.name) { used.add(c.id); return true; }
-        return false;
-      });
-      return { key: cat.slug, label: cat.name, items };
-    });
-    const others = source.filter((c) => !used.has(c.id));
-    if (others.length) groups.push({ key: "outros", label: "Outros cursos", items: others });
-    return groups.filter((g) => g.items.length > 0);
+    const source = courses.filter((c) => !/\beja\b/i.test(c.category ?? "") && (!q || c.title.toLowerCase().includes(q)));
+    const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const groupOf = (c: typeof courses[number]) => {
+      const cat = norm(c.category ?? ""), t = norm(c.title);
+      if (cat.includes("pos")) return "pos";
+      if (cat.includes("gradua")) return "graduacao";
+      if (cat.includes("tecnic")) return cat.includes("compet") || t.includes("competencia") ? "competencia" : "tecnicos";
+      if (cat.includes("compet")) return "competencia";
+      return "profissionalizantes";
+    };
+    const defs = [
+      { key: "tecnicos", label: "Técnicos Regulares" },
+      { key: "competencia", label: "Técnicos por Competência" },
+      { key: "graduacao", label: "Graduação" },
+      { key: "pos", label: "Pós-Graduação e MBA" },
+      { key: "profissionalizantes", label: "Profissionalizantes" },
+    ];
+    void dbCats;
+    return defs.map((d) => ({ ...d, items: source.filter((c) => groupOf(c) === d.key) })).filter((g) => g.items.length > 0);
   }, [courses, dbCats, query]);
 
   const visibleGroups = useMemo(
@@ -128,22 +132,36 @@ const Cursos = () => {
         {loading ? (
           <div className="py-20 grid place-items-center text-muted-foreground"><Loader2 className="size-6 animate-spin" /></div>
         ) : (
-          <div className="space-y-14">
+          <>
+          <div className="mb-8 rounded-xl border border-border bg-card p-5 space-y-3">
+            <p className="text-sm font-semibold text-foreground">Quem emite o certificado de cada curso:</p>
+            <div className="flex flex-wrap gap-4 text-sm">
+              {(["U","FL","U/FL","M"] as const).map((v) => (
+                <span key={v} className="flex items-center gap-2"><InstitutionBadge value={v} size="sm" /> {INSTITUICAO_LABEL[v]}</span>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              A Multplick é uma instituição com faculdades parceiras: cursos técnicos, graduações e pós-graduações são ministrados e certificados pela faculdade parceira indicada, 100% EAD. Toda matrícula é formalizada em contrato, garantindo a segurança do aluno.
+            </p>
+          </div>
+          <Accordion type="multiple" defaultValue={query ? visibleGroups.map((g) => g.key) : []} key={query ? "q" : "n"} className="space-y-4">
             {visibleGroups.map((g) => (
-              <div key={g.key} id={slugId(g.key)} className="scroll-mt-24">
-                <div className="flex items-end justify-between mb-6 pb-3 border-b border-border">
-                  <h2 className="text-2xl md:text-3xl font-bold text-primary">{g.label}</h2>
-                  <span className="text-sm text-muted-foreground">{g.items.length} {g.items.length === 1 ? "curso" : "cursos"}</span>
-                </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {g.items.map((c) => <CourseCard key={c.id} course={c} />)}
-                </div>
-              </div>
+              <AccordionItem key={g.key} value={g.key} id={slugId(g.key)} className="scroll-mt-24 rounded-xl border border-border bg-card px-5">
+                <AccordionTrigger className="text-xl md:text-2xl font-bold text-primary hover:no-underline">
+                  <span>{g.label} <span className="text-sm font-normal text-muted-foreground">({g.items.length} {g.items.length === 1 ? "curso" : "cursos"})</span></span>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-2 pb-4">
+                    {g.items.map((c) => <CourseCard key={c.id} course={c} />)}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
+          </Accordion>
             {visibleGroups.length === 0 && (
               <div className="py-20 text-center text-muted-foreground">Nenhum curso disponível no momento.</div>
             )}
-          </div>
+          </>
         )}
       </section>
       ) }} />
