@@ -17,6 +17,8 @@ import { generateApostila } from "@/lib/apostila";
 import { GamerHUD } from "@/components/gamer/GamerHUD";
 import { AvatarTrail } from "@/components/gamer/AvatarTrail";
 import { CourseFinale } from "@/components/gamer/CourseFinale";
+import { FlashDeck } from "@/components/gamer/FlashDeck";
+import { PmocLessonExtras, PMOC_LESSON_IMAGES } from "@/components/gamer/PmocTools";
 import { useGamification } from "@/lib/gamer/useGamification";
 import { sfx, fireConfetti } from "@/lib/gamer/sfx";
 import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
@@ -418,6 +420,7 @@ const LessonView = ({ lesson, progress, onComplete, onNext, onPrev, onDownloadAp
       {lesson.lesson_type === "quiz" && <QuizBlock lesson={lesson} previousScore={progress?.score ?? null} onPass={(s) => onComplete(s)} />}
       {lesson.lesson_type === "flip" && <FlipBlock lesson={lesson} />}
       {lesson.lesson_type === "accordion" && <AccordionBlock lesson={lesson} />}
+      <PmocLessonExtras lessonId={lesson.id} />
 
       {lesson.lesson_type !== "text" && (
         <TextBlock lesson={lesson} hideMedia />
@@ -546,6 +549,11 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
         </div>
       )}
       {!hideMedia && lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
+      {!hideMedia && !lesson.content?.image_url && PMOC_LESSON_IMAGES[lesson.id] && (
+        <figure className="flex justify-center">
+          <LessonImage src={PMOC_LESSON_IMAGES[lesson.id]} alt={lesson.title} className="rounded-2xl border border-border w-full h-auto object-cover shadow-md" style={{ maxWidth: "860px" }} />
+        </figure>
+      )}
       {!hideMedia && lesson.content?.image_url && (
         <figure className="flex justify-center">
           <LessonImage
@@ -636,7 +644,7 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
         <section className="space-y-3">
           <h3 className="text-lg font-bold">Flashcards de memorização</h3>
           <div className="grid sm:grid-cols-2 gap-3">
-            {flashcards.map((f, i) => <Flashcard key={i} front={f.front} back={f.back} />)}
+            <div className="sm:col-span-2"><FlashDeck cards={flashcards} /></div>
           </div>
         </section>
       )}
@@ -733,34 +741,8 @@ const YoutubeEmbed = ({ yt }: { yt: { videoId: string; title?: string; channel?:
 );
 
 const FlipBlock = ({ lesson }: { lesson: Lesson }) => {
-  const [flipped, setFlipped] = useState<Record<number, boolean>>({});
   const items: { front: string; back: string }[] = lesson.content?.items ?? lesson.content?.flashcards ?? [];
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {items.map((it, i) => (
-        <button
-          key={i}
-          onClick={() => setFlipped(f => ({ ...f, [i]: !f[i] }))}
-          className="group aspect-[4/3] [perspective:1200px] text-left"
-          aria-pressed={!!flipped[i]}
-        >
-          <div
-            className="relative w-full h-full transition-transform duration-500 [transform-style:preserve-3d]"
-            style={{ transform: flipped[i] ? "rotateY(180deg)" : "rotateY(0deg)" }}
-          >
-            <div className="absolute inset-0 [backface-visibility:hidden] border border-border rounded-xl p-6 bg-card shadow-sm flex flex-col">
-              <span className="absolute top-2 right-2 text-[10px] uppercase tracking-wide text-muted-foreground">Frente · clique p/ virar</span>
-              <p className="text-base whitespace-pre-wrap mt-6 flex-1 overflow-auto">{it.front}</p>
-            </div>
-            <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] border border-primary/40 rounded-xl p-6 bg-secondary/40 shadow-sm flex flex-col">
-              <span className="absolute top-2 right-2 text-[10px] uppercase tracking-wide text-muted-foreground">Verso · clique p/ virar</span>
-              <p className="text-base whitespace-pre-wrap mt-6 flex-1 overflow-auto">{it.back}</p>
-            </div>
-          </div>
-        </button>
-      ))}
-    </div>
-  );
+  return <FlashDeck cards={items} />;
 };
 
 const AccordionBlock = ({ lesson }: { lesson: Lesson }) => {
