@@ -478,3 +478,14 @@ All colors MUST be HSL.
   box-shadow: 0 0 12px hsl(var(--neon-green) / 0.35);
   backdrop-filter: blur(4px);
 }
+
+/* Flashcards coloridos */
+:root {
+  --fc-1: 214 84% 46%;
+  --fc-2: 152 62% 36%;
+  --fc-3: 24 92% 50%;
+  --fc-4: 268 60% 50%;
+  --fc-5: 346 74% 48%;
+  --fc-6: 186 78% 36%;
+  --fc-ink: 0 0% 100%;
+}
