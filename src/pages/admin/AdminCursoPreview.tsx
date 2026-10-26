@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink, Pencil, Image as ImageIconLucide } from "lucide-react";
 import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
+import { FlashDeck } from "@/components/gamer/FlashDeck";
+import { PmocLessonExtras, PMOC_LESSON_IMAGES } from "@/components/gamer/PmocTools";
 
 const MODULE_ICONS: Record<string, any> = { Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle: CheckCircle2 };
 
@@ -140,7 +142,7 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
   const [editOpen, setEditOpen] = useState(false);
   const yt = lesson.content?.youtube;
   const body = pickLessonHtml(lesson.content);
-  const imageUrl: string | undefined = lesson.content?.image_url;
+  const imageUrl: string | undefined = lesson.content?.image_url || PMOC_LESSON_IMAGES[lesson.id];
   const flashcards: Array<{ front: string; back: string }> = lesson.content?.flashcards ?? lesson.content?.items ?? [];
   const quiz: Array<{ question: string; options: string[]; answer?: number; correct?: number; explanation?: string }> =
     lesson.content?.quiz ?? lesson.content?.questions ?? [];
@@ -203,6 +205,8 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
           />
         </figure>
       )}
+
+      <PmocLessonExtras lessonId={lesson.id} />
 
       {body && (
         <div
@@ -288,11 +292,7 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
       {flashcards.length > 0 && (
         <section>
           <h3 className="text-lg font-bold mb-3">Flashcards de memorização</h3>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {flashcards.map((f, i) => (
-              <Flashcard key={i} front={f.front} back={f.back} />
-            ))}
-          </div>
+          <FlashDeck cards={flashcards} />
         </section>
       )}
 
