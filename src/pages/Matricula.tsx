@@ -173,10 +173,35 @@ const Matricula = () => {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!course) return;
+    const goTo = (key: string, msg: string) => {
+      const el = document.querySelector<HTMLElement>(`[data-field="${key}"]`);
+      document.querySelectorAll(".campo-faltando").forEach(n => n.classList.remove("campo-faltando", "ring-2", "ring-destructive", "rounded-md", "p-1"));
+      if (el) {
+        el.classList.add("campo-faltando", "ring-2", "ring-destructive", "rounded-md", "p-1");
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        const input = el.querySelector<HTMLElement>("input:not([disabled]), textarea, button[role=combobox]");
+        setTimeout(() => input?.focus(), 400);
+      }
+      toast.error(msg, { duration: 6000 });
+    };
+    const OBRIGATORIOS: [keyof typeof initial, string][] = [
+      ["full_name","Nome completo"],["cpf","CPF"],["birth_date","Data de nascimento"],["rg","RG"],["rg_issuer","Órgão emissor"],
+      ["rg_issue_date","Data de emissão do RG"],["naturalidade","Naturalidade"],["father_name","Nome do pai"],["mother_name","Nome da mãe"],
+      ["cep","CEP"],["street","Rua"],["neighborhood","Bairro"],["city","Cidade"],["state","Estado"],["phone","Telefone"],["email","E-mail"],
+      ["schooling","Escolaridade"],["graduation_year","Ano de formação"],["institution","Nome da instituição"],
+      ["payment_method","Forma de pagamento"],["course_modality","Modalidade do curso"],
+    ];
+    const vazio = OBRIGATORIOS.find(([k]) => !String(form[k] ?? "").trim());
+    if (vazio) return goTo(vazio[0], `Falta preencher: ${vazio[1]}. Se não souber, escreva "não sei" ou "não tenho".`);
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) return goTo("email", "E-mail inválido. Confira o endereço digitado.");
     const parsed = schema.safeParse(form);
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) {
+      const k = String(parsed.error.issues[0].path[0] ?? "");
+      return goTo(k, parsed.error.issues[0].message);
+    }
     const faltando = customFields.find(f => f.required && !(customData[f.field_key] ?? "").trim());
-    if (faltando) return toast.error(`Preencha: ${faltando.label}`);
+    if (faltando) return goTo(`custom_${faltando.field_key}`, `Falta preencher: ${faltando.label}`);
+    document.querySelectorAll(".campo-faltando").forEach(n => n.classList.remove("campo-faltando", "ring-2", "ring-destructive", "rounded-md", "p-1"));
     setLoading(true);
     try {
       const allTitles = [course.title, ...comboCourses.map(c => c.title)];
@@ -294,49 +319,49 @@ const Matricula = () => {
           <Card className="p-5 md:p-6 space-y-4">
             <h2 className="font-semibold text-primary">Dados pessoais</h2>
             <div className="grid md:grid-cols-2 gap-3">
-              <div className="md:col-span-2"><Label>Nome completo *</Label><Input value={form.full_name} onChange={e=>set("full_name", e.target.value)} required /></div>
-              <div><Label>CPF</Label><Input value={form.cpf} onChange={e=>set("cpf", e.target.value)} placeholder="000.000.000-00" /></div>
-              <div><Label>Data de Nascimento</Label><Input type="date" value={form.birth_date} onChange={e=>set("birth_date", e.target.value)} /></div>
-              <div><Label>RG</Label><Input value={form.rg} onChange={e=>set("rg", e.target.value)} /></div>
-              <div><Label>Órgão Emissor</Label><Input value={form.rg_issuer} onChange={e=>set("rg_issuer", e.target.value)} placeholder="SSP/UF" /></div>
-              <div><Label>Data de Emissão</Label><Input type="date" value={form.rg_issue_date} onChange={e=>set("rg_issue_date", e.target.value)} /></div>
-              <div><Label>Naturalidade</Label><Input value={form.naturalidade} onChange={e=>set("naturalidade", e.target.value)} placeholder="Cidade/UF" /></div>
+              <div className="md:col-span-2" data-field="full_name"><Label>Nome completo *</Label><Input value={form.full_name} onChange={e=>set("full_name", e.target.value)} required /></div>
+              <div data-field="cpf"><Label>CPF *</Label><Input value={form.cpf} onChange={e=>set("cpf", e.target.value)} placeholder="000.000.000-00" /></div>
+              <div data-field="birth_date"><Label>Data de Nascimento *</Label><Input type="date" value={form.birth_date} onChange={e=>set("birth_date", e.target.value)} /></div>
+              <div data-field="rg"><Label>RG *</Label><Input value={form.rg} onChange={e=>set("rg", e.target.value)} /></div>
+              <div data-field="rg_issuer"><Label>Órgão Emissor *</Label><Input value={form.rg_issuer} onChange={e=>set("rg_issuer", e.target.value)} placeholder="SSP/UF" /></div>
+              <div data-field="rg_issue_date"><Label>Data de Emissão *</Label><Input type="date" value={form.rg_issue_date} onChange={e=>set("rg_issue_date", e.target.value)} /></div>
+              <div data-field="naturalidade"><Label>Naturalidade *</Label><Input value={form.naturalidade} onChange={e=>set("naturalidade", e.target.value)} placeholder="Cidade/UF" /></div>
             </div>
           </Card>
 
           <Card className="p-5 md:p-6 space-y-4">
             <h2 className="font-semibold text-primary">Filiação</h2>
             <div className="grid md:grid-cols-2 gap-3">
-              <div><Label>Pai</Label><Input value={form.father_name} onChange={e=>set("father_name", e.target.value)} /></div>
-              <div><Label>Mãe</Label><Input value={form.mother_name} onChange={e=>set("mother_name", e.target.value)} /></div>
+              <div data-field="father_name"><Label>Pai *</Label><Input value={form.father_name} onChange={e=>set("father_name", e.target.value)} /></div>
+              <div data-field="mother_name"><Label>Mãe *</Label><Input value={form.mother_name} onChange={e=>set("mother_name", e.target.value)} /></div>
             </div>
           </Card>
 
           <Card className="p-5 md:p-6 space-y-4">
             <h2 className="font-semibold text-primary">Endereço</h2>
             <div className="grid md:grid-cols-2 gap-3">
-              <div><Label>CEP</Label><Input value={form.cep} onChange={e=>set("cep", e.target.value)} placeholder="00000-000" /></div>
-              <div><Label>Rua</Label><Input value={form.street} onChange={e=>set("street", e.target.value)} /></div>
-              <div><Label>Bairro</Label><Input value={form.neighborhood} onChange={e=>set("neighborhood", e.target.value)} /></div>
-              <div><Label>Cidade</Label><Input value={form.city} onChange={e=>set("city", e.target.value)} /></div>
-              <div><Label>Estado</Label><Input value={form.state} onChange={e=>set("state", e.target.value)} placeholder="UF" maxLength={2} /></div>
+              <div data-field="cep"><Label>CEP *</Label><Input value={form.cep} onChange={e=>set("cep", e.target.value)} placeholder="00000-000" /></div>
+              <div data-field="street"><Label>Rua *</Label><Input value={form.street} onChange={e=>set("street", e.target.value)} /></div>
+              <div data-field="neighborhood"><Label>Bairro *</Label><Input value={form.neighborhood} onChange={e=>set("neighborhood", e.target.value)} /></div>
+              <div data-field="city"><Label>Cidade *</Label><Input value={form.city} onChange={e=>set("city", e.target.value)} /></div>
+              <div data-field="state"><Label>Estado *</Label><Input value={form.state} onChange={e=>set("state", e.target.value)} placeholder="UF" maxLength={2} /></div>
             </div>
           </Card>
 
           <Card className="p-5 md:p-6 space-y-4">
             <h2 className="font-semibold text-primary">Contatos</h2>
             <div className="grid md:grid-cols-2 gap-3">
-              <div><Label>Telefone *</Label><Input value={form.phone} onChange={e=>set("phone", e.target.value)} placeholder="(00) 00000-0000" /></div>
-              <div><Label>E-mail *</Label><Input type="email" value={form.email} onChange={e=>set("email", e.target.value)} required /></div>
+              <div data-field="phone"><Label>Telefone *</Label><Input value={form.phone} onChange={e=>set("phone", e.target.value)} placeholder="(00) 00000-0000" /></div>
+              <div data-field="email"><Label>E-mail *</Label><Input type="email" value={form.email} onChange={e=>set("email", e.target.value)} required /></div>
             </div>
           </Card>
 
           <Card className="p-5 md:p-6 space-y-4">
             <h2 className="font-semibold text-primary">Formação</h2>
             <div className="grid md:grid-cols-3 gap-3">
-              <div><Label>Escolaridade</Label><Input value={form.schooling} onChange={e=>set("schooling", e.target.value)} placeholder="Ensino Médio Completo" /></div>
-              <div><Label>Ano de Formação</Label><Input value={form.graduation_year} onChange={e=>set("graduation_year", e.target.value)} placeholder="2018" /></div>
-              <div><Label>Nome da Instituição</Label><Input value={form.institution} onChange={e=>set("institution", e.target.value)} /></div>
+              <div data-field="schooling"><Label>Escolaridade *</Label><Input value={form.schooling} onChange={e=>set("schooling", e.target.value)} placeholder="Ensino Médio Completo" /></div>
+              <div data-field="graduation_year"><Label>Ano de Formação *</Label><Input value={form.graduation_year} onChange={e=>set("graduation_year", e.target.value)} placeholder="2018" /></div>
+              <div data-field="institution"><Label>Nome da Instituição *</Label><Input value={form.institution} onChange={e=>set("institution", e.target.value)} /></div>
             </div>
           </Card>
 
@@ -345,7 +370,7 @@ const Matricula = () => {
               <h2 className="font-semibold text-primary">Informações complementares</h2>
               <div className="grid md:grid-cols-2 gap-3">
                 {customFields.map(f => (
-                  <div key={f.id} className={f.field_type === "textarea" ? "md:col-span-2" : ""}>
+                  <div key={f.id} data-field={`custom_${f.field_key}`} className={f.field_type === "textarea" ? "md:col-span-2" : ""}>
                     <Label>{f.label}{f.required ? " *" : ""}</Label>
                     {f.field_type === "textarea" ? (
                       <Textarea
@@ -376,7 +401,7 @@ const Matricula = () => {
                 <Label>Curso</Label>
                 <Input value={course.title} disabled />
               </div>
-              <div>
+              <div data-field="payment_method">
                 <Label>Forma de pagamento *</Label>
                 <Select value={form.payment_method} onValueChange={v=>set("payment_method", v)}>
                   <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
@@ -391,8 +416,8 @@ const Matricula = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label>Modalidade do curso</Label>
+              <div data-field="course_modality">
+                <Label>Modalidade do curso *</Label>
                 <Select value={form.course_modality} onValueChange={v=>set("course_modality", v)}>
                   <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
                   <SelectContent>
