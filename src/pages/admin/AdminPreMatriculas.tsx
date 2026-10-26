@@ -220,6 +220,12 @@ const Inner = () => {
     setCourses(cs ?? []);
   };
   useEffect(() => { load(); }, []);
+  // Nova ficha enviada pelo aluno entra sozinha na lista (verifica a cada 30s)
+  useEffect(() => {
+    const t = setInterval(() => { if (document.visibilityState === "visible") load(); }, 30000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Carrega as datas no estado quando abre o dialog de visualização
   useEffect(() => {
