@@ -225,6 +225,13 @@
       "when": 1790692910718,
       "tag": "0031_courses_conteudo_programatico",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1793303323014,
+      "tag": "0032_rede_repasses",
+      "breakpoints": true
     }
   ]
 }
