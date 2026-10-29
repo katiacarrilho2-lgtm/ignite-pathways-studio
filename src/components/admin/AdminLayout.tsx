@@ -11,6 +11,7 @@ import UrgencyCenter from "@/components/admin/UrgencyCenter";
 import { useEffect, useState } from "react";
 import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
 import InternalMessageAlert from "@/components/admin/InternalMessageAlert";
+import CampaignLeadAlert from "@/components/admin/CampaignLeadAlert";
 import AccountContextBanner from "@/components/admin/AccountContextBanner";
 import useCommercialAccounts from "@/hooks/useCommercialAccounts";
 import { ROOT_ACCOUNT_ID } from "@/lib/multiAccount";
@@ -189,6 +190,7 @@ const AdminLayoutInner = () => {
       </main>
       <CrmUrgentAlerts />
       <InternalMessageAlert />
+      <CampaignLeadAlert />
     </div>
   );
 };
