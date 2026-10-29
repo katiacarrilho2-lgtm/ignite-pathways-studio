@@ -14,6 +14,7 @@ const links = [
   { to: "/curso-regular", label: "Técnico Regular" },
   { to: "/unicorp", label: "Unicorp" },
   { to: "/teste-vocacional", label: "Teste Vocacional" },
+  { to: "/gerador-curriculo", label: "Currículo Grátis" },
   { to: "/curso-por-competencia", label: "Técnico por Competência" },
   { to: "/empresas", label: "Empresas" },
   { to: "/in-company", label: "In Company" },
