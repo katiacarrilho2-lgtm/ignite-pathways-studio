@@ -32,7 +32,7 @@ type Regra = {
 
 const brl = (c?: number | null) => ((c ?? 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const toCents = (v: string) => Math.round(parseFloat((v || "0").replace(/\./g, "").replace(",", ".")) * 100) || 0;
-const fromCents = (c?: number | null) => ((c ?? 0) / 100).toFixed(2);
+const fromCents = (c?: number | null) => (c ? (c / 100).toFixed(2) : "");
 
 const ESCOPOS = [
   { v: "curso", label: "Curso" },
@@ -183,7 +183,7 @@ function Inner() {
                   <td className="p-2 text-right">{brl(r.preco_minimo_cents)}</td>
                   <td className="p-2 text-right">{brl(r.preco_sugerido_cents)}</td>
                   <td className="p-2 text-right text-amber-700">{brl(r.custo_interno_cents)}</td>
-                  <td className="p-2">{r.tipo_regra === "percentual_licenciado" ? `${Number(r.percentual)}% ao Polo` : r.tipo_regra === "percentual_multplick" ? `${Number(r.percentual)}% da tabela à Multplick` : `${brl(r.valor_fixo_cents)} à Multplick`}</td>
+                  <td className="p-2">{r.tipo_regra === "percentual_licenciado" ? `${Number(r.percentual)}% ao Polo` : r.tipo_regra === "percentual_multplick" ? `${Number(r.percentual)}% da tabela à Multplick` : (r.valor_fixo_cents ? `${brl(r.valor_fixo_cents)} à Multplick` : "A definir")}</td>
                   <td className="p-2 text-center">{r.ativo ? "Sim" : "Não"}</td>
                   <td className="p-2 text-right whitespace-nowrap">
                     <Button size="sm" variant="ghost" onClick={() => { setForm({ ...r }); setOpen(true); }}><Pencil className="size-4" /></Button>

@@ -10,7 +10,7 @@ type Regra = {
 const brl = (c: number) => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function descreve(r: Regra) {
-  if (r.tipo_regra === "valor_fixo_multplick") return `${brl(r.valor_fixo_cents)} por matrícula`;
+  if (r.tipo_regra === "valor_fixo_multplick") return r.valor_fixo_cents ? `${brl(r.valor_fixo_cents)} por matrícula` : "A definir";
   if (r.tipo_regra === "percentual_multplick") return `${Number(r.percentual)}% do preço de tabela`;
   return `Você fica com ${Number(r.percentual)}% do recebido`;
 }
