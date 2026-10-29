@@ -73,6 +73,7 @@ import AdminMensagens from "./pages/admin/AdminMensagens.tsx";
 import AdminSuporte from "./pages/admin/AdminSuporte.tsx";
 import AdminFinanceiro from "./pages/admin/AdminFinanceiro.tsx";
 import AdminSecretaria from "./pages/admin/AdminSecretaria.tsx";
+import LeadsEntradas from "./pages/admin/leads/LeadsEntradas.tsx";
 import AdminCampanhaCompetencia from "./pages/admin/AdminCampanhaCompetencia.tsx";
 import AdminMatriculas from "./pages/admin/AdminMatriculas.tsx";
 import AdminRepasses from "./pages/admin/AdminRepasses.tsx";
@@ -220,6 +221,7 @@ const App = () => (
               </Route>
               <Route path="leads" element={<LeadsLayout />}>
                 <Route index element={<LeadsRecebidos />} />
+                <Route path="entradas" element={<LeadsEntradas />} />
                 <Route path="banco" element={<LeadsBanco />} />
                 <Route path="importar" element={<LeadsImportar />} />
               </Route>
@@ -295,6 +297,7 @@ const App = () => (
               <Route path="cargos" element={<AdminCargos />} />
               <Route path="leads" element={<LeadsLayout />}>
                 <Route index element={<LeadsRecebidos />} />
+                <Route path="entradas" element={<LeadsEntradas />} />
                 <Route path="banco" element={<LeadsBanco />} />
                 <Route path="importar" element={<LeadsImportar />} />
               </Route>

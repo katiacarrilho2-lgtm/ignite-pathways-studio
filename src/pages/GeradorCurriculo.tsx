@@ -98,7 +98,7 @@ export default function GeradorCurriculo() {
     await sb.rpc("store_registrar_interesse", {
       _tipo: "consulta",
       _dados: { nome: f.nome.trim(), whatsapp: f.whatsapp.replace(/\D/g, ""), email: f.email.trim(), cidade_uf: f.cidade_uf.trim(),
-        curso: `Gerador de currículo: ${f.cargo.trim()}`, profissao: f.cargo.trim(), polo: o.polo, consultor: o.consultor, campanha: o.campanha || "gerador-curriculo" },
+        curso: `Gerador de currículo: ${f.cargo.trim()}`, profissao: f.cargo.trim(), polo: o.polo, consultor: o.consultor, campanha: o.campanha || "gerador-curriculo", origem: "gerador-curriculo" },
     }).then(({ error }: any) => error && console.warn("lead não salvo", error.message));
     try { gerarPdf(f, exps); toast.success("Currículo baixado!"); setPronto(true); }
     catch { toast.error("Não foi possível gerar o PDF. Tente novamente."); }
