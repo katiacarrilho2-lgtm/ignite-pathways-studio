@@ -149,7 +149,7 @@ export default function TesteVocacional() {
     await sb.rpc("store_registrar_interesse", {
       _tipo: "consulta",
       _dados: { ...f, whatsapp: f.whatsapp.replace(/\D/g, ""), curso: `Teste vocacional: ${AREAS[res].titulo}`,
-        profissao: AREAS[res].perfil, polo: o.polo, consultor: o.consultor, campanha: o.campanha || "teste-vocacional" },
+        profissao: AREAS[res].perfil, polo: o.polo, consultor: o.consultor, campanha: o.campanha || "teste-vocacional", origem: "teste-vocacional" },
     }).then(({ error }: any) => error && console.warn("lead não salvo", error.message));
     setBusy(false);
   };
