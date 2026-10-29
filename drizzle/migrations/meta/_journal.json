@@ -232,6 +232,13 @@
       "when": 1793303323014,
       "tag": "0032_rede_repasses",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1793303350497,
+      "tag": "0033_polo_regras_tipo_percentual_multplick",
+      "breakpoints": true
     }
   ]
 }

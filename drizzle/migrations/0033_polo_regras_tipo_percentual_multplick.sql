@@ -1,0 +1,2 @@
+ALTER TABLE public.polo_regras DROP CONSTRAINT polo_regras_tipo_chk;
+ALTER TABLE public.polo_regras ADD CONSTRAINT polo_regras_tipo_chk CHECK (tipo_regra IN ('percentual_licenciado','valor_fixo_multplick','percentual_multplick'));
