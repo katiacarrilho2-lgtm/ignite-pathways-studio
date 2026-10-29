@@ -180,12 +180,9 @@ const AdminLayoutInner = () => {
         </div>
       </header>
       <main className="flex-1 min-w-0 overflow-x-hidden">
-        <div className="md:hidden flex items-center px-3 py-2 border-b border-border bg-background">
+        <div className="sticky top-14 md:top-0 z-30 flex h-12 items-center justify-between gap-2 px-3 md:px-4 bg-background/80 backdrop-blur border-b border-border">
           <HistoryNav />
-        </div>
-        <div className="hidden md:flex sticky top-0 z-30 h-12 items-center justify-between gap-2 px-4 bg-background/80 backdrop-blur border-b border-border">
-          <HistoryNav />
-          <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
             <UrgencyCenter />
             <NotificationBell />
           </div>
