@@ -72,6 +72,7 @@ import AdminMensagens from "./pages/admin/AdminMensagens.tsx";
 import AdminSuporte from "./pages/admin/AdminSuporte.tsx";
 import AdminFinanceiro from "./pages/admin/AdminFinanceiro.tsx";
 import AdminSecretaria from "./pages/admin/AdminSecretaria.tsx";
+import AdminCampanhaCompetencia from "./pages/admin/AdminCampanhaCompetencia.tsx";
 import AdminMatriculas from "./pages/admin/AdminMatriculas.tsx";
 import AdminRepasses from "./pages/admin/AdminRepasses.tsx";
 import AdminRelatorioPagamentos from "./pages/admin/AdminRelatorioPagamentos.tsx";
@@ -231,6 +232,7 @@ const App = () => (
               <Route path="alunos/:userId" element={<AdminAlunoEdit />} />
               <Route path="financeiro" element={<AdminFinanceiro />} />
               <Route path="secretaria" element={<AdminSecretaria />} />
+              <Route path="campanha-competencia" element={<AdminCampanhaCompetencia />} />
               <Route path="matriculas" element={<AdminMatriculas />} />
               <Route path="relatorios/pagamentos" element={<AdminRelatorioPagamentos />} />
               <Route path="usuarios" element={<AdminUsuarios />} />
