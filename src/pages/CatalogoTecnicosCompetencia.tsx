@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, Check, MessageCircle, FileText, ClipboardCheck, Award, UserCheck, ShieldCheck } from "lucide-react";
 import logo from "@/assets/multplick-logo.png";
+import { supabase } from "@/integrations/supabase/client";
+const sb = supabase as any;
 
 const WHATS = "5518996841902";
 const MAX = 4;
@@ -35,7 +37,7 @@ const FAQ = [
 export default function CatalogoTecnicosCompetencia() {
   const [q, setQ] = useState("");
   const [sel, setSel] = useState<string[]>([]);
-  const [f, setF] = useState({ nome: "", cidade: "", exp: "", amigo: "" });
+  const [f, setF] = useState({ nome: "", whats: "", cidade: "", exp: "", amigo: "" });
   const [aviso, setAviso] = useState("");
 
   useEffect(() => {
@@ -44,6 +46,7 @@ export default function CatalogoTecnicosCompetencia() {
     const m = document.createElement("meta");
     m.name = "robots"; m.content = "noindex,nofollow";
     document.head.appendChild(m);
+    if (!sessionStorage.getItem("cat-tc-v")) { sessionStorage.setItem("cat-tc-v", "1"); sb.from("campanha_visitas").insert({ campanha: "catalogo-competencia" }).then(() => {}); }
     return () => { document.title = prevTitle; m.remove(); };
   }, []);
 
@@ -58,8 +61,8 @@ export default function CatalogoTecnicosCompetencia() {
   };
 
   const enviar = () => {
-    if (!f.nome.trim() || !f.cidade.trim() || !f.exp.trim() || sel.length === 0) {
-      setAviso("Preencha nome, cidade/UF, experiência e escolha pelo menos 1 curso.");
+    if (!f.nome.trim() || f.whats.replace(/\D/g, "").length < 10 || !f.cidade.trim() || !f.exp.trim() || sel.length === 0) {
+      setAviso("Preencha nome, WhatsApp com DDD, cidade/UF, experiência e escolha pelo menos 1 curso.");
       document.getElementById("form")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
@@ -70,8 +73,13 @@ export default function CatalogoTecnicosCompetencia() {
       "Cursos de interesse:", ...sel.map((c, i) => `${i + 1}. ${nome(c)}`),
       "Gostaria de saber se meu perfil se encaixa.",
     ].filter(Boolean).join("\n");
+    sb.rpc("store_registrar_interesse", { _tipo: "interesse", _dados: {
+      nome: f.nome.trim(), whatsapp: f.whats.trim(), cidade: f.cidade.trim(), experiencia: f.exp.trim(),
+      amigo: f.amigo.trim(), curso: sel.map(nome).join(", "), origem: "catalogo-competencia", campanha: "Técnicos por Competência",
+    } }).then(() => {});
     window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
   };
+  const outros = () => window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent("Olá, Multplick! Vim pelo Catálogo de Técnicos por Competência e quero conhecer outros cursos (profissionalizantes, idiomas, informática).")}`, "_blank", "noopener");
 
   const input = "w-full rounded-lg border border-[hsl(215_30%_80%)] bg-background px-3 py-3 text-base text-foreground outline-none focus:border-[hsl(var(--cat-gold))]";
 
@@ -132,12 +140,21 @@ export default function CatalogoTecnicosCompetencia() {
         ))}
       </section>
 
+      <section className="mx-auto mt-12 max-w-5xl px-5">
+        <div className="rounded-2xl bg-[hsl(var(--cat-navy))] p-6 text-[hsl(var(--cat-paper))]">
+          <h2 className="font-serif text-2xl">Procura outro tipo de curso?</h2>
+          <p className="mt-2 text-sm opacity-90">Não tem experiência comprovada ou quer outra área? A Multplick também oferece <b>Cursos Profissionalizantes, Idiomas, Informática e Cursos Livres</b> com certificado.</p>
+          <button onClick={outros} className="mt-4 inline-flex items-center gap-2 rounded-full border border-[hsl(var(--cat-gold))] px-5 py-2.5 font-semibold text-[hsl(var(--cat-gold))]"><MessageCircle className="h-4 w-4" />Quero conhecer outros cursos</button>
+        </div>
+      </section>
+
       <section id="form" className="mx-auto mt-12 max-w-5xl px-5">
         <div className="rounded-2xl bg-background p-5 sm:p-8 shadow-sm border border-[hsl(var(--cat-gold)/0.4)]">
           <h2 className="font-serif text-2xl">Fale com a Multplick</h2>
           <p className="mt-1 text-sm opacity-80">Não pedimos CPF, RG nem documentos aqui. Isso é tratado com segurança no atendimento.</p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <label className="text-sm font-medium">Nome*<input className={input + " mt-1"} value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} maxLength={80} /></label>
+            <label className="text-sm font-medium">WhatsApp com DDD*<input type="tel" inputMode="tel" className={input + " mt-1"} value={f.whats} onChange={(e) => setF({ ...f, whats: e.target.value })} placeholder="(18) 99999-9999" maxLength={20} /></label>
             <label className="text-sm font-medium">Cidade/UF*<input className={input + " mt-1"} value={f.cidade} onChange={(e) => setF({ ...f, cidade: e.target.value })} placeholder="Ex.: Presidente Prudente/SP" maxLength={60} /></label>
             <label className="text-sm font-medium sm:col-span-2">Sua experiência na área*<textarea rows={3} className={input + " mt-1"} value={f.exp} onChange={(e) => setF({ ...f, exp: e.target.value })} placeholder="Ex.: 5 anos como auxiliar de refrigeração" maxLength={300} /></label>
             <label className="text-sm font-medium sm:col-span-2">Nome do amigo (opcional)<input className={input + " mt-1"} value={f.amigo} onChange={(e) => setF({ ...f, amigo: e.target.value })} maxLength={80} /></label>
