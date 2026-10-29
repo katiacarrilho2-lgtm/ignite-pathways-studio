@@ -42,6 +42,7 @@ const ESCOPOS = [
 const TIPOS = [
   { v: "percentual_licenciado", label: "Percentual do Licenciado" },
   { v: "valor_fixo_multplick", label: "Valor fixo da Multplick" },
+  { v: "percentual_multplick", label: "% da tabela à Multplick" },
 ];
 
 const empty = (): Partial<Regra> => ({
@@ -182,7 +183,7 @@ function Inner() {
                   <td className="p-2 text-right">{brl(r.preco_minimo_cents)}</td>
                   <td className="p-2 text-right">{brl(r.preco_sugerido_cents)}</td>
                   <td className="p-2 text-right text-amber-700">{brl(r.custo_interno_cents)}</td>
-                  <td className="p-2">{r.tipo_regra === "percentual_licenciado" ? `${Number(r.percentual)}% ao Polo` : `${brl(r.valor_fixo_cents)} à Multplick`}</td>
+                  <td className="p-2">{r.tipo_regra === "percentual_licenciado" ? `${Number(r.percentual)}% ao Polo` : r.tipo_regra === "percentual_multplick" ? `${Number(r.percentual)}% da tabela à Multplick` : `${brl(r.valor_fixo_cents)} à Multplick`}</td>
                   <td className="p-2 text-center">{r.ativo ? "Sim" : "Não"}</td>
                   <td className="p-2 text-right whitespace-nowrap">
                     <Button size="sm" variant="ghost" onClick={() => { setForm({ ...r }); setOpen(true); }}><Pencil className="size-4" /></Button>
@@ -259,11 +260,11 @@ function Inner() {
                 <SelectContent>{TIPOS.map((t) => <SelectItem key={t.v} value={t.v}>{t.label}</SelectItem>)}</SelectContent>
               </Select>
             </div>
-            {form.tipo_regra === "percentual_licenciado" ? (
+            {form.tipo_regra === "percentual_licenciado" || form.tipo_regra === "percentual_multplick" ? (
               <div>
-                <Label>Percentual do Licenciado (%)</Label>
+                <Label>{form.tipo_regra === "percentual_multplick" ? "Percentual da Multplick sobre o preço de tabela (%)" : "Percentual do Licenciado (%)"}</Label>
                 <Input type="number" step="0.01" value={String(form.percentual ?? 0)} onChange={(e) => setForm({ ...form, percentual: Number(e.target.value) })} />
-                <p className="text-[11px] text-muted-foreground mt-1">Calculado somente sobre valores efetivamente recebidos do aluno.</p>
+                <p className="text-[11px] text-muted-foreground mt-1">{form.tipo_regra === "percentual_multplick" ? "Usa o preço sugerido desta regra; se vazio, o preço do curso." : "Calculado somente sobre valores efetivamente recebidos do aluno."}</p>
               </div>
             ) : (
               <div>
