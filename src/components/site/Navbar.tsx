@@ -13,6 +13,7 @@ const links = [
   { to: "/loja", label: "Loja" },
   { to: "/curso-regular", label: "Técnico Regular" },
   { to: "/unicorp", label: "Unicorp" },
+  { to: "/teste-vocacional", label: "Teste Vocacional" },
   { to: "/curso-por-competencia", label: "Técnico por Competência" },
   { to: "/empresas", label: "Empresas" },
   { to: "/in-company", label: "In Company" },

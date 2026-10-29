@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound.tsx";
 import Sobre from "./pages/Sobre.tsx";
 import Cursos from "./pages/Cursos.tsx";
 import CursoPorCompetencia from "./pages/CursoPorCompetencia.tsx";
+import TesteVocacional from "./pages/TesteVocacional.tsx";
 import CursoRegular from "./pages/CursoRegular.tsx";
 import Unicorp from "./pages/Unicorp.tsx";
 import Eja from "./pages/Eja.tsx";
@@ -158,6 +159,7 @@ const App = () => (
               <Route path="/curso-por-competencia" element={<CursoPorCompetencia />} />
               <Route path="/curso-regular" element={<CursoRegular />} />
               <Route path="/unicorp" element={<Unicorp />} />
+              <Route path="/teste-vocacional" element={<TesteVocacional />} />
               <Route path="/eja" element={<Eja />} />
               <Route path="/empresas" element={<Empresas />} />
               <Route path="/in-company" element={<InCompany />} />

@@ -17,6 +17,7 @@ const staticEntries: SitemapEntry[] = [
   { path: "/curso-por-competencia", changefreq: "monthly", priority: "0.8" },
   { path: "/curso-regular", changefreq: "monthly", priority: "0.8" },
   { path: "/unicorp", changefreq: "monthly", priority: "0.8" },
+  { path: "/teste-vocacional", changefreq: "monthly", priority: "0.8" },
   { path: "/eja", changefreq: "monthly", priority: "0.8" },
   { path: "/certifique-sua-experiencia", changefreq: "weekly", priority: "0.8" },
   { path: "/empresas", changefreq: "monthly", priority: "0.7" },
