@@ -460,6 +460,24 @@ export type Database = {
         }
         Relationships: []
       }
+      campanha_visitas: {
+        Row: {
+          campanha: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          campanha: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          campanha?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       certificate_settings: {
         Row: {
           account_id: string
