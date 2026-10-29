@@ -226,7 +226,7 @@ export default function TesteVocacional() {
               <p className="text-muted-foreground">Cursos técnicos regulares com condição especial:</p>
               <p className="text-4xl font-extrabold text-primary">{CAMPANHA.avista}<span className="text-base font-medium text-muted-foreground"> à vista</span></p>
               <p className="font-semibold">ou {CAMPANHA.entrada} de entrada + {CAMPANHA.parcelas} no boleto</p>
-              <Button asChild variant="whatsapp" className="w-full h-14 text-base">
+              <Button asChild variant="whatsapp" className="w-full h-auto min-h-14 py-3 text-base whitespace-normal">
                 <a href={waUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-5" />Clique aqui para pegar o cupom dessa campanha</a>
               </Button>
               {busy && <p className="text-xs text-muted-foreground">Salvando seu resultado…</p>}
