@@ -36,6 +36,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://multplick.live/gerador-curriculo</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://multplick.live/eja</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
