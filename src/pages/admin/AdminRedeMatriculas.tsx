@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, GraduationCap, Search, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useCommercialAccounts } from "@/hooks/useCommercialAccounts";
+import RepassesTabela from "@/components/rede/RepassesTabela";
 
 type Fila = {
   id: string; account_id: string; polo: string; full_name: string; course_title: string;
@@ -164,6 +165,7 @@ export default function AdminRedeMatriculas() {
         <TabsList>
           <TabsTrigger value="pre">Pré-matrículas ({fPre.length})</TabsTrigger>
           <TabsTrigger value="mat">Matrículas ({fMat.length})</TabsTrigger>
+          <TabsTrigger value="rep">Repasses</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pre">
@@ -223,6 +225,14 @@ export default function AdminRedeMatriculas() {
                 </tbody>
               </table>
             </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="rep">
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Repasses devidos pelos Polos</CardTitle>
+              <CardDescription>Gerados ao aprovar a pré-matrícula, conforme as Regras Comerciais.</CardDescription></CardHeader>
+            <CardContent><RepassesTabela podeBaixar poloNome={(id) => polos.find((p) => p.id === id)?.nome ?? "—"} /></CardContent>
           </Card>
         </TabsContent>
       </Tabs>
