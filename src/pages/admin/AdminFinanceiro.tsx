@@ -13,11 +13,12 @@ import { ROOT_ACCOUNT_ID } from "@/lib/multiAccount";
 import { useAuth } from "@/hooks/useAuth";
 import jsPDF from "jspdf";
 import logoUrl from "@/assets/multplick-logo.png";
+import { buildWhatsappLink } from "@/lib/crm";
 
 type Row = {
   id: string; enrollment_id: string; numero: number; valor_cents: number;
   vencimento: string | null; status: string; paid_at: string | null;
-  student_name: string | null; student_email: string | null; course_title: string | null;
+  student_name: string | null; student_email: string | null; student_phone: string | null; course_title: string | null;
   forma_pagamento: string | null; desconto_cents: number; valor_final_cents: number | null;
 };
 
@@ -51,10 +52,12 @@ const Inner = () => {
     const { data: enrs } = await supabase.from("enrollments").select("id, user_id, course_id").in("id", enrIds);
     const userIds = Array.from(new Set((enrs ?? []).map((e: any) => e.user_id).filter(Boolean)));
     const courseIds = Array.from(new Set((enrs ?? []).map((e: any) => e.course_id).filter(Boolean)));
-    const [{ data: profs }, { data: cs }] = await Promise.all([
+    const [{ data: profs }, { data: cs }, { data: sps }] = await Promise.all([
       userIds.length ? supabase.from("profiles").select("user_id, display_name, email").in("user_id", userIds) : Promise.resolve({ data: [] }),
       courseIds.length ? supabase.from("courses").select("id, title").in("id", courseIds) : Promise.resolve({ data: [] }),
+      userIds.length ? supabase.from("student_profiles").select("user_id, phone, phone1, phone2").in("user_id", userIds) : Promise.resolve({ data: [] }),
     ]);
+    const spMap = new Map((sps ?? []).map((sp: any) => [sp.user_id, sp]));
     const eMap = new Map((enrs ?? []).map((e: any) => [e.id, e]));
     const pMap = new Map((profs ?? []).map((p: any) => [p.user_id, p]));
     const cMap = new Map((cs ?? []).map((c: any) => [c.id, c]));
@@ -70,7 +73,9 @@ const Inner = () => {
         desconto_cents: safeCents(i.desconto_cents),
         valor_final_cents: i.valor_final_cents == null ? null : safeCents(i.valor_final_cents),
         status: isAtrasado ? "atrasado" : (i.status ?? "aberto"),
-        student_name: p?.display_name ?? null, student_email: p?.email ?? null, course_title: c?.title ?? null };
+        student_name: p?.display_name ?? null, student_email: p?.email ?? null,
+        student_phone: (() => { const sp: any = e ? spMap.get(e.user_id) : null; return sp?.phone1 || sp?.phone || sp?.phone2 || null; })(),
+        course_title: c?.title ?? null };
     }));
     setLoading(false);
   };
@@ -226,9 +231,15 @@ const Inner = () => {
     doc.save(`recibo_${safe(r.student_name)}_parc${r.numero}.pdf`);
   };
 
-  const enviarWhats = (r: Row) => {
-    const msg = `Olá ${r.student_name ?? ""}, segue em anexo o recibo de pagamento do curso ${r.course_title ?? ""}. Atenciosamente, equipe Multplick.`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank", "noopener,noreferrer");
+  const enviarWhats = (r: Row, tipo: "recibo" | "cobranca" = "recibo") => {
+    const nome = r.student_name ?? "";
+    const venc = r.vencimento ? new Date(r.vencimento).toLocaleDateString("pt-BR") : "";
+    const msg = tipo === "recibo"
+      ? `Olá ${nome}, segue o recibo de pagamento da parcela ${r.numero} do curso ${r.course_title ?? ""}. Atenciosamente, equipe Multplick.`
+      : `Olá ${nome}, tudo bem? Passando para lembrar da parcela ${r.numero} do curso ${r.course_title ?? ""}, no valor de ${brl(r.valor_final_cents ?? r.valor_cents)}${venc ? `, com vencimento em ${venc}` : ""}. Qualquer dúvida estamos à disposição. Equipe Multplick.`;
+    if (!r.student_phone) toast.info("Aluno sem telefone na ficha — escolha o contato no WhatsApp.");
+    const url = r.student_phone ? buildWhatsappLink(r.student_phone, msg) : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -298,6 +309,11 @@ const Inner = () => {
                     <div className="flex justify-end gap-2 flex-wrap" key={`${r.id}-${r.status}-${r.paid_at ?? "sem-pagamento"}`}>
                       {r.status !== "pago" && r.status !== "cancelado" && canSettle && (
                         <Button size="sm" variant="outline" onClick={() => marcarPago(r.id)}>Marcar como pago</Button>
+                      )}
+                      {(r.status === "aberto" || r.status === "atrasado") && (
+                        <Button size="sm" variant="outline" onClick={() => enviarWhats(r, "cobranca")} title="Cobrar via WhatsApp" className="text-emerald-600 hover:text-emerald-700">
+                          <MessageCircle className="size-4 mr-1" /> Cobrar
+                        </Button>
                       )}
                       {r.status === "pago" && (
                         <>

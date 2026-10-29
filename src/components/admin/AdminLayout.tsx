@@ -41,6 +41,7 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/parceiros", label: "Parceiros", icon: Handshake, perm: "manage_courses", mod: "mod_parceiros" },
   { to: "/admin/loja", label: "Loja · Cupons e Pedidos", icon: Tag, perm: "manage_courses", mod: "mod_cupons" },
   { to: "/admin/marketing", label: "Central de Marketing", icon: Rocket, perm: "manage_courses", mod: "mod_marketing" },
+  { to: "/admin/secretaria", label: "Secretaria Escolar", icon: Building2, perm: "manage_courses", mod: "mod_alunos" },
   { to: "/admin/alunos", label: "Alunos", icon: UserCheck, perm: "manage_courses", mod: "mod_alunos" },
   { to: "/admin/pre-matriculas", label: "Pré-matrículas", icon: ClipboardList, perm: "manage_courses", mod: "mod_pre_matriculas" },
   { to: "/admin/turmas", label: "Turmas", icon: Users2, perm: "manage_courses", mod: "mod_turmas" },
