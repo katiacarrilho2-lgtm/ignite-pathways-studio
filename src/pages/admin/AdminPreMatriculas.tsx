@@ -732,7 +732,7 @@ const Inner = () => {
               <th className="text-left p-3">Vendedor</th>
               <th className="text-left p-3">Recebido</th>
               <th className="text-left p-3">Status</th>
-              <th></th>
+              <th className="text-left p-3 sticky right-0 bg-secondary z-10 shadow-[-6px_0_8px_-6px_hsl(var(--foreground)/0.25)]">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -790,7 +790,7 @@ const Inner = () => {
                     </div>
                   )}
                 </td>
-                <td className="p-3 text-right whitespace-nowrap">
+                <td className="p-3 text-right whitespace-nowrap sticky right-0 bg-card z-10 shadow-[-6px_0_8px_-6px_hsl(var(--foreground)/0.25)]">
                   {!isPolo && isPending(a) && a.course_id && (
                     <Button size="sm" variant="hero" onClick={() => openMatricular(a)} className="mr-1">
                       <UserPlus className="size-4" /> Matricular
