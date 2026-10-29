@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MessageCircle, UserCheck, ClipboardList, Users2, CalendarCheck, FileCheck2, Search } from "lucide-react";
+import { GraduationCap, MessageCircle, UserCheck, ClipboardList, Users2, CalendarCheck, FileCheck2, Search } from "lucide-react";
 import { buildWhatsappLink } from "@/lib/crm";
 import { toast } from "sonner";
 
@@ -78,6 +78,7 @@ export default function AdminSecretaria() {
 
   const atalhos = [
     { to: "/admin/alunos", label: "Alunos e fichas", icon: UserCheck },
+    { to: "/admin/matriculas", label: "Matrículas", icon: GraduationCap },
     { to: "/admin/pre-matriculas", label: "Pré-matrículas", icon: ClipboardList },
     { to: "/admin/turmas", label: "Turmas", icon: Users2 },
     { to: "/admin/chamada", label: "Lista de chamada", icon: CalendarCheck },
@@ -90,7 +91,7 @@ export default function AdminSecretaria() {
         <h1 className="text-3xl font-bold text-primary">Secretaria Escolar</h1>
         <p className="text-muted-foreground">Tudo da secretaria em um só lugar.</p>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
         {atalhos.map((a) => (
           <Link key={a.to} to={a.to} className="bg-card border border-border rounded-xl p-4 hover:border-primary flex flex-col gap-2">
             <a.icon className="size-5 text-primary" /><span className="text-sm font-medium">{a.label}</span>
