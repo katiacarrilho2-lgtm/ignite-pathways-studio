@@ -32,6 +32,7 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/certificacao", label: "Certificação e Documentação para Conselhos", icon: FileCheck2, perm: "manage_certification", mod: "mod_certificacao" },
   { to: "/admin/documentos-links", label: "Links de Documentos", icon: LinkIcon, perm: "manage_courses", mod: "mod_documentos_links" },
   { to: "/admin/crm", label: "CRM", icon: Kanban, perm: "manage_leads", mod: "mod_crm" },
+  { to: "/admin/campanha-competencia", label: "Campanha Competência", icon: Kanban, perm: "manage_leads", mod: "mod_crm" },
   { to: "/admin/connect", label: "Multplick Connect", icon: MessagesSquare, perm: "manage_leads", mod: "mod_connect" },
   { to: "/admin/cursos", label: "Cursos", icon: GraduationCap, perm: "manage_courses", mod: "mod_cursos" },
   { to: "/admin/cursos/ia", label: "Gerar Curso IA", icon: Sparkles, perm: "manage_courses", mod: "mod_cursos_ia" },
