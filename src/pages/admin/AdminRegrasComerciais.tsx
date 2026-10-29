@@ -32,7 +32,7 @@ type Regra = {
 
 const brl = (c?: number | null) => ((c ?? 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const toCents = (v: string) => Math.round(parseFloat((v || "0").replace(/\./g, "").replace(",", ".")) * 100) || 0;
-const fromCents = (c?: number | null) => ((c ?? 0) / 100).toFixed(2);
+const fromCents = (c?: number | null) => (c ? (c / 100).toFixed(2) : "");
 
 const ESCOPOS = [
   { v: "curso", label: "Curso" },

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Pencil } from "lucide-react";
 
 type Repasse = {
   id: string; account_id: string; aluno: string | null; curso: string | null;
@@ -36,6 +37,17 @@ export default function RepassesTabela({ podeBaixar = false, poloNome }: { podeB
     load();
   };
 
+  const editarValor = async (r: Repasse) => {
+    const atual = r.valor_cents ? (r.valor_cents / 100).toFixed(2).replace(".", ",") : "";
+    const v = window.prompt(`Valor do repasse para ${r.aluno ?? "aluno"} (R$):`, atual);
+    if (v === null) return;
+    const cents = Math.round(parseFloat((v || "0").replace(/\./g, "").replace(",", ".")) * 100) || 0;
+    const { error } = await supabase.from("rede_repasses" as any).update({ valor_cents: cents }).eq("id", r.id);
+    if (error) return toast.error(error.message);
+    toast.success("Valor atualizado");
+    load();
+  };
+
   const pendente = rows.filter((r) => r.status === "pendente").reduce((s, r) => s + r.valor_cents, 0);
   const recebido = rows.filter((r) => r.status === "recebido").reduce((s, r) => s + r.valor_cents, 0);
 
@@ -59,7 +71,14 @@ export default function RepassesTabela({ podeBaixar = false, poloNome }: { podeB
                 {poloNome && <td className="pr-3">{poloNome(r.account_id)}</td>}
                 <td className="pr-3 font-medium">{r.aluno ?? "—"}</td>
                 <td className="pr-3 text-muted-foreground">{r.curso ?? "—"}</td>
-                <td className="pr-3 font-semibold">{r.valor_cents ? brl(r.valor_cents) : "Sem regra"}</td>
+                <td className="pr-3 font-semibold whitespace-nowrap">
+                  {r.valor_cents ? brl(r.valor_cents) : "A definir"}
+                  {podeBaixar && (
+                    <Button size="sm" variant="ghost" className="ml-1 h-7 px-2" onClick={() => editarValor(r)} aria-label="Editar valor">
+                      <Pencil className="size-3.5" />
+                    </Button>
+                  )}
+                </td>
                 <td className="pr-3 text-xs">{r.status === "recebido" ? `Repassado em ${dataBr(r.recebido_em)}` : "Pendente"}</td>
                 {podeBaixar && <td className="text-right">
                   <Button size="sm" variant="outline" onClick={() => marcar(r, r.status !== "recebido")}>
