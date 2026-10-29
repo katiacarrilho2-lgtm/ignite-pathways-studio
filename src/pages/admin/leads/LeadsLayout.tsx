@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Inbox, Database, Upload } from "lucide-react";
+import { Inbox, Database, Upload, Globe } from "lucide-react";
 import { RequirePermission } from "@/components/admin/AdminLayout";
 import { usePortalBase } from "@/lib/portal";
 
 const mkTabs = (base: string) => [
   { to: `${base}/leads`, label: "Recebidos", icon: Inbox, end: true },
+  { to: `${base}/leads/entradas`, label: "Entradas Site/Campanhas", icon: Globe },
   { to: `${base}/leads/banco`, label: "Banco de Leads", icon: Database },
   { to: `${base}/leads/importar`, label: "Importar / Colar lista", icon: Upload },
 ];
