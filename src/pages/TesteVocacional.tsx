@@ -150,7 +150,7 @@ export default function TesteVocacional() {
       _tipo: "consulta",
       _dados: { ...f, whatsapp: f.whatsapp.replace(/\D/g, ""), curso: `Teste vocacional: ${AREAS[res].titulo}`,
         profissao: AREAS[res].perfil, polo: o.polo, consultor: o.consultor, campanha: o.campanha || "teste-vocacional" },
-    }).then(({ error }) => error && console.warn("lead não salvo", error.message));
+    }).then(({ error }: any) => error && console.warn("lead não salvo", error.message));
     setBusy(false);
   };
 
