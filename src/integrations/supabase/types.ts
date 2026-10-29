@@ -4698,6 +4698,56 @@ export type Database = {
           },
         ]
       }
+      rede_repasses: {
+        Row: {
+          account_id: string
+          aluno: string | null
+          application_id: string
+          course_id: string | null
+          created_at: string
+          curso: string | null
+          id: string
+          recebido_em: string | null
+          recebido_por: string | null
+          status: string
+          valor_cents: number
+        }
+        Insert: {
+          account_id: string
+          aluno?: string | null
+          application_id: string
+          course_id?: string | null
+          created_at?: string
+          curso?: string | null
+          id?: string
+          recebido_em?: string | null
+          recebido_por?: string | null
+          status?: string
+          valor_cents?: number
+        }
+        Update: {
+          account_id?: string
+          aluno?: string | null
+          application_id?: string
+          course_id?: string | null
+          created_at?: string
+          curso?: string | null
+          id?: string
+          recebido_em?: string | null
+          recebido_por?: string | null
+          status?: string
+          valor_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rede_repasses_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: true
+            referencedRelation: "enrollment_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       repasse_contratos: {
         Row: {
           ativo: boolean
@@ -6173,6 +6223,10 @@ export type Database = {
           tipo_regra: string
           valor_fixo_cents: number
         }[]
+      }
+      polo_repasse_devido: {
+        Args: { _account: string; _course_id: string }
+        Returns: number
       }
       polo_resumo_comercial: {
         Args: { _account?: string; _ym?: string }

@@ -47,6 +47,7 @@ const groups: Group[] = [
     title: "Gestão",
     items: [
       { to: "/polo/financeiro", label: "Financeiro", icon: DollarSign, mod: "mod_financeiro" },
+      { to: "/polo/repasses", label: "Regras e Repasses", icon: DollarSign },
       { to: "/polo/relatorios/pagamentos", label: "Relatórios", icon: FileBarChart, mod: "mod_relatorios" },
       { to: "/polo/usuarios", label: "Usuários / Equipe", icon: Users, mod: "mod_usuarios" },
     ],

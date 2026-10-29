@@ -139,6 +139,7 @@ import { SiteLayout } from "./components/site/SiteLayout";
 import { AdminLayout } from "./components/admin/AdminLayout";
 import { PoloLayout } from "./components/polo/PoloLayout";
 import PoloCriativos from "./pages/polo/PoloCriativos.tsx";
+import PoloRepasses from "./pages/polo/PoloRepasses.tsx";
 import { AlunoLayout } from "./components/aluno/AlunoLayout";
 import { AuthProvider } from "./hooks/useAuth";
 import { useReferralCapture } from "./hooks/useReferralCapture";
@@ -226,6 +227,7 @@ const App = () => (
                 <Route path="importar" element={<LeadsImportar />} />
               </Route>
               <Route path="criativos" element={<PoloCriativos />} />
+              <Route path="repasses" element={<PoloRepasses />} />
               <Route path="pre-matriculas" element={<AdminPreMatriculas />} />
               <Route path="afiliados" element={<AdminAfiliados />} />
               <Route path="meu-afiliado" element={<AlunoAfiliado />} />
