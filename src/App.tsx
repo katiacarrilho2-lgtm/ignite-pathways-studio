@@ -304,6 +304,9 @@ const App = () => (
               <Route path="mensagens" element={<AdminMensagens />} />
               <Route path="suporte" element={<AdminSuporte />} />
               <Route path="financeiro" element={<AdminFinanceiro />} />
+              <Route path="secretaria" element={<AdminSecretaria />} />
+              <Route path="matriculas" element={<AdminMatriculas />} />
+              <Route path="campanha-competencia" element={<AdminCampanhaCompetencia />} />
               <Route path="financeiro/repasses" element={<AdminRepasses />} />
               <Route path="relatorios/pagamentos" element={<AdminRelatorioPagamentos />} />
               <Route path="afiliados" element={<AdminAfiliados />} />
