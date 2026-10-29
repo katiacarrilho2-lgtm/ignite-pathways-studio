@@ -18,8 +18,14 @@ import { mapAdminPathToPolo } from "@/lib/portal";
 
 
 
-const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?: Permission; badge?: BadgeChannel }[] = [
+const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?: Permission; badge?: BadgeChannel; group?: string }[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/secretaria", label: "Painel da Secretaria", icon: Building2, perm: "manage_courses", mod: "mod_alunos", group: "Secretaria Escolar" },
+  { to: "/admin/alunos", label: "Alunos e fichas", icon: UserCheck, perm: "manage_courses", mod: "mod_alunos", group: "Secretaria Escolar" },
+  { to: "/admin/matriculas", label: "Matrículas", icon: GraduationCap, perm: "manage_courses", mod: "mod_alunos", group: "Secretaria Escolar" },
+  { to: "/admin/pre-matriculas", label: "Pré-matrículas", icon: ClipboardList, perm: "manage_courses", mod: "mod_pre_matriculas", group: "Secretaria Escolar" },
+  { to: "/admin/turmas", label: "Turmas", icon: Users2, perm: "manage_courses", mod: "mod_turmas", group: "Secretaria Escolar" },
+  { to: "/admin/chamada", label: "Lista de Chamada", icon: CalendarCheck, mod: "mod_frequencia", group: "Secretaria Escolar" },
   { to: "/admin/rede-interna", label: "Rede Interna", icon: Network, mod: "mod_rede_interna" },
   { to: "/admin/agenda", label: "Agenda Geral", icon: CalendarDays, mod: "mod_agenda" },
 
@@ -41,10 +47,6 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/parceiros", label: "Parceiros", icon: Handshake, perm: "manage_courses", mod: "mod_parceiros" },
   { to: "/admin/loja", label: "Loja · Cupons e Pedidos", icon: Tag, perm: "manage_courses", mod: "mod_cupons" },
   { to: "/admin/marketing", label: "Central de Marketing", icon: Rocket, perm: "manage_courses", mod: "mod_marketing" },
-  { to: "/admin/secretaria", label: "Secretaria Escolar", icon: Building2, perm: "manage_courses", mod: "mod_alunos" },
-  { to: "/admin/alunos", label: "Alunos", icon: UserCheck, perm: "manage_courses", mod: "mod_alunos" },
-  { to: "/admin/pre-matriculas", label: "Pré-matrículas", icon: ClipboardList, perm: "manage_courses", mod: "mod_pre_matriculas" },
-  { to: "/admin/turmas", label: "Turmas", icon: Users2, perm: "manage_courses", mod: "mod_turmas" },
   { to: "/admin/usuarios", label: "Usuários", icon: Users, perm: "manage_users", mod: "mod_usuarios" },
   { to: "/admin/cargos", label: "Cargos", icon: Shield, perm: "manage_users", mod: "mod_cargos" },
   { to: "/admin/leads", label: "Leads", icon: Inbox, perm: "manage_leads", mod: "mod_leads", badge: "leads" },
@@ -56,7 +58,6 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
   { to: "/admin/afiliados", label: "Afiliados", icon: Share2, perm: "manage_affiliates", mod: "mod_afiliados" },
   { to: "/admin/meu-afiliado", label: "Meu Afiliado", icon: Share2 },
   { to: "/admin/treinamentos", label: "Treinamentos", icon: Trophy, perm: "manage_users", mod: "mod_treinamentos" },
-  { to: "/admin/chamada", label: "Lista de Chamada", icon: CalendarCheck, mod: "mod_frequencia" },
   { to: "/admin/pedagogico/ocorrencias", label: "Pedagogia", icon: AlertTriangle, mod: "mod_pedagogia" },
   { to: "/admin/escola-fisica", label: "Escola Física", icon: Building2, mod: "mod_escola_fisica" },
   { to: "/admin/almoxarifado", label: "Almoxarifado", icon: Boxes, mod: "mod_almoxarifado" },
@@ -128,11 +129,14 @@ const AdminLayoutInner = () => {
           // Item exclusivo de módulo (sem permissão legada) exige o mod_ correspondente
           if (i.mod && !i.perm) return false;
           return !i.perm || hasPermission(i.perm);
-        }).map(i => {
-
+        }).map((i, idx, arr) => {
+          const showHead = i.group && arr[idx - 1]?.group !== i.group;
+          const endGroup = i.group && arr[idx + 1]?.group !== i.group;
           const count = i.badge ? counts[i.badge] : 0;
           return (
-            <NavLink key={i.to} to={i.to} end={i.to === "/admin"}
+            <div key={i.to} className={endGroup ? "pb-2 mb-2 border-b border-border" : ""}>
+            {showHead && <p className="px-3 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-primary">{i.group}</p>}
+            <NavLink to={i.to} end={i.to === "/admin"}
               className={({ isActive }) => `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-smooth ${isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"}`}>
               <i.icon className="size-4" />
               <span className="flex-1">{i.label}</span>
@@ -142,6 +146,7 @@ const AdminLayoutInner = () => {
                 </span>
               )}
             </NavLink>
+            </div>
           );
         })}
       </nav>
