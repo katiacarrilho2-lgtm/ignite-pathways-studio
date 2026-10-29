@@ -10,6 +10,7 @@ import { NotificationBell } from "@/components/admin/NotificationBell";
 import UrgencyCenter from "@/components/admin/UrgencyCenter";
 import { useEffect, useState } from "react";
 import CrmUrgentAlerts from "@/pages/admin/crm/CrmUrgentAlerts";
+import HistoryNav from "@/components/admin/HistoryNav";
 import InternalMessageAlert from "@/components/admin/InternalMessageAlert";
 import CampaignLeadAlert from "@/components/admin/CampaignLeadAlert";
 import AccountContextBanner from "@/components/admin/AccountContextBanner";
@@ -179,9 +180,15 @@ const AdminLayoutInner = () => {
         </div>
       </header>
       <main className="flex-1 min-w-0 overflow-x-hidden">
-        <div className="hidden md:flex sticky top-0 z-30 h-12 items-center justify-end gap-2 px-4 bg-background/80 backdrop-blur border-b border-border">
-          <UrgencyCenter />
-          <NotificationBell />
+        <div className="md:hidden flex items-center px-3 py-2 border-b border-border bg-background">
+          <HistoryNav />
+        </div>
+        <div className="hidden md:flex sticky top-0 z-30 h-12 items-center justify-between gap-2 px-4 bg-background/80 backdrop-blur border-b border-border">
+          <HistoryNav />
+          <div className="flex items-center gap-2">
+            <UrgencyCenter />
+            <NotificationBell />
+          </div>
         </div>
         <AccountContextBanner />
         <Outlet />
