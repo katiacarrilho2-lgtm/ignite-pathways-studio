@@ -95,8 +95,9 @@ const Eja = () => {
   // Cupom promocional válido apenas no dia — expira à meia-noite
   const today = new Date();
   const yyyymmdd = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, "0")}${String(today.getDate()).padStart(2, "0")}`;
-  const promoCode = `EJA799-${yyyymmdd}`;
-  const promoMsg = `Olá! Quero garantir a promoção do EJA por R$ 799,00.\n\nMeu código de desconto: ${promoCode}\n(válido somente hoje)`;
+  const promoCode = `BLACKEJA499-${yyyymmdd}`;
+  const finalMsg = "Olá! Li todas as informações da página e QUERO FAZER O MEU EJA na Multplick! Podemos negociar minha matrícula?";
+  const promoMsg = `Olá! Quero aproveitar o ESQUENTA BLACK FRIDAY do EJA por R$ 499,90.\n\nMeu código de desconto: ${promoCode}\n(válido somente hoje)`;
 
   const [copied, setCopied] = useState(false);
   const copyPromo = async () => {
@@ -172,81 +173,56 @@ const Eja = () => {
         </div>
       </section>
 
-      {/* Oferta relâmpago — código copiável + contagem regressiva */}
+      {/* Esquenta Black Friday — código copiável + contagem regressiva */}
       <section className="container mb-12">
-        <div
-          className="relative rounded-2xl p-6 md:p-8 shadow-elegant overflow-hidden"
-          style={{
-            background: `linear-gradient(135deg, #FFFFFF 0%, ${CREAM} 100%)`,
-            border: `2px dashed ${GOLD}`,
-          }}
-        >
-          <div className="absolute top-0 left-0 right-0 h-1" style={{ background: `linear-gradient(90deg, ${GOLD_DARK}, ${GOLD}, ${GOLD_DARK})` }} />
-
-          <div className="grid lg:grid-cols-[1.1fr_1fr] gap-6 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.25em] px-2.5 py-1 rounded-full mb-3"
-                style={{ backgroundColor: `${GOLD}22`, color: GOLD_DARK, border: `1px solid ${GOLD}55` }}>
-                <Tag className="size-3.5" /> Oferta válida somente hoje
+        <div className="relative rounded-2xl p-6 md:p-10 shadow-elegant overflow-hidden"
+          style={{ background: "linear-gradient(135deg, #050505 0%, #1a1a1a 55%, #0b0b0b 100%)", border: `2px solid ${GOLD}` }}>
+          <div className="absolute -top-24 -right-24 size-72 rounded-full opacity-25 blur-2xl" style={{ backgroundColor: GOLD }} />
+          <div className="absolute -bottom-24 -left-24 size-72 rounded-full opacity-20 blur-2xl" style={{ backgroundColor: "#E11D2E" }} />
+          <div className="absolute top-0 left-0 right-0 h-1.5" style={{ background: `linear-gradient(90deg, #E11D2E, ${GOLD}, #E11D2E)` }} />
+          <div className="relative grid lg:grid-cols-[1.1fr_1fr] gap-8 items-center">
+            <div className="text-white">
+              <div className="inline-flex items-center gap-2 text-[11px] md:text-xs font-black uppercase tracking-[0.25em] px-3 py-1.5 rounded-full mb-4 animate-pulse"
+                style={{ backgroundColor: "#E11D2E", color: "#fff" }}>
+                <Tag className="size-3.5" /> 🔥 Esquenta Black Friday
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-primary leading-tight">
-                EJA por <span style={{ color: GOLD_DARK }}>apenas R$ 799</span> — condição especial do dia
+              <h2 className="text-3xl md:text-5xl font-black leading-[1.05] uppercase">
+                Black <span style={{ color: GOLD }}>Friday</span> EJA
               </h2>
-              <p className="text-sm text-muted-foreground mt-2">
-                Copie o <strong>código promocional</strong> abaixo e envie no WhatsApp para o consultor.
-                Ele confirma o desconto e negocia a melhor forma de pagamento para você.
+              <div className="mt-4 flex items-end gap-3 flex-wrap">
+                <span className="text-lg line-through opacity-60">R$ 799,00</span>
+                <span className="text-5xl md:text-6xl font-black tabular-nums" style={{ color: GOLD }}>R$ 499,90</span>
+              </div>
+              <p className="text-sm opacity-85 mt-3">
+                Copie o <strong>cupom</strong> e cole para o atendente no WhatsApp. Ele confirma o desconto e
+                negocia a melhor forma de pagamento para você.
               </p>
-
-              <div className="mt-4 flex items-center gap-2 text-sm font-semibold" style={{ color: GOLD_DARK }}>
+              <div className="mt-4 flex items-center gap-2 text-sm font-bold" style={{ color: GOLD }}>
                 <Timer className="size-4 animate-pulse" />
-                Expira em <span className="tabular-nums text-primary">{hh}:{mm}:{ss}</span>
+                Cupom de hoje expira em <span className="tabular-nums text-white">{hh}:{mm}:{ss}</span>
               </div>
             </div>
-
             <div className="flex flex-col gap-3">
-              {/* Caixa do código piscando */}
-              <button
-                type="button"
-                onClick={copyPromo}
-                className="group relative rounded-xl px-5 py-5 text-left transition-smooth hover:shadow-elegant"
-                style={{
-                  background: `linear-gradient(135deg, ${GOLD}15, ${GOLD}30)`,
-                  border: `2px solid ${GOLD}`,
-                }}
-              >
-                <span className="absolute inset-0 rounded-xl animate-pulse pointer-events-none" style={{ boxShadow: `0 0 0 4px ${GOLD}22` }} />
-                <div className="text-[11px] uppercase tracking-widest font-bold" style={{ color: GOLD_DARK }}>
-                  Seu código de desconto
-                </div>
+              <button type="button" onClick={copyPromo}
+                className="relative rounded-xl px-5 py-5 text-left transition-smooth hover:scale-[1.01]"
+                style={{ background: "rgba(255,255,255,0.06)", border: `2px dashed ${GOLD}` }}>
+                <div className="text-[11px] uppercase tracking-widest font-bold" style={{ color: GOLD }}>Seu cupom Black Friday</div>
                 <div className="flex items-center justify-between gap-3 mt-1">
-                  <span className="text-xl md:text-2xl font-black tracking-wider text-primary tabular-nums select-all animate-pulse">
-                    {promoCode}
-                  </span>
-                  <span
-                    className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full"
-                    style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DARK})`, color: "#fff" }}
-                  >
+                  <span className="text-lg md:text-2xl font-black tracking-wider text-white tabular-nums select-all break-all">{promoCode}</span>
+                  <span className="shrink-0 inline-flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-full"
+                    style={{ backgroundColor: GOLD, color: "#000" }}>
                     <Copy className="size-3.5" /> {copied ? "Copiado!" : "Copiar"}
                   </span>
                 </div>
-                <div className="text-[11px] text-muted-foreground mt-2">
-                  Clique no código para copiar automaticamente.
-                </div>
+                <div className="text-[11px] text-white/60 mt-2">Clique para copiar e cole no WhatsApp do atendente.</div>
               </button>
-
-              <Button
-                asChild size="lg"
-                className="w-full hover:opacity-95 shadow-elegant"
-                style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DARK})`, color: "#fff" }}
-              >
+              <Button asChild size="lg" className="w-full h-14 text-base font-black uppercase hover:opacity-95 shadow-elegant"
+                style={{ backgroundColor: "#E11D2E", color: "#fff" }}>
                 <a href={waLink(promoMsg)} target="_blank" rel="noopener noreferrer" onClick={() => { void copyPromo(); }}>
-                  <MessageCircle className="size-4" /> Enviar código no WhatsApp
+                  <MessageCircle className="size-5" /> Enviar cupom no WhatsApp
                 </a>
               </Button>
-
-              <p className="text-[11px] text-muted-foreground text-center">
-                * Proposta com validade até o final do dia. Após esse período, o consultor pode reavaliar a condição.
-              </p>
+              <p className="text-[11px] text-white/60 text-center">* Condição da campanha Esquenta Black Friday, sujeita à confirmação do consultor.</p>
             </div>
           </div>
         </div>
@@ -541,6 +517,15 @@ const Eja = () => {
             </p>
           </div>
         </div>
+      </section>
+      {/* Botão final de decisão */}
+      <section className="container pb-16">
+        <a href={waLink(finalMsg)} target="_blank" rel="noopener noreferrer"
+          className="block w-full text-center rounded-2xl px-6 py-6 md:py-8 text-2xl md:text-4xl font-black uppercase tracking-wide shadow-elegant transition-smooth hover:scale-[1.02] animate-pulse"
+          style={{ background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DARK})`, color: NAVY }}>
+          <MessageCircle className="inline size-8 md:size-10 mr-3 -mt-1" />
+          Quero fazer o meu EJA
+        </a>
       </section>
       </>) }} />
     </>
