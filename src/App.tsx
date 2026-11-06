@@ -75,6 +75,7 @@ import AdminFinanceiro from "./pages/admin/AdminFinanceiro.tsx";
 import AdminSecretaria from "./pages/admin/AdminSecretaria.tsx";
 import LeadsEntradas from "./pages/admin/leads/LeadsEntradas.tsx";
 import AdminCampanhaCompetencia from "./pages/admin/AdminCampanhaCompetencia.tsx";
+import AdminStudioIA from "./pages/admin/AdminStudioIA.tsx";
 import AdminMatriculas from "./pages/admin/AdminMatriculas.tsx";
 import AdminRepasses from "./pages/admin/AdminRepasses.tsx";
 import AdminRelatorioPagamentos from "./pages/admin/AdminRelatorioPagamentos.tsx";
@@ -239,6 +240,7 @@ const App = () => (
               <Route path="financeiro" element={<AdminFinanceiro />} />
               <Route path="secretaria" element={<AdminSecretaria />} />
               <Route path="campanha-competencia" element={<AdminCampanhaCompetencia />} />
+              <Route path="studio-ia" element={<AdminStudioIA />} />
               <Route path="matriculas" element={<AdminMatriculas />} />
               <Route path="relatorios/pagamentos" element={<AdminRelatorioPagamentos />} />
               <Route path="usuarios" element={<AdminUsuarios />} />
@@ -309,6 +311,7 @@ const App = () => (
               <Route path="secretaria" element={<AdminSecretaria />} />
               <Route path="matriculas" element={<AdminMatriculas />} />
               <Route path="campanha-competencia" element={<AdminCampanhaCompetencia />} />
+              <Route path="studio-ia" element={<AdminStudioIA />} />
               <Route path="financeiro/repasses" element={<AdminRepasses />} />
               <Route path="relatorios/pagamentos" element={<AdminRelatorioPagamentos />} />
               <Route path="afiliados" element={<AdminAfiliados />} />
