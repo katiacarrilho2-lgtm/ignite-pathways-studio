@@ -34,11 +34,12 @@ export default function AdminStudioIA() {
   useEffect(() => {
     if (!courseId) return;
     (async () => {
-      const { data } = await supabase.from("course_lessons")
-        .select("id,title,position,content,course_sections!inner(course_id,title,position)")
+      const { data, error } = await supabase.from("course_lessons")
+        .select("id,title,sort_order,content,course_sections!inner(course_id,title,sort_order)")
         .eq("course_sections.course_id", courseId);
+      if (error) toast.error("Erro ao carregar aulas: " + error.message);
       const s = (data ?? []).sort((a: any, b: any) =>
-        (a.course_sections.position - b.course_sections.position) || (a.position - b.position));
+        ((a.course_sections.sort_order ?? 0) - (b.course_sections.sort_order ?? 0)) || ((a.sort_order ?? 0) - (b.sort_order ?? 0)));
       setLessons(s);
     })();
   }, [courseId]);
