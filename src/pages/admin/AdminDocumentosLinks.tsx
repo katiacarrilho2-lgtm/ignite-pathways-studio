@@ -23,20 +23,28 @@ type Doc = {
 };
 
 type StudentDoc = {
-  id: string; user_id: string; doc_type: string; file_path: string; file_name: string | null;
+  id: string; user_id: string | null; link_id: string | null; doc_type: string; file_path: string; file_name: string | null;
   status: string; notes: string | null; created_at: string;
 };
+
+type Pessoa = { key: string; nome: string; contato: string; phone: string | null; rotulo: string | null; docs: StudentDoc[]; ultimo: string };
 
 const StudentDocsPanel = () => {
   const [rows, setRows] = useState<StudentDoc[]>([]);
   const [profs, setProfs] = useState<Record<string, any>>({});
+  const [links, setLinks] = useState<Record<string, any>>({});
   const [q, setQ] = useState("");
+  const [sel, setSel] = useState<string | null>(null);
 
   const load = async () => {
-    const { data } = await supabase.from("student_documents").select("*").order("created_at", { ascending: false });
+    const [{ data }, { data: l }] = await Promise.all([
+      supabase.from("student_documents").select("*").order("created_at", { ascending: false }),
+      supabase.from("document_upload_links").select("id,label,student_name,student_email,student_phone,user_id"),
+    ]);
     const list = (data ?? []) as StudentDoc[];
     setRows(list);
-    const ids = Array.from(new Set(list.map((r) => r.user_id).filter(Boolean)));
+    const lm: any = {}; (l ?? []).forEach((x: any) => { lm[x.id] = x; }); setLinks(lm);
+    const ids = Array.from(new Set(list.map((r) => r.user_id).filter(Boolean))) as string[];
     if (ids.length) {
       const { data: p } = await supabase.from("profiles").select("user_id,display_name,email").in("user_id", ids);
       const m: any = {}; (p ?? []).forEach((x: any) => { m[x.user_id] = x; }); setProfs(m);
@@ -56,13 +64,29 @@ const StudentDocsPanel = () => {
     if (url) window.open(url, "_blank"); else toast.error("Arquivo indisponível");
   };
 
-  const filtered = rows.filter((r) => {
-    const p = profs[r.user_id];
-    return !q || `${p?.display_name ?? ""} ${p?.email ?? ""} ${DOC_LABEL(r.doc_type)}`.toLowerCase().includes(q.toLowerCase());
-  });
+  const pessoas: Pessoa[] = (() => {
+    const g: Record<string, Pessoa> = {};
+    rows.forEach((r) => {
+      const lk = r.link_id ? links[r.link_id] : null;
+      const uid = r.user_id ?? lk?.user_id ?? null;
+      const key = uid ? `u:${uid}` : r.link_id ? `l:${r.link_id}` : `d:${r.id}`;
+      if (!g[key]) {
+        const pr = uid ? profs[uid] : null;
+        const nome = pr?.display_name || lk?.student_name || lk?.label || pr?.email || "Sem nome";
+        g[key] = { key, nome, contato: lk?.student_phone || lk?.student_email || pr?.email || "", phone: lk?.student_phone ?? null,
+          rotulo: lk?.label ?? null, docs: [], ultimo: r.created_at };
+      }
+      g[key].docs.push(r);
+      if (r.created_at > g[key].ultimo) g[key].ultimo = r.created_at;
+    });
+    return Object.values(g).sort((a, b) => b.ultimo.localeCompare(a.ultimo));
+  })();
 
-  const exportar = () => downloadCsv("documentos_alunos", ["Aluno", "E-mail", "Documento", "Arquivo", "Status", "Enviado em"],
-    filtered.map((r) => [profs[r.user_id]?.display_name ?? "", profs[r.user_id]?.email ?? "", DOC_LABEL(r.doc_type), r.file_name ?? "", r.status, dateCsv(r.created_at)]));
+  const filtered = pessoas.filter((p) => !q || `${p.nome} ${p.contato} ${p.rotulo ?? ""}`.toLowerCase().includes(q.toLowerCase()));
+  const atual = pessoas.find((p) => p.key === sel) ?? null;
+
+  const exportar = () => downloadCsv("documentos_alunos", ["Aluno", "Contato", "Documento", "Arquivo", "Status", "Enviado em"],
+    filtered.flatMap((p) => p.docs.map((r) => [p.nome, p.contato, DOC_LABEL(r.doc_type), r.file_name ?? "", r.status, dateCsv(r.created_at)])));
 
   return (
     <div className="space-y-3">
@@ -70,44 +94,60 @@ const StudentDocsPanel = () => {
         <h2 className="text-xl font-bold text-primary">Documentos enviados pelos alunos</h2>
         <Button variant="outline" onClick={exportar}><Download className="size-4" /> Exportar</Button>
       </div>
-      <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar aluno ou documento…" className="max-w-sm" />
-      <div className="bg-card rounded-xl border border-border overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-secondary/60">
-            <tr>
-              <th className="text-left p-3">Aluno</th>
-              <th className="text-left p-3">Documento</th>
-              <th className="text-left p-3">Arquivo</th>
-              <th className="text-left p-3">Status</th>
-              <th className="text-left p-3">Enviado</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((r) => (
-              <tr key={r.id} className="border-t border-border">
-                <td className="p-3">{profs[r.user_id]?.display_name ?? profs[r.user_id]?.email ?? (r.user_id ? r.user_id.slice(0, 8) : "Link público")}</td>
-                <td className="p-3">{DOC_LABEL(r.doc_type)}</td>
-                <td className="p-3 text-muted-foreground truncate max-w-[220px]">{r.file_name ?? "—"}</td>
-                <td className="p-3">
-                  <Select value={r.status} onValueChange={(v) => setStatus(r, v)}>
-                    <SelectTrigger className="w-32 h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pendente">pendente</SelectItem>
-                      <SelectItem value="enviado">enviado</SelectItem>
-                      <SelectItem value="aprovado">aprovado</SelectItem>
-                      <SelectItem value="rejeitado">rejeitado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </td>
-                <td className="p-3 text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</td>
-                <td className="p-3 text-right"><Button size="sm" variant="ghost" onClick={() => open(r.file_path)}><Eye className="size-4" /></Button></td>
-              </tr>
-            ))}
-            {filtered.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-muted-foreground">Nenhum documento enviado.</td></tr>}
-          </tbody>
-        </table>
+      <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar aluno…" className="max-w-sm" />
+      <div className="bg-card rounded-xl border border-border divide-y divide-border">
+        {filtered.map((p) => {
+          const pend = p.docs.filter((d) => d.status === "enviado" || d.status === "pendente").length;
+          return (
+            <button key={p.key} onClick={() => setSel(p.key)} className="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-secondary/40">
+              <div className="min-w-0">
+                <p className="font-semibold text-primary truncate">{p.nome}</p>
+                <p className="text-xs text-muted-foreground truncate">{[p.rotulo, p.contato].filter(Boolean).join(" · ")}</p>
+              </div>
+              <div className="flex items-center gap-3 shrink-0 text-sm">
+                <span className="text-muted-foreground hidden sm:inline">{p.docs.length} documento(s)</span>
+                {pend > 0 && <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-accent text-accent-foreground">{pend} para conferir</span>}
+                <span className="inline-flex items-center gap-1 text-primary font-medium"><Eye className="size-4" /> Conferir</span>
+              </div>
+            </button>
+          );
+        })}
+        {filtered.length === 0 && <p className="p-8 text-center text-muted-foreground">Nenhum documento enviado.</p>}
       </div>
+
+      <Dialog open={!!atual} onOpenChange={(o) => !o && setSel(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{atual?.nome}</DialogTitle></DialogHeader>
+          {atual && (
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">{[atual.rotulo, atual.contato].filter(Boolean).join(" · ")}</p>
+              {atual.phone && (
+                <a href={`https://wa.me/55${atual.phone.replace(/\D/g, "").replace(/^55/, "")}`} target="_blank" rel="noreferrer"
+                  className="text-sm text-primary hover:underline inline-flex items-center gap-1">Falar no WhatsApp <ExternalLink className="size-3" /></a>
+              )}
+              {atual.docs.map((d) => (
+                <div key={d.id} className="flex items-center justify-between gap-2 rounded-lg border border-border px-3 py-2">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{DOC_LABEL(d.doc_type)}</p>
+                    <p className="text-xs text-muted-foreground truncate">{d.file_name} · {new Date(d.created_at).toLocaleDateString("pt-BR")}</p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Select value={d.status} onValueChange={(v) => setStatus(d, v)}>
+                      <SelectTrigger className="w-28 h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="enviado">enviado</SelectItem>
+                        <SelectItem value="aprovado">aprovado</SelectItem>
+                        <SelectItem value="rejeitado">recusado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button size="sm" variant="ghost" onClick={() => open(d.file_path)}><Eye className="size-4" /></Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
