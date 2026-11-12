@@ -253,6 +253,13 @@
       "when": 1794488778188,
       "tag": "0035_tighten_public_settings_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1794505325077,
+      "tag": "0036_certificado_inclui_conteudo_programatico",
+      "breakpoints": true
     }
   ]
 }

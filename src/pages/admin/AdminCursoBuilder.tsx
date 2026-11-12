@@ -41,6 +41,7 @@ function extractYtId(raw: string): string | null {
 }
 import { exportCourseJson } from "@/lib/courseExport";
 import { generateApostila } from "@/lib/apostila";
+import { CourseCertificateDialog } from "@/components/admin/CourseCertificateDialog";
 
 import { uploadCourseImage } from "@/lib/courseMedia";
 import { supabase as sb } from "@/integrations/supabase/client";
@@ -131,6 +132,7 @@ const normalizeLessonContentForSave = (lessonType: Lesson["lesson_type"] | undef
 const Inner = () => {
   const { courseId } = useParams();
   const { isMaster } = useAuth();
+  const [certOpen, setCertOpen] = useState(false);
   const [course, setCourse] = useState<{ title: string; passing_score: number; published: boolean; live_url: string | null; live_label: string | null } | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -759,6 +761,9 @@ const Inner = () => {
             }}>
             <Download className="size-4" /> Apostila do professor
           </Button>
+          <Button size="sm" variant="outline" title="Editar o certificado deste curso" onClick={() => setCertOpen(true)}>
+            🎓 Certificado
+          </Button>
 
           {isMaster && sections.some(s => s.lessons.some((l: any) => !!l.content?.ai_error)) && (
             <Button
@@ -1215,6 +1220,9 @@ const Inner = () => {
         onConfirm={runAi}
       />
 
+      {courseId && (
+        <CourseCertificateDialog open={certOpen} onOpenChange={setCertOpen} courseId={courseId} courseTitle={course?.title ?? ""} sections={sections as any} />
+      )}
       <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>Histórico de versões (últimas 10)</DialogTitle></DialogHeader>
