@@ -104,7 +104,7 @@ const lessonHtml = (lesson: Lesson, gabaritoCollector: Gabarito[], mode: Apostil
   let body = "";
   switch (lesson.lesson_type) {
     case "text":
-      body = lesson.content?.html ?? "<p><em>(sem conteúdo)</em></p>";
+      body = (lesson.content?.image_url ? `<img src="${escapeHtml(lesson.content.image_url)}" crossorigin="anonymous" />` : "") + (lesson.content?.html ?? "<p><em>(sem conteúdo)</em></p>");
       break;
     case "video": {
       const yt = lesson.content?.youtube;

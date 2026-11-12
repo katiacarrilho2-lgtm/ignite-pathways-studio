@@ -277,6 +277,11 @@ const CursoPlayer = () => {
             onPrev={currentIdx > 0 ? goPrev : undefined}
             onDownloadApostila={handleDownloadApostila}
             downloadingApostila={downloadingApostila}
+            courseCover={currentIdx === 0 ? { title: course?.title ?? "", image: course?.image_url ?? course?.cover_url ?? null } : undefined}
+            moduleCover={(() => {
+              const si = sections.findIndex(sec => sec.lessons[0]?.id === current.id);
+              return si >= 0 ? { title: sections[si].title, index: si + 1, image: sections[si].lessons[0]?.content?.module_cover_url ?? sections[si].lessons[0]?.content?.image_url ?? null } : undefined;
+            })()}
             onLessonUpdated={(u) => {
               setSections(secs => secs.map(sec => ({
                 ...sec,
@@ -385,7 +390,44 @@ const SectionList = ({
   );
 };
 
-const LessonView = ({ lesson, progress, onComplete, onNext, onPrev, onDownloadApostila, downloadingApostila, onLessonUpdated }: { lesson: Lesson; progress?: Progress; onComplete: (score?: number) => void; onNext?: () => void; onPrev?: () => void; onDownloadApostila: () => void; downloadingApostila: boolean; onLessonUpdated?: (u: Lesson) => void }) => {
+type CoverInfo = { title: string; image: string | null; index?: number };
+
+const CoverStep = ({ kind, info, onStart }: { kind: "course" | "module"; info: CoverInfo; onStart: () => void }) => (
+  <div className="max-w-5xl mx-auto p-4 sm:p-6 md:p-10">
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-lg">
+      {info.image ? (
+        <LessonImage src={info.image} alt={info.title} className="w-full max-h-[60vh] object-cover" />
+      ) : (
+        <div className="aspect-[16/7] w-full bg-gradient-to-br from-primary/30 via-primary/10 to-secondary grid place-items-center">
+          <BookOpen className="size-16 text-primary" />
+        </div>
+      )}
+      <div className="p-6 sm:p-8 space-y-4 text-center">
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          {kind === "course" ? "Capa do curso" : `Módulo ${info.index ?? ""}`}
+        </p>
+        <h2 className="text-2xl sm:text-4xl font-bold text-foreground leading-tight">{info.title}</h2>
+        <Button variant="hero" size="lg" onClick={onStart}>
+          {kind === "course" ? "Começar o curso" : "Iniciar módulo"} <ArrowRight className="size-4" />
+        </Button>
+      </div>
+    </div>
+  </div>
+);
+
+const LessonView = (props: { lesson: Lesson; progress?: Progress; onComplete: (score?: number) => void; onNext?: () => void; onPrev?: () => void; onDownloadApostila: () => void; downloadingApostila: boolean; onLessonUpdated?: (u: Lesson) => void; courseCover?: CoverInfo; moduleCover?: CoverInfo }) => {
+  const covers: { kind: "course" | "module"; info: CoverInfo }[] = [];
+  if (props.courseCover) covers.push({ kind: "course", info: props.courseCover });
+  if (props.moduleCover) covers.push({ kind: "module", info: props.moduleCover });
+  const [coverIdx, setCoverIdx] = useState(0);
+  if (coverIdx < covers.length) {
+    const c = covers[coverIdx];
+    return <CoverStep kind={c.kind} info={c.info} onStart={() => { setCoverIdx(i => i + 1); window.scrollTo({ top: 0 }); }} />;
+  }
+  return <LessonBody {...props} />;
+};
+
+const LessonBody = ({ lesson, progress, onComplete, onNext, onPrev, onDownloadApostila, downloadingApostila, onLessonUpdated }: { lesson: Lesson; progress?: Progress; onComplete: (score?: number) => void; onNext?: () => void; onPrev?: () => void; onDownloadApostila: () => void; downloadingApostila: boolean; onLessonUpdated?: (u: Lesson) => void }) => {
   const done = !!progress?.completed;
   const attachments: { kind: string; title: string; url: string }[] = lesson.content?.attachments ?? [];
   const TypeIcon = ICONS[lesson.lesson_type];
@@ -524,6 +566,65 @@ const VideoBlock = ({ lesson, done, onComplete }: { lesson: Lesson; done: boolea
   );
 };
 
+const splitTopics = (html: string): string[] => {
+  if (!html || typeof DOMParser === "undefined") return html ? [html] : [];
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
+  const root = doc.body.firstElementChild as HTMLElement | null;
+  if (!root) return [html];
+  const chunks: string[] = [];
+  let cur = "";
+  Array.from(root.childNodes).forEach((n) => {
+    const tag = (n as HTMLElement).tagName;
+    if ((tag === "H1" || tag === "H2" || tag === "H3") && cur.replace(/<[^>]+>|\s/g, "").length > 0) {
+      chunks.push(cur); cur = "";
+    }
+    cur += (n as HTMLElement).outerHTML ?? n.textContent ?? "";
+  });
+  if (cur.trim()) chunks.push(cur);
+  return chunks.length ? chunks : [html];
+};
+
+const TopicStepper = ({ html, fallbackImage, title }: { html: string; fallbackImage?: string | null; title: string }) => {
+  const topics = useMemo(() => splitTopics(html), [html]);
+  const [i, setI] = useState(0);
+  const topRef = useRef<HTMLDivElement>(null);
+  const go = (n: number) => { setI(n); topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  const chunk = topics[i] ?? "";
+  const hasImg = /<img\s/i.test(chunk);
+  const article = "lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/85 prose-li:text-foreground/85 prose-strong:text-foreground prose-a:text-primary";
+  if (topics.length <= 1) {
+    return <article className={article} dangerouslySetInnerHTML={{ __html: html }} />;
+  }
+  return (
+    <div ref={topRef} className="space-y-5 scroll-mt-20">
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">Tópico {i + 1} de {topics.length}</span>
+        <div className="h-2 flex-1 rounded-full bg-secondary overflow-hidden">
+          <div className="h-full bg-primary transition-all" style={{ width: `${((i + 1) / topics.length) * 100}%` }} />
+        </div>
+      </div>
+      {!hasImg && fallbackImage && (
+        <figure className="flex justify-center">
+          <LessonImage src={fallbackImage} alt={title} className="rounded-2xl border border-border w-full h-auto object-cover shadow-md" style={{ maxWidth: "860px" }} />
+        </figure>
+      )}
+      <article className={article} dangerouslySetInnerHTML={{ __html: chunk }} />
+      <div className="flex items-center justify-between gap-2 pt-2">
+        <Button variant="outline" onClick={() => go(i - 1)} disabled={i === 0}>
+          <ArrowLeft className="size-4" /> Tópico anterior
+        </Button>
+        {i < topics.length - 1 ? (
+          <Button variant="hero" onClick={() => go(i + 1)}>
+            Próximo tópico <ArrowRight className="size-4" />
+          </Button>
+        ) : (
+          <span className="text-sm text-muted-foreground">Fim dos tópicos ✓</span>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: boolean }) => {
   const html: string = pickLessonHtml(lesson.content);
   const flashcards: { front: string; back: string }[] = lesson.content?.flashcards ?? lesson.content?.items ?? [];
@@ -549,12 +650,12 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
         </div>
       )}
       {!hideMedia && lesson.content?.youtube?.videoId && <YoutubeEmbed yt={lesson.content.youtube} />}
-      {!hideMedia && !lesson.content?.image_url && PMOC_LESSON_IMAGES[lesson.id] && (
+      {!hideMedia && splitTopics(html).length <= 1 && !lesson.content?.image_url && PMOC_LESSON_IMAGES[lesson.id] && (
         <figure className="flex justify-center">
           <LessonImage src={PMOC_LESSON_IMAGES[lesson.id]} alt={lesson.title} className="rounded-2xl border border-border w-full h-auto object-cover shadow-md" style={{ maxWidth: "860px" }} />
         </figure>
       )}
-      {!hideMedia && lesson.content?.image_url && (
+      {!hideMedia && splitTopics(html).length <= 1 && lesson.content?.image_url && (
         <figure className="flex justify-center">
           <LessonImage
             src={lesson.content.image_url}
@@ -565,10 +666,7 @@ const TextBlock = ({ lesson, hideMedia = false }: { lesson: Lesson; hideMedia?: 
         </figure>
       )}
       {html && (
-        <article
-          className="lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/85 prose-li:text-foreground/85 prose-strong:text-foreground prose-a:text-primary"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <TopicStepper html={html} title={lesson.title} fallbackImage={hideMedia ? null : (lesson.content?.image_url ?? PMOC_LESSON_IMAGES[lesson.id] ?? null)} />
       )}
       {extraImages.length > 0 && (
         <section className="space-y-3">
