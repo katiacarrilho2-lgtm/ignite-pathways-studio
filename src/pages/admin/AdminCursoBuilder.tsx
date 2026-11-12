@@ -23,6 +23,22 @@ import { AiGenerateDialog, type AiOptions } from "@/components/admin/AiGenerateD
 import { LessonImageAiDialog } from "@/components/admin/LessonImageAiDialog";
 import { LessonImageGenDialog } from "@/components/admin/LessonImageGenDialog";
 import { YoutubePickerDialog, type YoutubeVideo } from "@/components/admin/YoutubePickerDialog";
+function extractYtId(raw: string): string | null {
+  const s = raw.trim();
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+  try {
+    const u = new URL(s.startsWith("http") ? s : `https://${s}`);
+    const host = u.hostname.replace(/^www\./, "").replace(/^m\./, "");
+    if (host === "youtu.be") return u.pathname.slice(1).split("/")[0] || null;
+    if (host.endsWith("youtube.com") || host.endsWith("youtube-nocookie.com")) {
+      const v = u.searchParams.get("v"); if (v) return v;
+      const parts = u.pathname.split("/").filter(Boolean);
+      const i = parts.findIndex(p => ["shorts", "embed", "live", "v"].includes(p));
+      if (i >= 0 && parts[i + 1]) return parts[i + 1];
+    }
+  } catch { /* noop */ }
+  return null;
+}
 import { exportCourseJson } from "@/lib/courseExport";
 import { generateApostila } from "@/lib/apostila";
 
@@ -134,6 +150,7 @@ const Inner = () => {
   const [imgAiBusy, setImgAiBusy] = useState(false);
   const [imgGenOpen, setImgGenOpen] = useState(false);
   const [ytPickerOpen, setYtPickerOpen] = useState(false);
+  const [pasteVideoUrl, setPasteVideoUrl] = useState("");
   const [reprocessingFailures, setReprocessingFailures] = useState(false);
   const [cancellingGeneration, setCancellingGeneration] = useState(false);
   // uploadingImg keeps the dropzone hint state in sync with the upload
@@ -915,7 +932,7 @@ const Inner = () => {
                 <Input value={editing.title ?? ""} onChange={e => setEditing({ ...editing, title: e.target.value })} />
               </div>
 
-              {(editing.lesson_type === "text" || editing.lesson_type === "video") && (
+              {editing.lesson_type && (
                 <div className="border border-border rounded-lg p-3 bg-secondary/20 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <Label className="text-sm">Vídeo do YouTube</Label>
@@ -937,6 +954,27 @@ const Inner = () => {
                       Nenhum vídeo associado. A busca usa a API oficial do YouTube — nenhuma URL é gerada pela IA.
                     </p>
                   )}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Cole aqui o link do vídeo (YouTube)"
+                      value={pasteVideoUrl}
+                      onChange={e => setPasteVideoUrl(e.target.value)}
+                    />
+                    <Button type="button" size="sm" onClick={() => {
+                      const id = extractYtId(pasteVideoUrl);
+                      if (!id) { toast.error("Link do YouTube inválido"); return; }
+                      const url = `https://www.youtube.com/watch?v=${id}`;
+                      setEditing({ ...editing, content: { ...(editing.content ?? {}), youtube: { videoId: id, title: editing.title || "Vídeo da aula", channel: "", thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`, url } } });
+                      setPasteVideoUrl("");
+                      toast.success("Vídeo adicionado à aula");
+                    }}>Usar link</Button>
+                    {editing.content?.youtube?.videoId && (
+                      <Button type="button" size="sm" variant="ghost" onClick={() => {
+                        const c = { ...(editing.content ?? {}) }; delete c.youtube;
+                        setEditing({ ...editing, content: c });
+                      }}>Remover</Button>
+                    )}
+                  </div>
                 </div>
               )}
 
