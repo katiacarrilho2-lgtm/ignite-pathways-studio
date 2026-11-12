@@ -246,6 +246,13 @@
       "when": 1794488468141,
       "tag": "0034_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1794488778188,
+      "tag": "0035_tighten_public_settings_reads",
+      "breakpoints": true
     }
   ]
 }
