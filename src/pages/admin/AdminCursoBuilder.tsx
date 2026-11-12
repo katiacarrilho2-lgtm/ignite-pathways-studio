@@ -964,9 +964,15 @@ const Inner = () => {
                       const id = extractYtId(pasteVideoUrl);
                       if (!id) { toast.error("Link do YouTube inválido"); return; }
                       const url = `https://www.youtube.com/watch?v=${id}`;
-                      setEditing({ ...editing, content: { ...(editing.content ?? {}), youtube: { videoId: id, title: editing.title || "Vídeo da aula", channel: "", thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`, url } } });
+                      const newContent = { ...(editing.content ?? {}), youtube: { videoId: id, title: editing.title || "Vídeo da aula", channel: "", thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`, url } };
+                      setEditing({ ...editing, content: newContent });
                       setPasteVideoUrl("");
-                      toast.success("Vídeo adicionado à aula");
+                      if (editing.id) {
+                        supabase.from("course_lessons").update({ content: newContent }).eq("id", editing.id).select("id").then(({ data, error }) => {
+                          if (error || !data?.length) toast.error("Não foi possível salvar o vídeo: " + (error?.message ?? "sem permissão"));
+                          else toast.success("Vídeo salvo na aula — já aparece para o aluno");
+                        });
+                      } else toast.success("Vídeo adicionado — clique em Salvar para gravar a aula");
                     }}>Usar link</Button>
                     {editing.content?.youtube?.videoId && (
                       <Button type="button" size="sm" variant="ghost" onClick={() => {
