@@ -239,6 +239,13 @@
       "when": 1793303350497,
       "tag": "0033_polo_regras_tipo_percentual_multplick",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794488468141,
+      "tag": "0034_migration",
+      "breakpoints": true
     }
   ]
 }
