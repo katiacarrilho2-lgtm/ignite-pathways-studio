@@ -31,7 +31,7 @@ type Lesson = {
   sort_order: number; content: any; video_path: string | null;
   duration_seconds: number | null; passing_score: number;
 };
-type Section = { id: string; title: string; sort_order: number; lessons: Lesson[] };
+type Section = { id: string; title: string; sort_order: number; ai_meta?: any; lessons: Lesson[] };
 type Progress = { lesson_id: string; completed: boolean; score: number | null };
 
 const ICONS = { video: Video, text: FileText, quiz: HelpCircle, flip: RotateCw, accordion: Rows } as const;
@@ -280,7 +280,7 @@ const CursoPlayer = () => {
             courseCover={currentIdx === 0 ? { title: course?.title ?? "", image: course?.image_url ?? course?.cover_url ?? null } : undefined}
             moduleCover={(() => {
               const si = sections.findIndex(sec => sec.lessons[0]?.id === current.id);
-              return si >= 0 ? { title: sections[si].title, index: si + 1, image: sections[si].lessons[0]?.content?.module_cover_url ?? sections[si].lessons[0]?.content?.image_url ?? null } : undefined;
+              return si >= 0 ? { title: sections[si].title, index: si + 1, image: sections[si].ai_meta?.cover_url ?? sections[si].lessons[0]?.content?.module_cover_url ?? sections[si].lessons[0]?.content?.image_url ?? null } : undefined;
             })()}
             onLessonUpdated={(u) => {
               setSections(secs => secs.map(sec => ({
@@ -566,7 +566,7 @@ const VideoBlock = ({ lesson, done, onComplete }: { lesson: Lesson; done: boolea
   );
 };
 
-const splitTopics = (html: string): string[] => {
+export const splitTopics = (html: string): string[] => {
   if (!html || typeof DOMParser === "undefined") return html ? [html] : [];
   const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
   const root = doc.body.firstElementChild as HTMLElement | null;
@@ -584,7 +584,7 @@ const splitTopics = (html: string): string[] => {
   return chunks.length ? chunks : [html];
 };
 
-const TopicStepper = ({ html, fallbackImage, title }: { html: string; fallbackImage?: string | null; title: string }) => {
+export const TopicStepper = ({ html, fallbackImage, title }: { html: string; fallbackImage?: string | null; title: string }) => {
   const topics = useMemo(() => splitTopics(html), [html]);
   const [i, setI] = useState(0);
   const topRef = useRef<HTMLDivElement>(null);

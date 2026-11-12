@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink, Pencil, Image as ImageIconLucide } from "lucide-react";
+import { TopicStepper } from "@/pages/aluno/CursoPlayer";
 import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
 import { FlashDeck } from "@/components/gamer/FlashDeck";
 import { PmocLessonExtras, PMOC_LESSON_IMAGES } from "@/components/gamer/PmocTools";
@@ -194,7 +195,7 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
         </div>
       )}
 
-      {imageUrl && !yt?.videoId && (
+      {imageUrl && !yt?.videoId && !body && (
         <figure className="flex justify-center">
           <img
             src={imageUrl}
@@ -209,10 +210,7 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
       <PmocLessonExtras lessonId={lesson.id} />
 
       {body && (
-        <div
-          className="lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:font-bold prose-a:text-primary"
-          dangerouslySetInnerHTML={{ __html: body }}
-        />
+        <TopicStepper key={lesson.id} html={body} title={lesson.title} fallbackImage={imageUrl ?? null} />
       )}
 
       {extraImages.length > 0 && (

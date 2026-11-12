@@ -368,6 +368,17 @@ const Inner = () => {
     const { error } = await supabase.from("course_sections").update({ title }).eq("id", s.id);
     if (error) toast.error(error.message); else load();
   };
+  const setSectionCover = (s: Section) => {
+    const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*";
+    inp.onchange = async () => {
+      const f = inp.files?.[0]; if (!f) return;
+      const url = await uploadCourseImage(f, `modules/${s.id}`);
+      if (!url) { toast.error("Falha ao enviar imagem"); return; }
+      const { error } = await supabase.from("course_sections").update({ ai_meta: { ...(s.ai_meta ?? {}), cover_url: url } }).eq("id", s.id);
+      if (error) toast.error(error.message); else { toast.success("Imagem do módulo salva"); load(); }
+    };
+    inp.click();
+  };
   const removeSection = async (s: Section) => {
     if (!confirm(`Excluir seção "${s.title}" e todas as aulas dentro?`)) return;
     const { error } = await supabase.from("course_sections").delete().eq("id", s.id);
@@ -811,6 +822,9 @@ const Inner = () => {
                     <Sparkles className="size-3.5 text-primary" />
                   </Button>
                 )}
+                <Button size="sm" variant="ghost" title="Imagem de capa do módulo" onClick={() => setSectionCover(s)}>
+                  {s.ai_meta?.cover_url ? <img src={s.ai_meta.cover_url} alt="" className="size-5 rounded object-cover" /> : <span className="text-xs">🖼️ Capa</span>}
+                </Button>
                 <Button size="sm" variant="ghost" onClick={() => renameSection(s)}><Pencil className="size-3.5" /></Button>
                 <Button size="sm" variant="ghost" onClick={() => removeSection(s)} className="text-destructive"><Trash2 className="size-3.5" /></Button>
               </div>
