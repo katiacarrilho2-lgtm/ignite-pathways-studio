@@ -41,6 +41,25 @@ export const RichTextEditor = ({ value, onChange, onUploadImage, minHeight = 280
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const topicMode = useRef(false);
+  const uploadRef = useRef<Props["onUploadImage"]>(undefined);
+  const editorRef = useRef<any>(null);
+  const pasteFiles = (files: File[], pos?: number) => {
+    const imgs = files.filter((f) => f.type.startsWith("image/"));
+    const up = uploadRef.current; const ed = editorRef.current;
+    if (!imgs.length || !up || !ed) return false;
+    (async () => {
+      setUploading(true);
+      try {
+        for (const f of imgs) {
+          const url = await up(f);
+          if (!url) continue;
+          if (typeof pos === "number") ed.chain().focus().insertContentAt(pos, { type: "image", attrs: { src: url } }).run();
+          else ed.chain().focus().setImage({ src: url }).run();
+        }
+      } finally { setUploading(false); }
+    })();
+    return true;
+  };
 
   const editor = useEditor({
     extensions: [
@@ -60,9 +79,22 @@ export const RichTextEditor = ({ value, onChange, onUploadImage, minHeight = 280
         class: "prose prose-slate max-w-none focus:outline-none px-4 py-3",
         style: `min-height:${minHeight}px`,
       },
+      handlePaste: (_view, event) => {
+        const files = Array.from(event.clipboardData?.files ?? []);
+        if (pasteFiles(files)) { event.preventDefault(); event.stopPropagation(); return true; }
+        return false;
+      },
+      handleDrop: (view, event) => {
+        const files = Array.from((event as DragEvent).dataTransfer?.files ?? []);
+        const coords = view.posAtCoords({ left: (event as DragEvent).clientX, top: (event as DragEvent).clientY });
+        if (pasteFiles(files, coords?.pos)) { event.preventDefault(); event.stopPropagation(); return true; }
+        return false;
+      },
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
   });
+  uploadRef.current = onUploadImage;
+  editorRef.current = editor;
 
   // Keep editor in sync if `value` is replaced externally (e.g. opening another lesson)
   useEffect(() => {
