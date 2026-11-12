@@ -88,7 +88,7 @@ export default function AdminCursoPreview() {
     <div className="min-h-screen bg-background">
       <div className="border-b border-border bg-card sticky top-0 z-10">
         <div className="px-6 py-3 flex items-center gap-3">
-          <Button asChild variant="ghost" size="sm"><Link to={`/admin/cursos/${courseId}`}><ArrowLeft className="size-4" /> Voltar ao editor</Link></Button>
+          <Button asChild variant="ghost" size="sm"><Link to={`/admin/cursos/${courseId}/conteudo`}><ArrowLeft className="size-4" /> Voltar ao editor</Link></Button>
           <div className="flex-1">
             <div className="text-xs text-muted-foreground">Pré-visualização · {course.category}</div>
             <h1 className="text-lg font-bold truncate">{course.title}</h1>
