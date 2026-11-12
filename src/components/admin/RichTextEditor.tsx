@@ -40,6 +40,7 @@ const Divider = () => <span className="w-px h-5 bg-border mx-0.5" />;
 export const RichTextEditor = ({ value, onChange, onUploadImage, minHeight = 280 }: Props) => {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const topicMode = useRef(false);
 
   const editor = useEditor({
     extensions: [
@@ -80,9 +81,21 @@ export const RichTextEditor = ({ value, onChange, onUploadImage, minHeight = 280
     setUploading(true);
     try {
       const url = await onUploadImage(file);
-      if (url) editor.chain().focus().setImage({ src: url }).run();
-    } finally { setUploading(false); }
+      if (!url) return;
+      if (topicMode.current) {
+        // Insere logo abaixo do título do tópico onde o cursor está
+        const { state } = editor;
+        const pos = state.selection.from;
+        let insertAt = 0;
+        state.doc.descendants((node, p) => {
+          if (node.type.name === "heading" && p < pos) insertAt = p + node.nodeSize;
+          return false;
+        });
+        editor.chain().focus().insertContentAt(insertAt, { type: "image", attrs: { src: url } }).run();
+      } else editor.chain().focus().setImage({ src: url }).run();
+    } finally { setUploading(false); topicMode.current = false; }
   };
+  const imageSelected = editor.isActive("image");
 
   const setLink = () => {
     const prev = editor.getAttributes("link").href as string | undefined;
@@ -171,9 +184,17 @@ export const RichTextEditor = ({ value, onChange, onUploadImage, minHeight = 280
         <TbBtn title="Link" active={editor.isActive("link")} onClick={setLink}><Link2 className="size-4" /></TbBtn>
         {onUploadImage && (
           <>
-            <TbBtn title="Inserir imagem" onClick={() => fileRef.current?.click()} disabled={uploading}>
+            <TbBtn title="Inserir imagem onde está o cursor" onClick={() => { topicMode.current = false; fileRef.current?.click(); }} disabled={uploading}>
               {uploading ? <Loader2 className="size-4 animate-spin" /> : <ImageIcon className="size-4" />}
             </TbBtn>
+            <TbBtn title="Imagem no início do tópico (clique dentro do tópico antes)" onClick={() => { topicMode.current = true; fileRef.current?.click(); }} disabled={uploading}>
+              <span className="text-xs font-medium px-1">🖼️ Imagem do tópico</span>
+            </TbBtn>
+            {imageSelected && (
+              <TbBtn title="Remover imagem selecionada" onClick={() => editor.chain().focus().deleteSelection().run()}>
+                <span className="text-xs font-medium px-1 text-destructive">🗑️ Remover imagem</span>
+              </TbBtn>
+            )}
             <input ref={fileRef} type="file" accept="image/*" className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImage(f); e.target.value = ""; }} />
           </>

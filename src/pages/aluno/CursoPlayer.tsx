@@ -590,7 +590,6 @@ export const TopicStepper = ({ html, fallbackImage, title }: { html: string; fal
   const topRef = useRef<HTMLDivElement>(null);
   const go = (n: number) => { setI(n); topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); };
   const chunk = topics[i] ?? "";
-  const hasImg = /<img\s/i.test(chunk);
   const article = "lesson-content prose prose-neutral max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/85 prose-li:text-foreground/85 prose-strong:text-foreground prose-a:text-primary";
   if (topics.length <= 1) {
     return <article className={article} dangerouslySetInnerHTML={{ __html: html }} />;
@@ -603,11 +602,6 @@ export const TopicStepper = ({ html, fallbackImage, title }: { html: string; fal
           <div className="h-full bg-primary transition-all" style={{ width: `${((i + 1) / topics.length) * 100}%` }} />
         </div>
       </div>
-      {!hasImg && fallbackImage && (
-        <figure className="flex justify-center">
-          <LessonImage src={fallbackImage} alt={title} className="rounded-2xl border border-border w-full h-auto object-cover shadow-md" style={{ maxWidth: "860px" }} />
-        </figure>
-      )}
       <article className={article} dangerouslySetInnerHTML={{ __html: chunk }} />
       <div className="flex items-center justify-between gap-2 pt-2">
         <Button variant="outline" onClick={() => go(i - 1)} disabled={i === 0}>
