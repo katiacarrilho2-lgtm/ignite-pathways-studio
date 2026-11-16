@@ -1,5 +1,8 @@
 # Roadmap — Rede Multplick
 
+## Envio de vídeo nas aulas
+- [x] Upload junto ao link em todos os tipos de aula, gravação imediata em aulas existentes e reprodução compartilhada na prévia e aluno; dois testes passaram. Teste completo de envio com conta real depende de login na prévia.
+
 ## Etapa 1 — Fundação multi-conta (CONCLUÍDA + revisão de segurança)
 - [x] `account_id` em `profiles` + tabelas dos módulos do Polo (aditivo, backfill para conta ROOT)
 - [x] Funções `current_account_id()`, `is_network_master()`, `account_visible()`, `account_can_write()`

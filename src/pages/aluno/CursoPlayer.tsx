@@ -24,6 +24,7 @@ import { sfx, fireConfetti } from "@/lib/gamer/sfx";
 import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
 import { Pencil } from "lucide-react";
 import { youtubeIdFromUrl } from "@/lib/courseMedia";
+import { UploadedLessonVideo } from "@/components/aluno/UploadedLessonVideo";
 
 type Lesson = {
   id: string; section_id: string; title: string;
@@ -457,6 +458,7 @@ const LessonBody = ({ lesson, progress, onComplete, onNext, onPrev, onDownloadAp
           onSaved={(u) => onLessonUpdated?.({ ...(lesson as any), ...u })}
         />
       )}
+      {lesson.lesson_type !== "video" && lesson.video_path && <UploadedLessonVideo path={lesson.video_path} title={lesson.title} />}
       {lesson.lesson_type === "video" && <VideoBlock lesson={lesson} done={done} onComplete={() => onComplete()} />}
       {lesson.lesson_type === "text" && <TextBlock lesson={lesson} />}
       {lesson.lesson_type === "quiz" && <QuizBlock lesson={lesson} previousScore={progress?.score ?? null} onPass={(s) => onComplete(s)} />}
@@ -523,21 +525,8 @@ const LessonBody = ({ lesson, progress, onComplete, onNext, onPrev, onDownloadAp
 };
 
 const VideoBlock = ({ lesson, done, onComplete }: { lesson: Lesson; done: boolean; onComplete: () => void }) => {
-  const [url, setUrl] = useState<string | null>(null);
-  const ref = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      if (!lesson.video_path) return;
-      const { data, error } = await supabase.storage.from("course-videos").createSignedUrl(lesson.video_path, 60 * 60 * 4);
-      if (!active) return;
-      if (error) toast.error(error.message); else setUrl(data.signedUrl);
-    })();
-    return () => { active = false; };
-  }, [lesson.video_path]);
-
   const yt = lesson.content?.youtube;
-  if (yt?.videoId) {
+  if (yt?.videoId && !lesson.video_path) {
     return (
       <div className="space-y-3">
         <YoutubeEmbed yt={yt} />
@@ -555,10 +544,8 @@ const VideoBlock = ({ lesson, done, onComplete }: { lesson: Lesson; done: boolea
       </Button>
     </div>
   );
-  if (!url) return <div className="aspect-video bg-black/90 rounded-lg grid place-items-center text-white"><Loader2 className="size-6 animate-spin" /></div>;
-
   return (
-    <video ref={ref} src={url} controls className="w-full rounded-lg bg-black"
+    <UploadedLessonVideo path={lesson.video_path} title={lesson.title}
       onTimeUpdate={(e) => {
         const v = e.currentTarget;
         if (!done && v.duration && v.currentTime / v.duration >= 0.95) onComplete();

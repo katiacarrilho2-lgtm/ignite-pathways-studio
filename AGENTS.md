@@ -11,4 +11,6 @@
 
 ## Regras técnicas
 
+- Uploaded lesson videos use the existing private `course-videos` bucket and `course_lessons.video_path` across all lesson types; shared `UploadedLessonVideo` playback uses signed URLs so editor, preview and student views stay consistent without public storage.
+
 - Ilustrações de aula por IA passam pela Edge Function `generate-lesson-image` (gateway Lovable AI, modelo `openai/gpt-image-2.5-sunburst`, SSE) e são salvas no bucket `course-images` via `uploadDataUrlAsImage` — a chave de IA nunca vai para o navegador.

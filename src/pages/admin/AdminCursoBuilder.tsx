@@ -42,6 +42,7 @@ function extractYtId(raw: string): string | null {
 import { exportCourseJson } from "@/lib/courseExport";
 import { generateApostila } from "@/lib/apostila";
 import { CourseCertificateDialog } from "@/components/admin/CourseCertificateDialog";
+import { UploadedLessonVideo } from "@/components/aluno/UploadedLessonVideo";
 
 import { uploadCourseImage } from "@/lib/courseMedia";
 import { supabase as sb } from "@/integrations/supabase/client";
@@ -153,6 +154,8 @@ const Inner = () => {
   const [imgGenOpen, setImgGenOpen] = useState(false);
   const [ytPickerOpen, setYtPickerOpen] = useState(false);
   const [pasteVideoUrl, setPasteVideoUrl] = useState("");
+  const [uploadingVideo, setUploadingVideo] = useState(false);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const [reprocessingFailures, setReprocessingFailures] = useState(false);
   const [cancellingGeneration, setCancellingGeneration] = useState(false);
   // uploadingImg keeps the dropzone hint state in sync with the upload
@@ -631,24 +634,38 @@ const Inner = () => {
 
   const onVideoUpload = async (file: File) => {
     if (!editing || !courseId) return;
+    if (!file.type.startsWith("video/") && !/\.(mp4|webm|mov|m4v)$/i.test(file.name)) return toast.error("Selecione um arquivo de vídeo");
     if (file.size > 600 * 1024 * 1024) return toast.error("Vídeo acima de 600MB. Comprima antes de enviar.");
-    setSaving(true);
+    setUploadingVideo(true);
     try {
       const path = `${courseId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
       const { error } = await supabase.storage.from("course-videos").upload(path, file, { upsert: false, contentType: file.type });
       if (error) throw error;
-      // try to read duration in browser
-      const dur = await new Promise<number | null>((res) => {
-        const v = document.createElement("video");
-        v.preload = "metadata";
-        v.src = URL.createObjectURL(file);
-        v.onloadedmetadata = () => { res(Math.round(v.duration)); URL.revokeObjectURL(v.src); };
-        v.onerror = () => res(null);
-      });
-      setEditing({ ...editing, video_path: path, duration_seconds: dur ?? editing.duration_seconds ?? null });
-      toast.success("Vídeo enviado");
+      if (editing.id) {
+        const { data, error: saveError } = await supabase.from("course_lessons").update({ video_path: path, duration_seconds: null }).eq("id", editing.id).select("id");
+        if (saveError || !data?.length) {
+          await supabase.storage.from("course-videos").remove([path]);
+          throw saveError ?? new Error("Sem permissão para salvar o vídeo na aula");
+        }
+      }
+      setEditing(current => current ? { ...current, video_path: path, duration_seconds: null } : current);
+      toast.success(editing.id ? "Vídeo enviado e salvo na aula" : "Vídeo enviado — clique em Salvar para gravar a aula");
     } catch (e: any) { toast.error(e.message); }
-    finally { setSaving(false); }
+    finally { setUploadingVideo(false); }
+  };
+
+  const removeUploadedVideo = async () => {
+    if (!editing) return;
+    setUploadingVideo(true);
+    try {
+      if (editing.id) {
+        const { data, error } = await supabase.from("course_lessons").update({ video_path: null, duration_seconds: null }).eq("id", editing.id).select("id");
+        if (error || !data?.length) throw error ?? new Error("Sem permissão para remover o vídeo");
+      }
+      setEditing(current => current ? { ...current, video_path: null, duration_seconds: null } : current);
+      toast.success("Vídeo removido da aula");
+    } catch (e: any) { toast.error(e.message); }
+    finally { setUploadingVideo(false); }
   };
 
   const uploadLessonImage = async (file: File): Promise<string | null> => {
@@ -954,7 +971,7 @@ const Inner = () => {
               {editing.lesson_type && (
                 <div className="border border-border rounded-lg p-3 bg-secondary/20 space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <Label className="text-sm">Vídeo do YouTube</Label>
+                    <Label className="text-sm">Vídeo da aula</Label>
                     <Button type="button" size="sm" variant="outline" onClick={() => setYtPickerOpen(true)}>
                       <Video className="size-3.5" /> {editing.content?.youtube?.videoId ? "Trocar vídeo" : "Buscar vídeo"}
                     </Button>
@@ -973,8 +990,9 @@ const Inner = () => {
                       Nenhum vídeo associado. A busca usa a API oficial do YouTube — nenhuma URL é gerada pela IA.
                     </p>
                   )}
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Input
+                      className="min-w-0 flex-1 basis-48"
                       placeholder="Cole aqui o link do vídeo (YouTube)"
                       value={pasteVideoUrl}
                       onChange={e => setPasteVideoUrl(e.target.value)}
@@ -1000,20 +1018,23 @@ const Inner = () => {
                       }}>Remover</Button>
                     )}
                   </div>
-                </div>
-              )}
-
-              {editing.lesson_type === "video" && (
-                <div className="space-y-2">
-                  <Label>Arquivo de vídeo (MP4)</Label>
-                  {editing.video_path && <p className="text-xs text-muted-foreground break-all">Atual: {editing.video_path}{editing.duration_seconds ? ` · ${Math.round(editing.duration_seconds / 60)} min` : ""}</p>}
-                  <label className="flex items-center gap-2 cursor-pointer text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary w-fit">
-                    {saving ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-                    {editing.video_path ? "Trocar vídeo" : "Enviar vídeo"}
-                    <input type="file" accept="video/mp4,video/*" className="hidden" disabled={saving}
-                      onChange={e => e.target.files?.[0] && onVideoUpload(e.target.files[0])} />
-                  </label>
-                  <p className="text-xs text-muted-foreground">Recomendado: MP4 H.264, 10–20 min, até 500 MB.</p>
+                  <div className="space-y-2 border-t border-border pt-3">
+                    <input ref={videoInputRef} type="file" aria-label="Arquivo de vídeo da aula" accept="video/*,.mp4,.webm,.mov,.m4v" className="hidden" disabled={saving || uploadingVideo}
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (file) void onVideoUpload(file);
+                      }} />
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="button" size="sm" variant="outline" disabled={saving || uploadingVideo} onClick={() => videoInputRef.current?.click()}>
+                        {uploadingVideo ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
+                        {uploadingVideo ? "Enviando vídeo…" : editing.video_path ? "Trocar vídeo do computador" : "Carregar vídeo do computador"}
+                      </Button>
+                      {editing.video_path && <Button type="button" size="sm" variant="ghost" disabled={saving || uploadingVideo} onClick={() => void removeUploadedVideo()}><Trash2 className="size-4" /> Remover arquivo de vídeo</Button>}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Preferencialmente MP4 (H.264) para reprodução no navegador.</p>
+                    {editing.video_path && <UploadedLessonVideo path={editing.video_path} title={editing.title ?? "Vídeo da aula"} />}
+                  </div>
                 </div>
               )}
 

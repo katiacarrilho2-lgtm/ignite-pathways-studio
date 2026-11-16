@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, PlayCircle, FileText, HelpCircle, Layers, Wind, ShieldAlert, Ruler, Drill, Wrench, Flame, Droplet, Zap, Gauge, CheckCircle2, Youtube, ExternalLink, Pencil, Image as ImageIconLucide } from "lucide-react";
 import { TopicStepper } from "@/pages/aluno/CursoPlayer";
+import { UploadedLessonVideo } from "@/components/aluno/UploadedLessonVideo";
 import { LessonEditDialog } from "@/components/admin/LessonEditDialog";
 import { FlashDeck } from "@/components/gamer/FlashDeck";
 import { PmocLessonExtras, PMOC_LESSON_IMAGES } from "@/components/gamer/PmocTools";
@@ -43,6 +44,7 @@ type Lesson = {
   sort_order: number;
   duration_seconds: number | null;
   content: any;
+  video_path: string | null;
 };
 
 export default function AdminCursoPreview() {
@@ -60,7 +62,7 @@ export default function AdminCursoPreview() {
       const [{ data: c }, { data: s }, { data: l }] = await Promise.all([
         supabase.from("courses").select("id,title,description,image_url,category").eq("id", courseId).maybeSingle(),
         supabase.from("course_sections").select("id,title,sort_order").eq("course_id", courseId).order("sort_order"),
-        supabase.from("course_lessons").select("id,section_id,title,lesson_type,sort_order,duration_seconds,content").order("sort_order"),
+        supabase.from("course_lessons").select("id,section_id,title,lesson_type,sort_order,duration_seconds,content,video_path").order("sort_order"),
       ]);
       setCourse(c as any);
       const secs = (s ?? []) as Section[];
@@ -183,7 +185,8 @@ function LessonView({ lesson, onUpdated }: { lesson: Lesson; onUpdated?: (u: Les
         <h2 className="text-2xl font-bold">{lesson.title}</h2>
       </header>
 
-      {yt?.videoId && (
+      {lesson.video_path && <UploadedLessonVideo path={lesson.video_path} title={lesson.title} />}
+      {yt?.videoId && (!lesson.video_path || lesson.lesson_type !== "video") && (
         <div className="aspect-video rounded-lg overflow-hidden border border-border bg-black">
           <iframe
             className="w-full h-full"
