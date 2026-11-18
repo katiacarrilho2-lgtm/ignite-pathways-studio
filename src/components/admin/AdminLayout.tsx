@@ -1,7 +1,7 @@
 import { Link, NavLink, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth, Permission } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, GraduationCap, Users, Inbox, LogOut, ExternalLink, Image as ImageIcon, UserCheck, Users2, Activity, MessageSquare, LifeBuoy, DollarSign, FileBarChart, Share2, Kanban, Menu, Megaphone, Tag, Sparkles, ClipboardList, FolderTree, Handshake, Briefcase, MessagesSquare, Trophy, Shield, FileCheck2, Link as LinkIcon, Rocket, Network, Inbox as InboxIcon, Boxes, Building2, CalendarCheck, AlertTriangle, CalendarDays, FolderLock, ShieldCheck, HelpCircle, Award } from "lucide-react";
+import { LayoutDashboard, GraduationCap, Users, Inbox, LogOut, ExternalLink, Image as ImageIcon, UserCheck, Users2, Activity, MessageSquare, LifeBuoy, DollarSign, FileBarChart, Share2, Kanban, Menu, Megaphone, Tag, Sparkles, ClipboardList, FolderTree, Handshake, Briefcase, MessagesSquare, Trophy, Shield, FileCheck2, Link as LinkIcon, Rocket, Network, Inbox as InboxIcon, Boxes, Building2, CalendarCheck, AlertTriangle, CalendarDays, FolderLock, ShieldCheck, HelpCircle, Award, Snowflake } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import logo from "@/assets/multplick-logo.png";
 import { AdminBadgesProvider, useAdminBadges, BadgeChannel } from "@/hooks/useAdminBadges";
@@ -46,6 +46,7 @@ const navItems: { to: string; label: string; icon: any; perm?: Permission; mod?:
 
   { to: "/admin/categorias", label: "Categorias", icon: FolderTree, perm: "manage_courses", mod: "mod_categorias" },
   { to: "/admin/site", label: "Configurações do site", icon: Activity, perm: "manage_courses", mod: "mod_andamento" },
+  { to: "/admin/site-refrigeracao", label: "Página Refrigeração", icon: Snowflake, perm: "manage_courses", mod: "mod_andamento" },
   { to: "/admin/imagens", label: "Imagens", icon: ImageIcon, perm: "manage_courses", mod: "mod_imagens" },
   { to: "/admin/promo", label: "Carrossel Home", icon: Megaphone, perm: "manage_courses", mod: "mod_promo" },
   { to: "/admin/parceiros", label: "Parceiros", icon: Handshake, perm: "manage_courses", mod: "mod_parceiros" },

@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const links = [
   { to: "/", label: "Início" },
+  { to: "/refrigeracao", label: "❄️ Refrigeração" },
   { to: "/sobre", label: "Sobre" },
   { to: "/cursos", label: "Cursos" },
   { to: "/loja", label: "Loja" },

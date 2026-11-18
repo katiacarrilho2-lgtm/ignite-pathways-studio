@@ -8,6 +8,8 @@ import NotFound from "./pages/NotFound.tsx";
 import Sobre from "./pages/Sobre.tsx";
 import Cursos from "./pages/Cursos.tsx";
 import CursoPorCompetencia from "./pages/CursoPorCompetencia.tsx";
+import Refrigeracao from "./pages/Refrigeracao.tsx";
+import AdminRefrigeracao from "./pages/admin/AdminRefrigeracao.tsx";
 import TesteVocacional from "./pages/TesteVocacional.tsx";
 import GeradorCurriculo from "./pages/GeradorCurriculo.tsx";
 import CatalogoTecnicosCompetencia from "./pages/CatalogoTecnicosCompetencia.tsx";
@@ -163,6 +165,7 @@ const App = () => (
               <Route path="/sobre" element={<Sobre />} />
               <Route path="/cursos" element={<Cursos />} />
               <Route path="/curso-por-competencia" element={<CursoPorCompetencia />} />
+              <Route path="/refrigeracao" element={<Refrigeracao />} />
               <Route path="/curso-regular" element={<CursoRegular />} />
               <Route path="/unicorp" element={<Unicorp />} />
               <Route path="/teste-vocacional" element={<TesteVocacional />} />
@@ -278,6 +281,7 @@ const App = () => (
               <Route path="cursos/:courseId/conteudo" element={<AdminCursoBuilder />} />
               <Route path="cursos/:courseId/preview" element={<AdminCursoPreview />} />
               <Route path="site" element={<AdminSiteConfig />} />
+              <Route path="site-refrigeracao" element={<AdminRefrigeracao />} />
               <Route path="andamento" element={<Navigate to="/admin/site" replace />} />
               <Route path="corporativo" element={<AdminCorporativo />} />
               <Route path="corporativo/crm" element={<CorpCrm />} />
