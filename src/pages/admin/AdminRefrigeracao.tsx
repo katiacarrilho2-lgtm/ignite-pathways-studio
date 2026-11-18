@@ -39,7 +39,7 @@ const Inner = () => {
     if (!files?.length) return;
     setUp(true);
     try {
-      const novas = [];
+      const novas: { url: string; legenda: string }[] = [];
       for (const f of Array.from(files)) novas.push({ url: await uploadCourseImage(f, "site/refrigeracao"), legenda: "" });
       setS((x) => ({ ...x, fotos: [...x.fotos, ...novas] }));
       toast.success("Fotos adicionadas. Clique em Publicar para aparecer.");
