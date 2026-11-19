@@ -13,7 +13,7 @@ const NAVY = "#002f5b"; const NAVY2 = "#00376b"; const ICE = "#38d6ff"; const BL
 
 const wa = (n: string, m: string) => `https://wa.me/${n}?text=${encodeURIComponent(m)}`;
 
-const PlanoCard = ({ p, num }: { p: Plano; num: string }) => (
+const PlanoCard = ({ p, num, slug }: { p: Plano; num: string; slug: string }) => (
   <div className="rounded-2xl p-7 flex flex-col shadow-xl border-2" style={{ background: "#fff", borderColor: ICE }}>
     <span className="text-xs font-bold uppercase tracking-widest" style={{ color: BLUE }}>{p.subtitulo}</span>
     <h3 className="text-2xl font-extrabold mt-2" style={{ color: NAVY }}>{p.titulo}</h3>
@@ -30,11 +30,11 @@ const PlanoCard = ({ p, num }: { p: Plano; num: string }) => (
       </div>
     )}
     <div className="mt-5 grid gap-2">
-      {p.link_pagamento && (
-        <a href={p.link_pagamento} target="_blank" rel="noopener noreferrer"
+      {(
+        <a href={`/matricula/${slug}${p.link_pagamento ? `?pagar=${encodeURIComponent(p.link_pagamento)}` : ""}`}
           className="flex items-center justify-center gap-2 rounded-xl py-4 font-bold text-lg"
           style={{ background: `linear-gradient(135deg, ${BLUE}, ${NAVY})`, color: "#fff" }}>
-          <CreditCard className="size-5" /> Pagar e garantir minha vaga
+          <CreditCard className="size-5" /> Fazer minha pré-matrícula
         </a>
       )}
       <a href={wa(num, p.whatsapp_msg)} target="_blank" rel="noopener noreferrer"
@@ -113,8 +113,8 @@ export default function Refrigeracao() {
           <h2 className="text-3xl font-extrabold text-center" style={{ color: NAVY }}>Escolha o caminho certo para você</h2>
           <p className="text-center mt-2" style={{ color: "#556" }}>Duas modalidades, a mesma qualidade Multplick.</p>
           <div className="grid md:grid-cols-2 gap-6 mt-10 max-w-5xl mx-auto">
-            <PlanoCard p={s.competencia} num={s.whatsapp} />
-            <PlanoCard p={s.regular} num={s.whatsapp} />
+            <PlanoCard p={s.competencia} num={s.whatsapp} slug="tecnico-refrigeracao-climatizacao-competencia" />
+            <PlanoCard p={s.regular} num={s.whatsapp} slug="tecnico-refrigeracao-climatizacao-regular" />
           </div>
         </div>
       </section>

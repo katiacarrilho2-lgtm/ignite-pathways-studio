@@ -48,6 +48,8 @@ const Matricula = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const comboParam = (searchParams.get("combo") ?? "").trim();
+  const pagarRaw = (searchParams.get("pagar") ?? "").trim();
+  const pagarLink = /^https:\/\//i.test(pagarRaw) ? pagarRaw : "";
   const [course, setCourse] = useState<Course | null>(null);
   const [comboCourses, setComboCourses] = useState<Course[]>([]);
   const [notFound, setNotFound] = useState(false);
@@ -268,7 +270,11 @@ const Matricula = () => {
             <p className="text-muted-foreground">
               Recebemos sua pré-matrícula para <strong>{course.title}</strong>. Nossa equipe entrará em contato em breve pelo telefone ou e-mail informado.
             </p>
-            <Button asChild variant="hero"><Link to="/cursos">Ver outros cursos</Link></Button>
+            {pagarLink ? (
+              <Button asChild variant="hero" size="lg"><a href={pagarLink} target="_blank" rel="noopener noreferrer">Pagar e garantir minha vaga</a></Button>
+            ) : (
+              <Button asChild variant="hero"><Link to="/cursos">Ver outros cursos</Link></Button>
+            )}
           </Card>
         </div>
       </section>
